@@ -1,0 +1,18 @@
+.formContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: url('../assets/bg.jpg') top center ;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.registerForm{
+    width: 30vw;
+    min-width: 250px;
+    padding: 20px;
+    background:rgba(0, 0, 0, 0.188);
+    border-radius: 50px;
+    color: bisque;
+    box-shadow: -20px 20px 20px -20px  pink;
+}

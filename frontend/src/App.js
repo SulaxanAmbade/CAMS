@@ -1,22 +1,21 @@
-import React from 'react'
-import Header from './Components/Header'
-import Footer from './Components/Footer'
-import Sidebar from './Components/Sidebar'
-const App = () => {
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import "./App.css";
+import Homepage from './pages/Homepage'
+import Login from './pages/Login'
+import Register from './pages/Register'
+
+function App() {
   return (
     <>
-    <Header/>
-    <div style={{display:'flex', height:'100vh'}}>
-    <Sidebar/>
-    <div style={{backgroundColor:'black', width:'100%'}}>
-      hello
-    </div>
-    </div>
-    <Footer/>
-  </>
-  )
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Homepage/>} />
+          <Route path="/login" element={<Login/>} />
+          <Route path="/register" element={<Register/>} />
+        </Routes>
+      </BrowserRouter>
+    </>
+  );
 }
 
-
-export default App
-
+export default App;
