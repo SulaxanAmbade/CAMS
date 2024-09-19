@@ -1,18 +1,37 @@
 import React from "react";
-import { Button, Form, Input, Select } from "antd";
-import { Link } from "react-router-dom";
+import { Button, Form, Input, Select, message } from "antd";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../css/register.css"; // Ensure your CSS file is linked
 
 const Register = () => {
   const { Option } = Select;
+  const navigate = useNavigate();
+  const [form] = Form.useForm();  // For form handling
 
-  const onSubmithandle = (values) => {
-    console.log(values);
+  const onSubmithandle = async (values) => {
+    try {
+      // Send POST request to backend
+      const response = await axios.post("/api/register", values);
+      
+      // Show success message
+      message.success(`${values.role} registered successfully!`);
+      
+      // Navigate to homepage with user details
+      navigate("/home", { state: { user: response.data.user } });
+    } catch (error) {
+      // Show error message
+      message.error("Registration failed, please try again.");
+
+      // Reset form fields
+      form.resetFields();
+    }
   };
 
   return (
     <div className="formContainer">
       <Form
+        form={form}  // Bind form instance to the Form component
         layout="vertical"
         onFinish={onSubmithandle}
         className="registerForm"
@@ -66,9 +85,9 @@ const Register = () => {
           </Select>
         </Form.Item>
 
-        <div style={{ textAlign: 'center', marginBottom: '10px', color: 'bisque' }}>
+        <div style={{ textAlign: "center", marginBottom: "10px", color: "bisque" }}>
           <h6>Already a user?</h6>
-          <Link to="/login" className="ms-2 text-decoration-none" style={{ color: 'pink' }}>
+          <Link to="/login" className="ms-2 text-decoration-none" style={{ color: "pink" }}>
             Login
           </Link>
         </div>
@@ -76,7 +95,7 @@ const Register = () => {
         <Button
           htmlType="submit"
           className="register-button"
-          style={{ width: '100%', background: 'pink', borderColor: 'transparent', color: 'black' }}
+          style={{ width: "100%", background: "pink", borderColor: "transparent", color: "black" }}
         >
           Submit
         </Button>
