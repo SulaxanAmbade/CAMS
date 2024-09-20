@@ -18,7 +18,7 @@ const Register = () => {
       message.success(`${values.role} registered successfully!`);
       
       // Navigate to homepage with user details
-      navigate("/home", { state: { user: response.data.user } });
+      navigate("/login", { state: { user: response.data.user } });
     } catch (error) {
       // Show error message
       message.error("Registration failed, please try again.");

@@ -2,6 +2,8 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 
 const HomePage = () => {
+  const token = localStorage.getItem('token')
+
   const location = useLocation();
   const { user } = location.state || {}; // Get user details from location state
 
