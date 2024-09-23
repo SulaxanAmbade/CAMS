@@ -84,12 +84,12 @@ const loginUser = async (req, res) => {
     }
 };
 
-const getUser = async (req,res)=>{
-    try {
-        const 
-    } catch (error) {
+// const getUser = async (req,res)=>{
+//     try {
+//         const 
+//     } catch (error) {
         
-    }
-}
+//     }
+// }
 
 module.exports = { registerUser, loginUser };
