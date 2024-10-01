@@ -3,7 +3,7 @@ import "./App.css";
 import Homepage from './pages/Homepage';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Sidebar from './Sidebar';  // Import the Sidebar component
+import Sidebar from './pages/Sidebar';  // Import the Sidebar component
 import { Layout } from 'antd';     // Import Ant Design Layout components
 
 function App() {
