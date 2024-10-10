@@ -1,48 +1,58 @@
 import React from "react";
-import { Button, Form, Input, Select, message } from "antd";
+import { Button, Form, Input, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../css/register.css"; // Import the CSS file
+import { useDispatch } from "react-redux";
+import { showLoading, hideLoading } from "../redux/features/alertSlice";
 
 const Login = () => {
-  const { Option } = Select;
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   // Function to handle the form submission (login)
   const onSubmithandle = async (values) => {
     try {
-      const response = await axios.post("/api/login", values); // API endpoint to handle login
+      dispatch(showLoading());
+      const response = await axios.post("/api/v1/user/login", values);
+      dispatch(hideLoading());
+
       if (response.data.success) {
-        message.success(response.data.message);
-        localStorage.setItem("token", response.data.token); // Store JWT token in localStorage
-        navigate("/"); // Redirect to a dashboard or home page upon successful login
+        localStorage.setItem("token", response.data.token); // Store JWT token
+        const userData = response.data.user;
+        console.log(userData); // Assuming user data is returned in the response
+
+        // Check if the user's profile is complete
+        if (!userData.profileCompleted) {
+          message.warning("Please complete your profile.");
+          navigate("/comProfile"); // Redirect to profile completion page
+        } else {
+          message.success(response.data.message);
+          navigate("/"); // Redirect to a dashboard or home page
+        }
       } else {
         message.error(response.data.message);
       }
     } catch (error) {
+      dispatch(hideLoading());
       message.error(
-        error.response?.data?.message ||
-          "Something went wrong. Please try again."
+        error.response?.data?.message || "Something went wrong. Please try again."
       );
     }
   };
 
   return (
     <div className="formContainer">
-      <Form
-        layout="vertical"
-        onFinish={onSubmithandle}
-        className="registerForm"
-      >
+      <Form layout="vertical" onFinish={onSubmithandle} className="registerForm">
         <h3 style={{ textAlign: "center", color: "bisque" }}>Login</h3>
 
         <Form.Item
           label="Phone Number"
-          name="phNo"
+          name="contactNo"
           rules={[
             { required: true, message: "Please input your phone number!" },
             {
-              pattern: /^\+91\s\d{10}$/,
+              pattern: /^\+91\d{10}$/,
               message: "Invalid phone number format!",
             },
           ]}
@@ -52,22 +62,10 @@ const Login = () => {
 
         <Form.Item
           label="Password"
-          name="pass"
+          name="password"
           rules={[{ required: true, message: "Please input your password!" }]}
         >
           <Input.Password placeholder="Enter your password" />
-        </Form.Item>
-
-        <Form.Item
-          label="Role"
-          name="role"
-          rules={[{ required: true, message: "Please select your role!" }]}
-        >
-          <Select placeholder="Select your role">
-            <Option value="Staff">Staff</Option>
-            <Option value="Doctor">Doctor</Option>
-            <Option value="Patient">Patient</Option>
-          </Select>
         </Form.Item>
 
         <div

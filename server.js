@@ -3,7 +3,6 @@ const colors = require("colors");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
-const registerRoutes = require("./routes/registerRoutes");
 
 // dotenv config
 dotenv.config();
@@ -19,7 +18,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 // API routes
-app.use("/api", registerRoutes);
+app.use("/api/v1/user", require("./routes/userRoutes"));
 
 // Health Check route
 app.get("/", (req, res) => {
