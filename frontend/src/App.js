@@ -3,15 +3,16 @@ import "./App.css";
 import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Sidebar from "./pages/Sidebar"; // Import the Sidebar component
-import { Layout } from "antd"; // Import Ant Design Layout components
 import { useSelector } from "react-redux";
 import Spinner from "./components/Spinner";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import PublicRoutes from "./components/PublicRoutes";
 import ProfileCompletion from "./pages/ProfileCompletion";
+import ProtectedLayout from "./components/ProtectedLayout"; // Import ProtectedLayout
+
 function App() {
   const { loading } = useSelector((state) => state.alerts);
+
   return (
     <>
       <BrowserRouter>
@@ -19,8 +20,7 @@ function App() {
           <Spinner />
         ) : (
           <Routes>
-            {/* Login and Register routes do not have a sidebar */}
-
+            {/* Public routes like login and register do not show the sidebar */}
             <Route
               path="/login"
               element={
@@ -37,28 +37,25 @@ function App() {
                 </PublicRoutes>
               }
             />
+
+            {/* Protected routes that show the sidebar */}
             <Route
               path="/comProfile"
               element={
                 <ProtectedRoutes>
-                  <ProfileCompletion />
+                  <ProtectedLayout> {/* Sidebar will be visible */}
+                    <ProfileCompletion /> {/* Page content */}
+                  </ProtectedLayout>
                 </ProtectedRoutes>
               }
             />
-
-            {/* Routes with Sidebar */}
             <Route
               path="/"
               element={
                 <ProtectedRoutes>
-                  <Layout style={{ height: "100vh" }}>
-                    <Sidebar /> {/* Sidebar Component */}
-                    <Layout>
-                      {/* The content for Homepage will be displayed here */}
-
-                      <Homepage />
-                    </Layout>
-                  </Layout>
+                  <ProtectedLayout> {/* Sidebar will be visible */}
+                    <Homepage /> {/* Page content */}
+                  </ProtectedLayout>
                 </ProtectedRoutes>
               }
             />

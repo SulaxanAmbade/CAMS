@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import PatientProfileForm from "../components/forms/PatientForm";
 import StaffProfileForm from "../components/forms/StaffForm";
 import DoctorProfileForm from "../components/forms/DoctorForm";
+import { message } from "antd";
 
 const ProfileCompletion = () => {
   const { user } = useSelector((state) => state.user); // Get logged-in user info
@@ -14,6 +15,8 @@ const ProfileCompletion = () => {
       // Redirect to login if no user is logged in
       navigate("/login");
     }
+   
+
   }, [user, navigate]);
 
   return (
@@ -22,6 +25,9 @@ const ProfileCompletion = () => {
       {user?.role === "Patient" && <PatientProfileForm />}
       {user?.role === "Doctor" && <DoctorProfileForm />}
       {user?.role === "Staff" && <StaffProfileForm />}
+      {message.error('Profile Completion feature is unavailable!')}
+     
+      
     </div>
   );
 };
