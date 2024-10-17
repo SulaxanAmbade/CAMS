@@ -19,6 +19,7 @@ app.use(morgan("dev"));
 
 // API routes
 app.use("/api/v1/user", require("./routes/userRoutes"));
+app.use("/api/v1/staff", require("./routes/staffRoutes.js"));
 
 // Health Check route
 app.get("/", (req, res) => {
