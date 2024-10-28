@@ -113,7 +113,9 @@ export const StaffDashboard = () => {
         throw new Error("Failed to delete patient");
       }
 
-      setPatientData(patientData.filter((patient) => patient._id !== patientId));
+      setPatientData(
+        patientData.filter((patient) => patient._id !== patientId)
+      );
       message.success({ message: "Patient deleted successfully!" });
     } catch (error) {
       message.error({ message: error.message });
@@ -163,116 +165,15 @@ export const StaffDashboard = () => {
 
   return (
     <>
-      <Button type="primary" onClick={() => setIsPatientModalVisible(true)}>
-        Add New Patient
-      </Button>
-      <Button type="primary" onClick={() => setIsDoctorModalVisible(true)}>
-        Add New Doctor
-      </Button>
-
+      <h3>Patient</h3>
       <Table dataSource={patientData} columns={columns} pagination={false} />
 
       <h3>Available Doctors</h3>
-      <Table dataSource={doctorData} columns={doctorColumns} pagination={false} />
-
-      {/* Modal for Adding New Patient */}
-      <Modal
-        title="Add New Patient"
-        open={isPatientModalVisible}
-        onCancel={() => setIsPatientModalVisible(false)}
-        footer={null}
-      >
-        <Form form={patientForm} onFinish={handleAddPatient}>
-          <Form.Item
-            label="Name"
-            name="name"
-            rules={[{ required: true, message: "Please input the patient's name!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Date of Birth"
-            name="dateOfBirth"
-            rules={[{ required: true, message: "Please input the patient's date of birth!" }]}
-          >
-            <DatePicker
-              onChange={(date) => {
-                if (date) {
-                  patientForm.setFieldsValue({ dateOfBirth: date });
-                } else {
-                  patientForm.setFieldsValue({ dateOfBirth: null });
-                }
-              }}
-            />
-          </Form.Item>
-          <Form.Item
-            label="Contact No"
-            name="contactNo"
-            rules={[{ required: true, message: "Please input the patient's contact number!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Emergency Contact"
-            name="emergencyContact"
-            rules={[{ required: true, message: "Please input the emergency contact!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item label="Medical History" name="medicalHistory">
-            <Input.TextArea rows={4} />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Add Patient
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      {/* Modal for Adding New Doctor */}
-      <Modal
-        title="Add New Doctor"
-        open={isDoctorModalVisible}
-        onCancel={() => setIsDoctorModalVisible(false)}
-        footer={null}
-      >
-        <Form form={doctorForm} onFinish={handleAddDoctor}>
-          <Form.Item
-            label="Name"
-            name="name"
-            rules={[{ required: true, message: "Please input the doctor's name!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Specialty"
-            name="specialty"
-            rules={[{ required: true, message: "Please input the doctor's specialty!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Contact No"
-            name="contactNo"
-            rules={[{ required: true, message: "Please input the doctor's contact number!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Email"
-            name="email"
-            rules={[{ required: true, message: "Please input the doctor's email!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Add Doctor
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
+      <Table
+        dataSource={doctorData}
+        columns={doctorColumns}
+        pagination={false}
+      />
     </>
   );
 };

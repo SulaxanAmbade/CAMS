@@ -8,10 +8,13 @@ import Spinner from "./components/Spinner";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import PublicRoutes from "./components/PublicRoutes";
 import ProfileCompletion from "./pages/ProfileCompletion";
-import ProtectedLayout from "./components/ProtectedLayout"; // Import ProtectedLayout
+import ProtectedLayout from "./components/ProtectedLayout";
+import DoctorManagement from "./components/StaffFunctions/DoctorManagement";
+import PatientManagement from "./components/StaffFunctions/PatientManagement";
 
 function App() {
   const { loading } = useSelector((state) => state.alerts);
+  const { user } = useSelector((state) => state.user); // Access user data
 
   return (
     <>
@@ -43,8 +46,8 @@ function App() {
               path="/comProfile"
               element={
                 <ProtectedRoutes>
-                  <ProtectedLayout> {/* Sidebar will be visible */}
-                    <ProfileCompletion /> {/* Page content */}
+                  <ProtectedLayout>
+                    <ProfileCompletion />
                   </ProtectedLayout>
                 </ProtectedRoutes>
               }
@@ -53,12 +56,38 @@ function App() {
               path="/"
               element={
                 <ProtectedRoutes>
-                  <ProtectedLayout> {/* Sidebar will be visible */}
-                    <Homepage /> {/* Page content */}
+                  <ProtectedLayout>
+                    <Homepage />
                   </ProtectedLayout>
                 </ProtectedRoutes>
               }
             />
+
+            {/* Conditionally rendered routes for Staff role only */}
+            {user?.role === "Staff" && (
+              <>
+                <Route
+                  path="/manage-patients"
+                  element={
+                    <ProtectedRoutes>
+                      <ProtectedLayout>
+                        <PatientManagement />
+                      </ProtectedLayout>
+                    </ProtectedRoutes>
+                  }
+                />
+                <Route
+                  path="/manage-doctors"
+                  element={
+                    <ProtectedRoutes>
+                      <ProtectedLayout>
+                        <DoctorManagement />
+                      </ProtectedLayout>
+                    </ProtectedRoutes>
+                  }
+                />
+              </>
+            )}
           </Routes>
         )}
       </BrowserRouter>
