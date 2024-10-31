@@ -1,7 +1,4 @@
-const newDoctor = require("../models/staffFunction/newDoctor");
-const newPatient = require("../models/staffFunction/newPatient"); // Keep the original naming
-
-// Get all patients
+const newPatient = require("../models/Patient"); // Keep the original naming
 const getAllPatient = async (req, res) => {
   try {
     const patients = await newPatient.find(); // Use find() to fetch all patients
@@ -81,56 +78,10 @@ const deletePatient = async (req, res) => {
   }
 };
 
-const getAllDoctors = async (req, res) => {
-  try {
-    const doctors = await newDoctor.find(); // Use find() to fetch all patients
-
-    // Check if the patients array is empty
-    if (doctors.length === 0) {
-      return res
-        .status(201)
-        .json({ success: true, message: "No doctors found" });
-    }
-
-    res.status(200).json({ success: true, data: doctors });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-const addNewDoctor = async (req, res) => {
-  try {
-    const newDoctorData = new newDoctor(req.body); // Create a new patient instance
-    const savedDoctor = await newDoctorData.save(); // Save to the database
-    res.status(201).json({ success: true, data: savedDoctor });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-const deleteDoctor = async (req, res) => {
-  try {
-    const deletedDoctors = await newDoctor.findByIdAndDelete(req.params.id); // Delete patient by ID
-    if (!deletedDoctors) {
-      return res
-        .status(201)
-        .json({ success: true, message: "Doctor not found" });
-    }
-    res
-      .status(200)
-      .json({ success: true, message: "Doctor deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
 module.exports = {
   getAllPatient,
   addNewPatient,
   getPatientById,
   updatePatient,
   deletePatient,
-  getAllDoctors,
-  addNewDoctor,
-  deleteDoctor,
 };

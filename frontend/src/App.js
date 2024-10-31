@@ -7,7 +7,6 @@ import { useSelector } from "react-redux";
 import Spinner from "./components/Spinner";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import PublicRoutes from "./components/PublicRoutes";
-import ProfileCompletion from "./pages/ProfileCompletion";
 import ProtectedLayout from "./components/ProtectedLayout";
 import DoctorManagement from "./components/StaffFunctions/DoctorManagement";
 import PatientManagement from "./components/StaffFunctions/PatientManagement";
@@ -40,18 +39,6 @@ function App() {
                 </PublicRoutes>
               }
             />
-
-            {/* Protected routes that show the sidebar */}
-            <Route
-              path="/comProfile"
-              element={
-                <ProtectedRoutes>
-                  <ProtectedLayout>
-                    <ProfileCompletion />
-                  </ProtectedLayout>
-                </ProtectedRoutes>
-              }
-            />
             <Route
               path="/"
               element={
@@ -63,31 +50,26 @@ function App() {
               }
             />
 
-            {/* Conditionally rendered routes for Staff role only */}
-            {user?.role === "Staff" && (
-              <>
-                <Route
-                  path="/manage-patients"
-                  element={
-                    <ProtectedRoutes>
-                      <ProtectedLayout>
-                        <PatientManagement />
-                      </ProtectedLayout>
-                    </ProtectedRoutes>
-                  }
-                />
-                <Route
-                  path="/manage-doctors"
-                  element={
-                    <ProtectedRoutes>
-                      <ProtectedLayout>
-                        <DoctorManagement />
-                      </ProtectedLayout>
-                    </ProtectedRoutes>
-                  }
-                />
-              </>
-            )}
+            <Route
+              path="/manage-patients"
+              element={
+                <ProtectedRoutes>
+                  <ProtectedLayout>
+                    <PatientManagement />
+                  </ProtectedLayout>
+                </ProtectedRoutes>
+              }
+            />
+            <Route
+              path="/manage-doctors"
+              element={
+                <ProtectedRoutes>
+                  <ProtectedLayout>
+                    <DoctorManagement />
+                  </ProtectedLayout>
+                </ProtectedRoutes>
+              }
+            />
           </Routes>
         )}
       </BrowserRouter>

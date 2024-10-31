@@ -12,7 +12,7 @@ export const PatientManagement = () => {
       const response = await fetch("/api/v1/staff/getAllPatient");
       if (!response.ok) throw new Error("Failed to fetch patients");
       const data = await response.json();
-      setPatientData(data.data);
+      setPatientData(data.data || []);
     } catch (error) {
       message.error({ message: error.message });
     }

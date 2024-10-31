@@ -10,5 +10,4 @@ router.post("/login", userController.loginUser);
 
 router.post("/getUserData", authMiddleware, userController.authController);
 
-router.post("/completeProfile", authMiddleware, userController.completeProfile);
 module.exports = router;
