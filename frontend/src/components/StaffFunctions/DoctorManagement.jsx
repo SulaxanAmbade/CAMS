@@ -8,7 +8,7 @@ export const DoctorManagement = () => {
 
   const fetchDoctors = async () => {
     try {
-      const response = await fetch("/api/v1/staff/getAllDoctors");
+      const response = await fetch("/api/v1/doctor/getAllDoctors");
       if (!response.ok) throw new Error("Failed to fetch doctors");
       const data = await response.json();
       setDoctorData(data.data);
@@ -21,7 +21,7 @@ export const DoctorManagement = () => {
 
   const handleAddDoctor = async (values) => {
     try {
-      const response = await fetch("/api/v1/staff/addNewDoctor", {
+      const response = await fetch("/api/v1/doctor/addNewDoctor", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values)
       });

@@ -13,7 +13,8 @@ const {user} =useSelector(state => state.user)
           <h1>{user?.name}</h1>
         </div>
       )}
-      {user?.role && <StaffDashboard/>}
+      {user?.role === 'Staff' && <StaffDashboard/>}
+      {(user?.role === 'Patient' || user?.role === 'Doctor')  && <div style={{textAlign:'center'}}>Sorry page is still Under Development!</div>}
     </div>
   );
 };

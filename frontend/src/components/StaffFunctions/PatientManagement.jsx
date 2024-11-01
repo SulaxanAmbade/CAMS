@@ -9,7 +9,7 @@ export const PatientManagement = () => {
 
   const fetchPatients = async () => {
     try {
-      const response = await fetch("/api/v1/staff/getAllPatient");
+      const response = await fetch("/api/v1/patient/getAllPatient");
       if (!response.ok) throw new Error("Failed to fetch patients");
       const data = await response.json();
       setPatientData(data.data || []);
@@ -22,7 +22,7 @@ export const PatientManagement = () => {
 
   const handleAddPatient = async (values) => {
     try {
-      const response = await fetch("/api/v1/staff/addNewPatient", {
+      const response = await fetch("/api/v1/patient/addNewPatient", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values)
       });
@@ -39,7 +39,7 @@ export const PatientManagement = () => {
 
   const handleDeletePatient = async (patientId) => {
     try {
-      const response = await fetch(`/api/v1/staff/deletePatient/${patientId}`, { method: "DELETE" });
+      const response = await fetch(`/api/v1/patient/deletePatient/${patientId}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Failed to delete patient");
       setPatientData(patientData.filter((patient) => patient._id !== patientId));
       message.success({ message: "Patient deleted successfully!" });

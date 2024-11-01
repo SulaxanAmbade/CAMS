@@ -21,7 +21,7 @@ export const StaffDashboard = () => {
   // Fetch all patients
   const fetchPatients = async () => {
     try {
-      const response = await fetch("/api/v1/staff/getAllPatient");
+      const response = await fetch("/api/v1/patient/getAllPatient");
       if (!response.ok) {
         throw new Error("Failed to fetch patients");
       }
@@ -35,7 +35,7 @@ export const StaffDashboard = () => {
   // Fetch all doctors
   const fetchDoctors = async () => {
     try {
-      const response = await fetch("/api/v1/staff/getAllDoctors");
+      const response = await fetch("/api/v1/doctor/getAllDoctors");
       if (!response.ok) {
         throw new Error("Failed to fetch doctors");
       }
@@ -53,7 +53,7 @@ export const StaffDashboard = () => {
 
   const handleAddPatient = async (values) => {
     try {
-      const response = await fetch("/api/v1/staff/addNewPatient", {
+      const response = await fetch("/api/v1/patient/addNewPatient", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,7 +77,7 @@ export const StaffDashboard = () => {
 
   const handleAddDoctor = async (values) => {
     try {
-      const response = await fetch("/api/v1/staff/addNewDoctor", {
+      const response = await fetch("/api/v1/doctor/addNewDoctor", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -105,7 +105,7 @@ export const StaffDashboard = () => {
       return;
     }
     try {
-      const response = await fetch(`/api/v1/staff/deletePatient/${patientId}`, {
+      const response = await fetch(`/api/v1/patient/deletePatient/${patientId}`, {
         method: "DELETE",
       });
 
