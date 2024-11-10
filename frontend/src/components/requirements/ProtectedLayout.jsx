@@ -7,7 +7,7 @@ const ProtectedLayout = ({ children }) => {
   return (
     <Layout style={{ height: "100vh" }}>
       <Sidebar />
-      <Layout>
+      <Layout style={{overflow:'scroll'}}>
         <div style={{ padding: "20px" }}>{children}</div>
       </Layout>
     </Layout>

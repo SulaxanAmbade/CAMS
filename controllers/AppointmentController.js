@@ -97,5 +97,74 @@ const getAllAppointments = async (req, res) => {
       .json({ success: false, message: "Server error", error: error.message });
   }
 };
+// controllers/appointmentController.js
 
-module.exports = { createAppointment, getAllAppointments };
+// Update Appointment Status Controller
+const updateStatus = async (req, res) => {
+  try {
+    const { appointmentId } = req.params;
+    const { status } = req.body;
+
+    // Check if the status is valid
+    const validStatuses = ["Pending", "Cancelled", "Completed", "No-show", "Rescheduled"];
+    if (!validStatuses.includes(status)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid status value." });
+    }
+
+    // Find the appointment by ID
+    const appointment = await Appointment.findById(appointmentId);
+    if (!appointment) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Appointment not found." });
+    }
+
+    // Update the status
+    appointment.status = status;
+    await appointment.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Appointment status updated successfully.",
+      appointment,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error updating appointment status.",
+      error: error.message,
+    });
+  }
+};
+const deleteAppointment = async (req, res) => {
+  try {
+    const { appointmentId } = req.params;
+
+    // Check if the appointment exists
+    const appointment = await Appointment.findById(appointmentId);
+    if (!appointment) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Appointment not found." });
+    }
+
+    // Delete the appointment
+    await Appointment.findByIdAndDelete(appointmentId);
+    res.status(200).json({
+      success: true,
+      message: "Appointment deleted successfully.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error deleting appointment.",
+      error: error.message,
+    });
+  }
+};
+
+
+module.exports = { createAppointment, getAllAppointments, deleteAppointment, updateStatus };
+

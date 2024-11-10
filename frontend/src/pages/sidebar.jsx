@@ -38,7 +38,7 @@ const Sidebar = () => {
   };
 
   return (
-    <Sider trigger={null} collapsible collapsed={collapsed}>
+    <Sider trigger={null} collapsible collapsed={collapsed} style={{backgroundColor:"#fe2c54",}} >
       <div
         className="logo"
         style={{ color: "white", textAlign: "center", padding: "10px" }}
@@ -47,13 +47,13 @@ const Sidebar = () => {
           <HomeOutlined /> {/* Home icon */}
         </Link>
       </div>
-      <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
+      <Menu mode="inline" defaultSelectedKeys={["1"]} style={{backgroundColor:'#fe2c54'}}>
         {user?.role === "Patient" && (
           <>
-            <Menu.Item key="1" icon={<UserOutlined />}>
+            <Menu.Item className="sidemenuItem" key="1" icon={<UserOutlined />}>
               My Profile
             </Menu.Item>
-            <Menu.Item key="2" icon={<CalendarOutlined />}>
+            <Menu.Item className="sidemenuItem" key="2" icon={<CalendarOutlined />}>
               My Appointments
             </Menu.Item>
           </>
@@ -61,10 +61,10 @@ const Sidebar = () => {
 
         {user?.role === "Doctor" && (
           <>
-            <Menu.Item key="1" icon={<UserOutlined />}>
+            <Menu.Item className="sidemenuItem" key="1" icon={<UserOutlined />}>
               Patient List
             </Menu.Item>
-            <Menu.Item key="2" icon={<CalendarOutlined />}>
+            <Menu.Item className="sidemenuItem" key="2" icon={<CalendarOutlined />}>
               My Schedule
             </Menu.Item>
           </>
@@ -76,6 +76,7 @@ const Sidebar = () => {
               key="managePatients"
               icon={<SolutionOutlined />}
               onClick={() => navigate("/manage-patients")}
+              className="sidemenuItem"
             >
               Manage Patients
             </Menu.Item>
@@ -83,21 +84,18 @@ const Sidebar = () => {
               key="manageDoctors"
               icon={<MedicineBoxOutlined />}
               onClick={() => navigate("/manage-doctors")}
+              className="sidemenuItem"
             >
               Manage Doctors
             </Menu.Item>
           </>
         )}
 
-        <Menu.Item key="completeProfile" icon={<UserOutlined />} onClick={handleCompleteProfile}>
-          Complete your Profile
-        </Menu.Item>
-
         <Menu.Item
           key="logout"
           icon={<LogoutOutlined />}
           onClick={handleLogout}
-          style={{ position: "absolute", bottom: "60px", width: "100%" }}
+          style={{ position: "absolute", bottom: "60px", width: "100%", color:'white' }}
         >
           Logout
         </Menu.Item>

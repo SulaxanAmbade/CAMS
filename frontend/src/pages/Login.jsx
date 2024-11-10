@@ -52,12 +52,12 @@ const Login = () => {
           rules={[
             { required: true, message: "Please input your phone number!" },
             {
-              pattern: /^\+91\d{10}$/,
+              pattern: /^\d{10}$/,
               message: "Invalid phone number format!",
             },
           ]}
         >
-          <Input placeholder="+91 XXXXXXXXXX" />
+          <Input placeholder="XXXXXXXXXX" />
         </Form.Item>
 
         <Form.Item

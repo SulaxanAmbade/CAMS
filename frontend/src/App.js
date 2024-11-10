@@ -11,6 +11,7 @@ import ProtectedLayout from "./components/requirements/ProtectedLayout";
 import DoctorManagement from "./components/functions/DoctorManagement";
 import PatientManagement from "./components/functions/PatientManagement";
 import DoctorSchedule from "./components/functions/DoctorSchedule"; // Import the DoctorSchedule component
+import Sidebar from "./pages/Sidebar";
 
 function App() {
   const { loading } = useSelector((state) => state.alerts);

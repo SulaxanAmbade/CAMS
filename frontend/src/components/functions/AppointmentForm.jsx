@@ -29,12 +29,8 @@ const AppointmentForm = () => {
         const patientsData = await patientsRes.json();
         const doctorsData = await doctorsRes.json();
 
-        setPatients(
-          Array.isArray(patientsData.data) ? patientsData.data : []
-        );
-        setDoctors(
-          Array.isArray(doctorsData.data) ? doctorsData.data : []
-        );
+        setPatients(Array.isArray(patientsData.data) ? patientsData.data : []);
+        setDoctors(Array.isArray(doctorsData.data) ? doctorsData.data : []);
       } catch (error) {
         console.error("Error fetching patients or doctors:", error);
         message.error("Error fetching patients or doctors.");
@@ -47,7 +43,27 @@ const AppointmentForm = () => {
   const handleScheduleAppointment = async () => {
     if (selectedPatient && selectedDoctor && selectedDate && selectedTime) {
       setLoading(true);
-  
+
+      // Find the selected doctor and check their visiting hours
+      const doctor = doctors.find((doc) => doc._id === selectedDoctor);
+
+      if (doctor) {
+        const { visitingHours } = doctor;
+        const startHour = visitingHours.start;
+        const endHour = visitingHours.end;
+        const selectedHour = selectedTime.format("HH:mm");
+
+        // Check if the selected time is within visiting hours
+        if (selectedHour < startHour || selectedHour > endHour) {
+          message.error(
+            `Selected time is outside the doctor's visiting hours. Please select a time between ${startHour} and ${endHour} ${selectedHour} .`
+          );
+
+          setLoading(false);
+          return;
+        }
+      }
+
       try {
         const response = await fetch("/api/v1/appointment/createAppointment", {
           method: "POST",
@@ -63,7 +79,9 @@ const AppointmentForm = () => {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to schedule appointment: " + response.statusText);
+          throw new Error(
+            "Failed to schedule appointment: " + response.statusText
+          );
         }
 
         const result = await response.json();
@@ -76,7 +94,7 @@ const AppointmentForm = () => {
           setSelectedDate(null);
           setSelectedTime(null);
         } else {
-          console.error("Error response:", result);  // Log detailed error from the server
+          console.error("Error response:", result); // Log detailed error from the server
           message.error("Failed to schedule appointment. Please try again.");
         }
       } catch (error) {
@@ -128,10 +146,12 @@ const AppointmentForm = () => {
         placeholder="Select Date"
         onChange={(date) => {
           setSelectedDate(date);
-          setSelectedTime(null); // Reset time if date changes
+          setSelectedTime(null);
+          // Reset time if date changes
         }}
         disabled={!selectedDoctor}
         style={{ width: "100%", marginBottom: "1rem" }}
+        disabledDate={(current) => current && current < moment().startOf("day")}
       />
 
       <TimePicker

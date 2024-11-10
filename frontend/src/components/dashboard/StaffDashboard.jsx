@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Modal, notification as message, DatePicker, Spin, Alert } from "antd";
+import {
+  Table,
+  Button,
+  Modal,
+  notification as message,
+  DatePicker,
+  Spin,
+  Alert,
+  Select,
+} from "antd";
 import axios from "axios";
 import moment from "moment"; // Import moment for date handling
 import AppointmentForm from "../functions/AppointmentForm";
@@ -10,7 +19,7 @@ export const StaffDashboard = () => {
   const [appointments, setAppointments] = useState([]); // State for appointments
   const [loadingAppointments, setLoadingAppointments] = useState(false); // Loading state for appointments
   const [APPform, setAPPform] = useState(false);
-
+  const { Option } = Select;
   // Fetch all patients
   const fetchPatients = async () => {
     try {
@@ -43,8 +52,11 @@ export const StaffDashboard = () => {
   const fetchAppointments = async () => {
     setLoadingAppointments(true);
     try {
-      const response = await axios.get("/api/v1/appointment/getAllAppointments");
+      const response = await axios.get(
+        "/api/v1/appointment/getAllAppointments"
+      );
       setAppointments(response.data.data);
+      console.log(appointments)
     } catch (error) {
       message.error("Error fetching appointments.");
     } finally {
@@ -64,15 +76,20 @@ export const StaffDashboard = () => {
       return;
     }
     try {
-      const response = await fetch(`/api/v1/patient/deletePatient/${patientId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/v1/patient/deletePatient/${patientId}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to delete patient");
       }
 
-      setPatientData(patientData.filter((patient) => patient._id !== patientId));
+      setPatientData(
+        patientData.filter((patient) => patient._id !== patientId)
+      );
       message.success({ message: "Patient deleted successfully!" });
     } catch (error) {
       message.error({ message: error.message });
@@ -110,7 +127,11 @@ export const StaffDashboard = () => {
       title: "Action",
       key: "action",
       render: (text, record) => (
-        <Button type="link" danger onClick={() => handleDeletePatient(record._id)}>
+        <Button
+          type="link"
+          danger
+          onClick={() => handleDeletePatient(record._id)}
+        >
           Delete
         </Button>
       ),
@@ -120,7 +141,11 @@ export const StaffDashboard = () => {
   // Define columns for doctors table
   const doctorColumns = [
     { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Specialization", dataIndex: "specialization", key: "specialization" },
+    {
+      title: "Specialization",
+      dataIndex: "specialization",
+      key: "specialization",
+    },
     { title: "Contact", dataIndex: "contact", key: "contact" },
     {
       title: "Visiting Hours Start",
@@ -151,13 +176,13 @@ export const StaffDashboard = () => {
       title: "Patient Name",
       dataIndex: "patientId",
       key: "patientId",
-      render: (patient) => patient ? patient.name : "Unknown", // Check if patient is not null
+      render: (patient) => patient? patient.name:"Deleted Patient",
     },
     {
       title: "Doctor Name",
       dataIndex: "doctorId",
       key: "doctorId",
-      render: (doctor) => doctor ? doctor.name : "Unknown",
+      render: (doctor) => doctor? doctor.name:"Deleted Doctor",
     },
     {
       title: "Date",
@@ -166,28 +191,92 @@ export const StaffDashboard = () => {
       render: (date) => new Date(date).toLocaleDateString(),
     },
     { title: "Time", dataIndex: "time", key: "time" },
+    { title: "Status", dataIndex: "status", key: "status" },
+    {
+      title: "Update Status",
+      key: "update",
+      render: (text, record) => (
+        <Select
+          defaultValue={record.status}
+          onChange={(newStatus) => handleStatusChange(record.key, newStatus)}
+          style={{ width: 120 }}
+        >
+          <Option value="Pending">Pending</Option>
+          <Option value="Confirmed">Confirmed</Option>
+          <Option value="Cancelled">Cancelled</Option>
+          <Option value="Completed">Completed</Option>
+          <Option value="No-Show">No-Show</Option>
+        </Select>
+      ),
+    },
   ];
+
+  // Function to handle status change
+  const handleStatusChange = async (appointmentId, newStatus) => {
+    try {
+      const response = await fetch(
+        `/api/v1/appointment/updateStatus/${appointmentId}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
+      const result = await response.json();
+      if (result.success) {
+        message.success("Status updated successfully");
+        // Refresh data here if necessary
+      } else {
+        message.error("Failed to update status");
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      message.error("An error occurred while updating the status.");
+    }
+  };
 
   return (
     <>
       <h3>Patient</h3>
-      <Table dataSource={patientData} columns={patientColumns} pagination={false} />
+      <Table
+        dataSource={patientData}
+        columns={patientColumns}
+        pagination={false}
+      />
 
       <h3>Available Doctors</h3>
-      <Table dataSource={doctorData} columns={doctorColumns} pagination={false} />
+      <Table
+        dataSource={doctorData}
+        columns={doctorColumns}
+        pagination={false}
+      />
 
       <h3>All Appointments</h3>
       {loadingAppointments ? (
         <Spin size="large" />
       ) : (
-        <Table dataSource={appointments} columns={appointmentColumns} rowKey="_id" pagination={{ pageSize: 10 }} />
+        <Table
+          dataSource={appointments}
+          columns={appointmentColumns}
+          rowKey="_id"
+          pagination={{ pageSize: 10 }}
+        />
       )}
 
-      <Button onClick={handleAppointmentButton} style={{ marginTop: "1rem" }}>Add Appointment</Button>
+      <Button onClick={handleAppointmentButton} style={{ marginTop: "1rem" }}>
+        Add Appointment
+      </Button>
 
-      <Modal open={APPform} onOk={handleappformclose} onCancel={handleappformclose}>
+      <Modal
+        open={APPform}
+        onOk={handleappformclose}
+        onCancel={handleappformclose}
+      >
         <AppointmentForm />
-        <Alert message="Clicking on 'OK' does not schedule the appointment" type="warning" />
+        <Alert
+          message="Clicking on 'OK' does not schedule the appointment"
+          type="warning"
+        />
       </Modal>
     </>
   );
