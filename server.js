@@ -20,8 +20,8 @@ app.use(morgan("dev"));
 // API routes
 app.use("/api/v1/user", require("./routes/userRoutes"));
 app.use("/api/v1/patient", require("./routes/patientRoutes.js"));
-app.use("/api/v1/doctor", require("./routes/doctorRoutes.js"))
-
+app.use("/api/v1/doctor", require("./routes/doctorRoutes.js"));
+app.use("/api/v1/appointment", require("./routes/appointmentRoutes.js"));
 // Health Check route
 app.get("/", (req, res) => {
   res.status(200).send({

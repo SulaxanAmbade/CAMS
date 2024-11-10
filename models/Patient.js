@@ -14,17 +14,20 @@ const PatientSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    gender: {
+      type: String,
+      required:true,
+    },
     emergencyContact: {
       type: String,
       required: true,
     },
     medicalHistory: {
       type: String,
-      default: "",
+      default: "Not Mentioned",
     },
   },
   { timestamps: true }
 );
 
-const Patient = mongoose.model("Patients", PatientSchema);
-module.exports = Patient;
+module.exports = mongoose.model("Patients", PatientSchema);

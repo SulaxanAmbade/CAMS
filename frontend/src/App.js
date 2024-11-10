@@ -4,12 +4,13 @@ import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { useSelector } from "react-redux";
-import Spinner from "./components/Spinner";
-import ProtectedRoutes from "./components/ProtectedRoutes";
-import PublicRoutes from "./components/PublicRoutes";
-import ProtectedLayout from "./components/ProtectedLayout";
-import DoctorManagement from "./components/StaffFunctions/DoctorManagement";
-import PatientManagement from "./components/StaffFunctions/PatientManagement";
+import Spinner from "./components/requirements/Spinner";
+import ProtectedRoutes from "./components/requirements/ProtectedRoutes";
+import PublicRoutes from "./components/requirements/PublicRoutes";
+import ProtectedLayout from "./components/requirements/ProtectedLayout";
+import DoctorManagement from "./components/functions/DoctorManagement";
+import PatientManagement from "./components/functions/PatientManagement";
+import DoctorSchedule from "./components/functions/DoctorSchedule"; // Import the DoctorSchedule component
 
 function App() {
   const { loading } = useSelector((state) => state.alerts);
@@ -49,7 +50,6 @@ function App() {
                 </ProtectedRoutes>
               }
             />
-
             <Route
               path="/manage-patients"
               element={
@@ -66,6 +66,17 @@ function App() {
                 <ProtectedRoutes>
                   <ProtectedLayout>
                     <DoctorManagement />
+                  </ProtectedLayout>
+                </ProtectedRoutes>
+              }
+            />
+            {/* Add route for viewing doctor schedule */}
+            <Route
+              path="/schedule/:doctorId" // Dynamic route for doctor schedule
+              element={
+                <ProtectedRoutes>
+                  <ProtectedLayout>
+                    <DoctorSchedule />
                   </ProtectedLayout>
                 </ProtectedRoutes>
               }

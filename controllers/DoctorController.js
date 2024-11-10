@@ -40,6 +40,8 @@ const deleteDoctor = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
   getAllDoctors,
   addDoctor,
