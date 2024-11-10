@@ -151,13 +151,13 @@ export const StaffDashboard = () => {
       title: "Patient Name",
       dataIndex: "patientId",
       key: "patientId",
-      render: (patient) => patient.name,
+      render: (patient) => patient ? patient.name : "Unknown", // Check if patient is not null
     },
     {
       title: "Doctor Name",
       dataIndex: "doctorId",
       key: "doctorId",
-      render: (doctor) => doctor.name,
+      render: (doctor) => doctor ? doctor.name : "Unknown",
     },
     {
       title: "Date",
