@@ -8,6 +8,7 @@ import {
   Spin,
   Alert,
   Select,
+  Input,
 } from "antd";
 import axios from "axios";
 import moment from "moment"; // Import moment for date handling
@@ -15,40 +16,37 @@ import AppointmentForm from "../functions/AppointmentForm";
 
 export const StaffDashboard = () => {
   const [patientData, setPatientData] = useState([]);
-  const [doctorData, setDoctorData] = useState([]); // State for doctors
-  const [appointments, setAppointments] = useState([]); // State for appointments
-  const [loadingAppointments, setLoadingAppointments] = useState(false); // Loading state for appointments
+  const [doctorData, setDoctorData] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [loadingAppointments, setLoadingAppointments] = useState(false);
+  const [searchText, setSearchText] = useState(""); // Search text state
   const [APPform, setAPPform] = useState(false);
   const { Option } = Select;
-  // Fetch all patients
+
+  useEffect(() => {
+    fetchPatients();
+    fetchDoctors();
+    fetchAppointments();
+  }, []);
+
   const fetchPatients = async () => {
     try {
-      const response = await fetch("/api/v1/patient/getAllPatient");
-      if (!response.ok) {
-        throw new Error("Failed to fetch patients");
-      }
-      const data = await response.json();
-      setPatientData(data.data);
+      const response = await axios.get("/api/v1/patient/getAllPatient");
+      setPatientData(response.data.data);
     } catch (error) {
-      message.error({ message: error.message });
+      message.error("Failed to fetch patients.");
     }
   };
 
-  // Fetch all doctors
   const fetchDoctors = async () => {
     try {
-      const response = await fetch("/api/v1/doctor/getAllDoctors");
-      if (!response.ok) {
-        throw new Error("Failed to fetch doctors");
-      }
-      const data = await response.json();
-      setDoctorData(data.data);
+      const response = await axios.get("/api/v1/doctor/getAllDoctors");
+      setDoctorData(response.data.data);
     } catch (error) {
-      message.error({ message: error.message });
+      message.error("Failed to fetch doctors.");
     }
   };
 
-  // Fetch all appointments
   const fetchAppointments = async () => {
     setLoadingAppointments(true);
     try {
@@ -56,7 +54,6 @@ export const StaffDashboard = () => {
         "/api/v1/appointment/getAllAppointments"
       );
       setAppointments(response.data.data);
-      console.log(appointments)
     } catch (error) {
       message.error("Error fetching appointments.");
     } finally {
@@ -64,125 +61,55 @@ export const StaffDashboard = () => {
     }
   };
 
-  useEffect(() => {
-    fetchPatients(); // Fetch patients when the component mounts
-    fetchDoctors(); // Fetch doctors when the component mounts
-    fetchAppointments(); // Fetch appointments when the component mounts
-  }, []);
+  const handleAppointmentButton = () => setAPPform(true);
+  const handleAppFormClose = () => setAPPform(false);
 
-  const handleDeletePatient = async (patientId) => {
-    if (!patientId) {
-      message.error({ message: "Invalid patient ID!" });
-      return;
-    }
+  const handleStatusChange = async (appointmentId, newStatus) => {
     try {
-      const response = await fetch(
-        `/api/v1/patient/deletePatient/${patientId}`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to delete patient");
-      }
-
-      setPatientData(
-        patientData.filter((patient) => patient._id !== patientId)
-      );
-      message.success({ message: "Patient deleted successfully!" });
+      await axios.put(`/api/v1/appointment/updateStatus/${appointmentId}`, {
+        status: newStatus,
+      });
+      message.success({ message: "Status updated successfully" });
+      fetchAppointments(); // Refresh appointments after status update
     } catch (error) {
-      message.error({ message: error.message });
+      message.error({ message: "Error updating status." });
     }
   };
 
-  const handleAppointmentButton = () => {
-    setAPPform(true);
-  };
-  const handleappformclose = () => {
-    setAPPform(false);
-  };
+  // Filter and sort appointments by status order and search text
+  const filteredAppointments = appointments
+    .filter((appointment) => {
+      const patientName = appointment.patientId?.name?.toLowerCase() || "";
+      const doctorName = appointment.doctorId?.name?.toLowerCase() || "";
+      const status = appointment.status.toLowerCase();
+      return (
+        patientName.includes(searchText.toLowerCase()) ||
+        doctorName.includes(searchText.toLowerCase()) ||
+        status.includes(searchText.toLowerCase())
+      );
+    })
+    .sort((a, b) => {
+      const statusOrder = {
+        Pending: 1,
+        Confirmed: 2,
+        Completed: 3,
+        Cancelled: 4,
+      };
+      return (statusOrder[a.status] || 5) - (statusOrder[b.status] || 5);
+    });
 
-  // Define columns for patients table
-  const patientColumns = [
-    { title: "Name", dataIndex: "name", key: "name" },
-    {
-      title: "Date of Birth",
-      dataIndex: "dateOfBirth",
-      key: "dateOfBirth",
-      render: (text) => moment(text).format("YYYY-MM-DD"), // Format the date for display
-    },
-    { title: "Contact No", dataIndex: "contactNo", key: "contactNo" },
-    {
-      title: "Emergency Contact",
-      dataIndex: "emergencyContact",
-      key: "emergencyContact",
-    },
-    {
-      title: "Medical History",
-      dataIndex: "medicalHistory",
-      key: "medicalHistory",
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (text, record) => (
-        <Button
-          type="link"
-          danger
-          onClick={() => handleDeletePatient(record._id)}
-        >
-          Delete
-        </Button>
-      ),
-    },
-  ];
-
-  // Define columns for doctors table
-  const doctorColumns = [
-    { title: "Name", dataIndex: "name", key: "name" },
-    {
-      title: "Specialization",
-      dataIndex: "specialization",
-      key: "specialization",
-    },
-    { title: "Contact", dataIndex: "contact", key: "contact" },
-    {
-      title: "Visiting Hours Start",
-      dataIndex: ["visitingHours", "start"],
-      key: "visitingHours.start",
-    },
-    {
-      title: "Visiting Hours End",
-      dataIndex: ["visitingHours", "end"],
-      key: "visitingHours.end",
-    },
-    {
-      title: "Visiting Days",
-      dataIndex: ["visitingHours", "days"],
-      key: "visitingHours.days",
-      render: (days) => (days ? days.join(", ") : "N/A"),
-    },
-    {
-      title: "Time slot Duration",
-      dataIndex: ["visitingHours", "slot"],
-      key: "visitingHours.slot",
-    },
-  ];
-
-  // Define columns for appointments table
   const appointmentColumns = [
     {
       title: "Patient Name",
       dataIndex: "patientId",
       key: "patientId",
-      render: (patient) => patient? patient.name:"Deleted Patient",
+      render: (patient) => (patient ? patient.name : "Deleted Patient"),
     },
     {
       title: "Doctor Name",
       dataIndex: "doctorId",
       key: "doctorId",
-      render: (doctor) => doctor? doctor.name:"Deleted Doctor",
+      render: (doctor) => (doctor ? doctor.name : "Deleted Doctor"),
     },
     {
       title: "Date",
@@ -198,7 +125,7 @@ export const StaffDashboard = () => {
       render: (text, record) => (
         <Select
           defaultValue={record.status}
-          onChange={(newStatus) => handleStatusChange(record.key, newStatus)}
+          onChange={(newStatus) => handleStatusChange(record._id, newStatus)}
           style={{ width: 120 }}
         >
           <Option value="Pending">Pending</Option>
@@ -211,72 +138,39 @@ export const StaffDashboard = () => {
     },
   ];
 
-  // Function to handle status change
-  const handleStatusChange = async (appointmentId, newStatus) => {
-    try {
-      const response = await fetch(
-        `/api/v1/appointment/updateStatus/${appointmentId}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: newStatus }),
-        }
-      );
-      const result = await response.json();
-      if (result.success) {
-        message.success("Status updated successfully");
-        // Refresh data here if necessary
-      } else {
-        message.error("Failed to update status");
-      }
-    } catch (error) {
-      console.error("Error updating status:", error);
-      message.error("An error occurred while updating the status.");
-    }
-  };
-
   return (
     <>
-      <h3>Patient</h3>
-      <Table
-        dataSource={patientData}
-        columns={patientColumns}
-        pagination={false}
-      />
-
-      <h3>Available Doctors</h3>
-      <Table
-        dataSource={doctorData}
-        columns={doctorColumns}
-        pagination={false}
-      />
-
       <h3>All Appointments</h3>
+      <div
+        style={{
+          position: "sticky",
+          top: "20px",
+          zIndex: "2",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <Input
+          placeholder="Search by patient name, doctor name, or status"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          style={{ marginBottom: 16, width: "300px" }}
+        />
+        <Button onClick={handleAppointmentButton}>Add Appointment</Button>
+      </div>
+
       {loadingAppointments ? (
         <Spin size="large" />
       ) : (
         <Table
-          dataSource={appointments}
+          dataSource={filteredAppointments}
           columns={appointmentColumns}
-          rowKey="_id"
-          pagination={{ pageSize: 10 }}
+          pagination={false}
         />
       )}
 
-      <Button onClick={handleAppointmentButton} style={{ marginTop: "1rem" }}>
-        Add Appointment
-      </Button>
-
-      <Modal
-        open={APPform}
-        onOk={handleappformclose}
-        onCancel={handleappformclose}
-      >
+      <Modal open={APPform} footer={null} onCancel={handleAppFormClose}>
         <AppointmentForm />
-        <Alert
-          message="Clicking on 'OK' does not schedule the appointment"
-          type="warning"
-        />
       </Modal>
     </>
   );

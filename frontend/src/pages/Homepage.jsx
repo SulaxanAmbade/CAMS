@@ -10,7 +10,7 @@ const HomePage = () => {
     <div>
       {user && (
         <div>
-          <h1>{user?.name}</h1>
+          <h1 style={{position:'sticky', top:"0px"}}>{user?.name}</h1>
         </div>
       )}
       {user?.role === "Staff" && <StaffDashboard />}

@@ -97,15 +97,12 @@ const getAllAppointments = async (req, res) => {
       .json({ success: false, message: "Server error", error: error.message });
   }
 };
-// controllers/appointmentController.js
 
-// Update Appointment Status Controller
 const updateStatus = async (req, res) => {
   try {
     const { appointmentId } = req.params;
     const { status } = req.body;
 
-    // Check if the status is valid
     const validStatuses = ["Pending", "Cancelled", "Completed", "No-show", "Rescheduled"];
     if (!validStatuses.includes(status)) {
       return res
@@ -113,7 +110,6 @@ const updateStatus = async (req, res) => {
         .json({ success: false, message: "Invalid status value." });
     }
 
-    // Find the appointment by ID
     const appointment = await Appointment.findById(appointmentId);
     if (!appointment) {
       return res
@@ -121,7 +117,6 @@ const updateStatus = async (req, res) => {
         .json({ success: false, message: "Appointment not found." });
     }
 
-    // Update the status
     appointment.status = status;
     await appointment.save();
 

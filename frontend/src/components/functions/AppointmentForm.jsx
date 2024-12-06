@@ -111,7 +111,7 @@ const AppointmentForm = () => {
   return (
     <div>
       <h2>Schedule Appointment</h2>
-
+      <p>Patient</p>
       <Select
         placeholder="Select Patient"
         value={selectedPatient}
@@ -124,9 +124,9 @@ const AppointmentForm = () => {
           </Option>
         ))}
       </Select>
-
+      <p>Doctor</p>
       <Select
-        placeholder="Select Doctor"
+        placeholder={selectedDoctor}
         value={selectedDoctor}
         onChange={(value) => {
           setSelectedDoctor(value);
