@@ -2,7 +2,7 @@ import React from "react";
 import { Button, Form, Input, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import "../css/register.css"; // Import the CSS file
+import "../css/register.css"; 
 import { useDispatch } from "react-redux";
 import { showLoading, hideLoading } from "../redux/features/alertSlice";
 
@@ -10,7 +10,7 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Function to handle the form submission (login)
+  // Function to handle the form submission for login
   const onSubmithandle = async (values) => {
     try {
       dispatch(showLoading());
@@ -18,17 +18,18 @@ const Login = () => {
       dispatch(hideLoading());
 
       if (response.data.success) {
-        localStorage.setItem("token", response.data.token); // Store JWT token
+         // Store the JWT token in localStorage
+        localStorage.setItem("token", response.data.token); 
         const userData = response.data.user;
-        console.log(userData); // Assuming user data is returned in the response
+        console.log(userData); 
 
         // Check if the user's profile is complete
         if (!userData.profileCompleted) {
           message.warning("Please complete your profile.");
-          navigate("/comProfile"); // Redirect to profile completion page
+          navigate("/comProfile"); // Navigate to profile completion page
         } else {
           message.success(response.data.message);
-          navigate("/"); // Redirect to a dashboard or home page
+          navigate("/"); // Navigate to a dashboard or home page
         }
       } else {
         message.error(response.data.message);

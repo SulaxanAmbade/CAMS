@@ -11,8 +11,8 @@ import {
 } from "antd";
 import React, { useEffect, useState } from "react";
 import moment from "moment";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for routing
-import DoctorSchedule from "./DoctorSchedule"; // Assuming you have a DoctorSchedule component
+import { useNavigate } from "react-router-dom"; 
+import DoctorSchedule from "./DoctorSchedule"; 
 
 export const DoctorManagement = () => {
   const [doctorData, setDoctorData] = useState([]);
@@ -31,7 +31,7 @@ export const DoctorManagement = () => {
     "Saturday",
     "Sunday",
   ];
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate(); 
 
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },

@@ -1,8 +1,6 @@
-// ProtectedLayout.js
 import React from "react";
-import { Layout } from "antd"; // Using Ant Design's Layout
-import Sidebar from "../../pages/Sidebar"; // Sidebar component
-
+import { Layout } from "antd"; 
+import Sidebar from "../../pages/Sidebar"; 
 const ProtectedLayout = ({ children }) => {
   return (
     <Layout style={{ height: "100vh" }}>
