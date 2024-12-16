@@ -12,6 +12,7 @@ import DoctorManagement from "./components/functions/DoctorManagement";
 import PatientManagement from "./components/functions/PatientManagement";
 import DoctorSchedule from "./components/functions/DoctorSchedule"; // Import the DoctorSchedule component
 import Sidebar from "./pages/Sidebar";
+import DoctorLogin from "./pages/DoctorLogin";
 
 function App() {
   const { loading } = useSelector((state) => state.alerts);
@@ -49,6 +50,14 @@ function App() {
                     <Homepage />
                   </ProtectedLayout>
                 </ProtectedRoutes>
+              }
+            />
+            <Route
+              path="/doctor-login"
+              element={
+                <PublicRoutes>
+                  <DoctorLogin />
+                </PublicRoutes>
               }
             />
             <Route

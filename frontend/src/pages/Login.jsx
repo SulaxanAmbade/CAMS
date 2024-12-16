@@ -5,6 +5,7 @@ import axios from "axios";
 import "../css/register.css"; // Import the CSS file
 import { useDispatch } from "react-redux";
 import { showLoading, hideLoading } from "../redux/features/alertSlice";
+import DoctorLogin from "./DoctorLogin";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -36,14 +37,19 @@ const Login = () => {
     } catch (error) {
       dispatch(hideLoading());
       message.error(
-        error.response?.data?.message || "Something went wrong. Please try again."
+        error.response?.data?.message ||
+          "Something went wrong. Please try again."
       );
     }
   };
 
   return (
     <div className="formContainer">
-      <Form layout="vertical" onFinish={onSubmithandle} className="registerForm">
+      <Form
+        layout="vertical"
+        onFinish={onSubmithandle}
+        className="registerForm"
+      >
         <h3 style={{ textAlign: "center", color: "bisque" }}>Login</h3>
 
         <Form.Item
@@ -94,6 +100,7 @@ const Login = () => {
           Login
         </Button>
       </Form>
+      <Link to="/doctor-login">LOGIN AS DOCTOR</Link>
     </div>
   );
 };

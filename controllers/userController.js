@@ -41,16 +41,7 @@ const loginUser = async (req, res) => {
     // Check the role and fetch corresponding profile data
     let profileCompleted = false;
     // Assuming you have different models for each role
-    if (user.role === "doctor") {
-      const doctorProfile = await Doctor.findOne({ userId: user._id });
-      profileCompleted = doctorProfile ? doctorProfile.isComplete : false; // Check if the doctor's profile is complete
-    } else if (user.role === "staff") {
-      const staffProfile = await Staff.findOne({ userId: user._id });
-      profileCompleted = staffProfile ? staffProfile.isComplete : false; // Check if the staff's profile is complete
-    } else if (user.role === "patient") {
-      const patientProfile = await Patient.findOne({ userId: user._id });
-      profileCompleted = patientProfile ? patientProfile.isComplete : false; // Check if the patient's profile is complete
-    }
+   
     res.status(200).send({
       message: "Logged In Successfully",
       success: true,
@@ -66,25 +57,40 @@ const loginUser = async (req, res) => {
 };
 const authController = async (req, res) => {
   try {
+    // First, check if the user exists
     const user = await User.findOne({ _id: req.body.userId });
-    if (!user) {
-      return res
-        .status(200)
-        .send({ message: "User Not Found!", success: failed });
-    } else {
-      res.status(200).send({
+    if (user) {
+      return res.status(200).send({
         success: true,
         data: {
           name: user.name,
           contactNo: user.contactNo,
-          role:user.role
+          role: user.role,
         },
       });
     }
+
+    // If not a user, check if it's a doctor
+    const doctor = await Doctor.findOne({ _id: req.body.userId });
+    if (doctor) {
+      return res.status(200).send({
+        success: true,
+        data: {
+          name: doctor.name,
+          contactNo: doctor.contact,
+          specialization: doctor.specialization,
+          role:"Doctor"
+        },
+      });
+    }
+
+    // If neither user nor doctor is found
+    return res.status(404).send({ message: "User or Doctor Not Found!", success: false });
   } catch (error) {
     res.status(500).json({ success: false, message: "Authentication Failed" });
   }
 };
+
 const completeProfile = async (req, res) => {
   try {
     const { role, userId } = req.body; // Get role and userId from request

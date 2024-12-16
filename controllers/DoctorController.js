@@ -1,4 +1,5 @@
 const Doctor = require("../models/Doctor");
+const jwt = require("jsonwebtoken");
 const getAllDoctors = async (req, res) => {
   try {
     const doctors = await Doctor.find();
@@ -40,10 +41,45 @@ const deleteDoctor = async (req, res) => {
   }
 };
 
+const doctorLogin = async (req, res) => {
+  const { phoneNumber } = req.body;
 
+  if (!phoneNumber) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Phone number is required" });
+  }
+
+  try {
+    // Check if a doctor exists with the given phone number
+    const doctor = await Doctor.findOne({ contact: phoneNumber });
+
+    if (!doctor) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Doctor not found" });
+    }
+    const token = jwt.sign({ id: doctor._id }, process.env.JWT_SECRET, {
+      expiresIn: "1hr",
+    });
+    // Login successful
+    return res
+      .status(200)
+      .json({
+        success: true,
+        message: "Login successful",
+        doctor: { ...doctor._doc },
+        token,
+      });
+  } catch (err) {
+    console.error("Error during login:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
 
 module.exports = {
   getAllDoctors,
   addDoctor,
   deleteDoctor,
+  doctorLogin,
 };

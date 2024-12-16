@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-    createAppointment,
+  createAppointment,
   getAllAppointments,
   updateStatus,
 } = require("../controllers/AppointmentController");
