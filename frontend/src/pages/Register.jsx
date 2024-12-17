@@ -2,14 +2,16 @@ import React from "react";
 import { Button, Form, Input, Select, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import "../css/register.css"; // Ensure your CSS file is linked
+import "../css/register.css";
 import { useDispatch } from "react-redux";
 import { showLoading, hideLoading } from "../redux/features/alertSlice";
+
 const Register = () => {
   const { Option } = Select;
   const navigate = useNavigate();
-  const [form] = Form.useForm(); // For form handling
+  const [form] = Form.useForm();
   const dispatch = useDispatch();
+
   const onSubmithandle = async (values) => {
     try {
       dispatch(showLoading());
@@ -31,7 +33,7 @@ const Register = () => {
   return (
     <div className="formContainer">
       <Form
-        form={form} // Bind form instance to the Form component
+        form={form}
         layout="vertical"
         onFinish={onSubmithandle}
         className="registerForm"
@@ -43,10 +45,7 @@ const Register = () => {
           name="contactNo"
           rules={[
             { required: true, message: "Please input your phone number!" },
-            {
-              pattern: /^\d{10}$/,
-              message: "Invalid phone number format!",
-            },
+            { pattern: /^\d{10}$/, message: "Invalid phone number format!" },
           ]}
         >
           <Input placeholder="XXXXXXXXXX" />
@@ -80,9 +79,7 @@ const Register = () => {
           </Select>
         </Form.Item>
 
-        <div
-          style={{ textAlign: "center", marginBottom: "10px", color: "bisque" }}
-        >
+        <div style={{ textAlign: "center", marginBottom: "10px", color: "bisque" }}>
           <h6>Already a user?</h6>
           <Link
             to="/login"

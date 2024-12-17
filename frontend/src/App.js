@@ -10,7 +10,7 @@ import PublicRoutes from "./components/requirements/PublicRoutes";
 import ProtectedLayout from "./components/requirements/ProtectedLayout";
 import DoctorManagement from "./components/functions/DoctorManagement";
 import PatientManagement from "./components/functions/PatientManagement";
-import DoctorSchedule from "./components/functions/DoctorSchedule"; // Import the DoctorSchedule component
+import DoctorSchedule from "./components/functions/DoctorSchedule"; 
 import Sidebar from "./pages/Sidebar";
 import DoctorLogin from "./pages/DoctorLogin";
 import PatientLogin from "./pages/PatientLogin";
@@ -27,7 +27,7 @@ function App() {
           <Spinner />
         ) : (
           <Routes>
-            {/* Public routes like login and register do not show the sidebar */}
+            {/* // Public routes like login and register are not shown in the sidebar */}
             <Route
               path="/login"
               element={
@@ -100,7 +100,7 @@ function App() {
                 </ProtectedRoutes>
               }
             />
-            {/* Add route for viewing doctor schedule */}
+            {/* Route to view doctor schedule */}
             <Route
               path="/schedule/:doctorId" // Dynamic route for doctor schedule
               element={

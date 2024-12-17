@@ -48,7 +48,5 @@ export default function ProtectedRoutes({ children }) {
     return <Navigate to="/login" />;
     localStorage.clear();
   }
-
-  // Return children if user is present
   return children;
 }
