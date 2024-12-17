@@ -31,17 +31,23 @@ const loginUser = async (req, res) => {
   try {
     const user = await User.findOne({ contactNo: req.body.contactNo });
     if (!user) {
-      return res.status(200).send({ message: "User not found!", success: false });
+      return res
+        .status(200)
+        .send({ message: "User not found!", success: false });
     }
     const isMatch = await bcrypt.compare(req.body.password, user.password);
     if (!isMatch) {
-      return res.status(200).send({ message: "Invalid Credentials", success: false });
+      return res
+        .status(200)
+        .send({ message: "Invalid Credentials", success: false });
     }
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1hr" });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1hr",
+    });
     // Check the role and fetch corresponding profile data
     let profileCompleted = false;
     // Assuming you have different models for each role
-   
+
     res.status(200).send({
       message: "Logged In Successfully",
       success: true,
@@ -63,6 +69,7 @@ const authController = async (req, res) => {
       return res.status(200).send({
         success: true,
         data: {
+          ID:user._id,
           name: user.name,
           contactNo: user.contactNo,
           role: user.role,
@@ -76,16 +83,34 @@ const authController = async (req, res) => {
       return res.status(200).send({
         success: true,
         data: {
+          ID:doctor._id,
           name: doctor.name,
           contactNo: doctor.contact,
           specialization: doctor.specialization,
-          role:"Doctor"
+          role: "Doctor",
+        },
+      });
+    }
+    const patient = await Patient.findOne({ _id: req.body.userId });
+    if (patient) {
+      return res.status(200).send({
+        success: true,
+        data: {
+          ID:patient._id,
+          name: patient.name,
+          contactNo: patient.contactNo,
+          dateOfBirth: patient.dateOfBirth,
+          gender: patient.gender,
+          medicalHistory: patient.medicalHistory,
+          role: "Patient",
         },
       });
     }
 
     // If neither user nor doctor is found
-    return res.status(404).send({ message: "User or Doctor Not Found!", success: false });
+    return res
+      .status(404)
+      .send({ message: "User or Doctor Not Found!", success: false });
   } catch (error) {
     res.status(500).json({ success: false, message: "Authentication Failed" });
   }
@@ -110,4 +135,4 @@ const completeProfile = async (req, res) => {
     res.status(500).send({ success: false, message: error.message });
   }
 };
-module.exports = { registerUser, loginUser, authController ,completeProfile };
+module.exports = { registerUser, loginUser, authController, completeProfile };

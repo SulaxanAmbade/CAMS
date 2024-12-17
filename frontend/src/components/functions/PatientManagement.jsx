@@ -10,8 +10,10 @@ import {
 } from "antd";
 import React, { useEffect, useState } from "react";
 import moment from "moment";
+import { useSelector } from "react-redux";
 
 export const PatientManagement = () => {
+  const { user } = useSelector((state) => state.user);
   const [patientData, setPatientData] = useState([]);
   const [isPatientModalVisible, setIsPatientModalVisible] = useState(false);
   const [patientForm] = Form.useForm();
@@ -71,10 +73,9 @@ export const PatientManagement = () => {
       onOk() {
         handleDeletePatient(patientId);
       },
-      onCancel() {
-        
-      },
-    });}
+      onCancel() {},
+    });
+  };
 
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
@@ -108,96 +109,113 @@ export const PatientManagement = () => {
 
   return (
     <>
-      <Button type="primary" onClick={() => setIsPatientModalVisible(true)}>
-        Add New Patient
-      </Button>
-      <Table dataSource={patientData} columns={columns} pagination={false} />
-      <Modal
-        title="Add New Patient"
-        open={isPatientModalVisible}
-        onCancel={() => setIsPatientModalVisible(false)}
-        footer={null}
-      >
-        <Form form={patientForm} onFinish={handleAddPatient}>
-          <Form.Item
-            label="Name"
-            name="name"
-            rules={[
-              { required: true, message: "Please input the patient's name!" },
-            ]}
+      {user?.role === "Staff" ? (
+        <>
+          <Button type="primary" onClick={() => setIsPatientModalVisible(true)}>
+            Add New Patient
+          </Button>
+          <Table
+            dataSource={patientData}
+            columns={columns}
+            pagination={false}
+          />
+          <Modal
+            title="Add New Patient"
+            open={isPatientModalVisible}
+            onCancel={() => setIsPatientModalVisible(false)}
+            footer={null}
           >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Date of Birth"
-            name="dateOfBirth"
-            rules={[
-              {
-                required: true,
-                message: "Please input the patient's date of birth!",
-              },
-            ]}
-          >
-            <DatePicker
-              onChange={(date) => {
-                if (date) {
-                  patientForm.setFieldsValue({ dateOfBirth: date });
-                } else {
-                  patientForm.setFieldsValue({ dateOfBirth: null });
-                }
-              }}
-            />
-          </Form.Item>
-          <Form.Item
-            label="Gender"
-            name="gender"
-            rules={[
-              {
-                required: true,
-                message: "Please input the gender!",
-              },
-            ]}
-          >
-            <Select placeholder="Select your gender">
-              <Option value="Male">Male</Option>
-              <Option value="Female">Female</Option>
-              <Option value="Others">Others</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item
-            label="Contact No"
-            name="contactNo"
-            rules={[
-              {
-                required: true,
-                message: "Please input the patient's contact number!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="Emergency Contact"
-            name="emergencyContact"
-            rules={[
-              {
-                required: true,
-                message: "Please input the emergency contact!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item label="Medical History" name="medicalHistory">
-            <Input.TextArea rows={4} />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Add Patient
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
+            <Form form={patientForm} onFinish={handleAddPatient}>
+              <Form.Item
+                label="Name"
+                name="name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the patient's name!",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Date of Birth"
+                name="dateOfBirth"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the patient's date of birth!",
+                  },
+                ]}
+              >
+                <DatePicker
+                  onChange={(date) => {
+                    if (date) {
+                      patientForm.setFieldsValue({ dateOfBirth: date });
+                    } else {
+                      patientForm.setFieldsValue({ dateOfBirth: null });
+                    }
+                  }}
+                />
+              </Form.Item>
+              <Form.Item
+                label="Gender"
+                name="gender"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the gender!",
+                  },
+                ]}
+              >
+                <Select placeholder="Select your gender">
+                  <Option value="Male">Male</Option>
+                  <Option value="Female">Female</Option>
+                  <Option value="Others">Others</Option>
+                </Select>
+              </Form.Item>
+              <Form.Item
+                label="Contact No"
+                name="contactNo"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the patient's contact number!",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
+                label="Emergency Contact"
+                name="emergencyContact"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input the emergency contact!",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item label="Medical History" name="medicalHistory">
+                <Input.TextArea rows={4} />
+              </Form.Item>
+              <Form.Item>
+                <Button type="primary" htmlType="submit">
+                  Add Patient
+                </Button>
+              </Form.Item>
+            </Form>
+          </Modal>
+        </>
+      ) : (
+        <div style={{ textAlign: "center" }}>
+          <h2 style={{ color: "red" }}>
+            ERROR 404 : This page is not developed or you are not allowed!
+          </h2>
+        </div>
+      )}
     </>
   );
 };

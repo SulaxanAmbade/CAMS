@@ -13,6 +13,8 @@ import PatientManagement from "./components/functions/PatientManagement";
 import DoctorSchedule from "./components/functions/DoctorSchedule"; // Import the DoctorSchedule component
 import Sidebar from "./pages/Sidebar";
 import DoctorLogin from "./pages/DoctorLogin";
+import PatientLogin from "./pages/PatientLogin";
+import PatientProfile from "./components/profile/PatientProfile";
 
 function App() {
   const { loading } = useSelector((state) => state.alerts);
@@ -61,11 +63,29 @@ function App() {
               }
             />
             <Route
+              path="/patient-login"
+              element={
+                <PublicRoutes>
+                  <PatientLogin />
+                </PublicRoutes>
+              }
+            />
+            <Route
               path="/manage-patients"
               element={
                 <ProtectedRoutes>
                   <ProtectedLayout>
                     <PatientManagement />
+                  </ProtectedLayout>
+                </ProtectedRoutes>
+              }
+            />
+            <Route
+              path="/patientProfile"
+              element={
+                <ProtectedRoutes>
+                  <ProtectedLayout>
+                    <PatientProfile />
                   </ProtectedLayout>
                 </ProtectedRoutes>
               }

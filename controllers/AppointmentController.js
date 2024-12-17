@@ -97,13 +97,47 @@ const getAllAppointments = async (req, res) => {
       .json({ success: false, message: "Server error", error: error.message });
   }
 };
+const getDoctorAppointment = async (req, res) => {
+  try {
+    const appointments = await Appointment.find({ doctorId: req.body.userID })
+      .populate({ path: "patientId", select: "name" })
+      .populate({ path: "doctorId", select: "name" });
+
+    // Check if appointments are empty
+    if (!appointments || appointments.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `No appointments found for this doctor.${doctorId}`,
+      });
+    }
+
+    // Return appointments if found
+    res.status(200).json({
+      success: true,
+      data: appointments,
+    });
+  } catch (error) {
+    console.error("Error fetching appointments:", error); // Log the error details
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
 
 const updateStatus = async (req, res) => {
   try {
     const { appointmentId } = req.params;
     const { status } = req.body;
 
-    const validStatuses = ["Pending", "Cancelled", "Completed", "No-show", "Rescheduled"];
+    const validStatuses = [
+      "Pending",
+      "Cancelled",
+      "Completed",
+      "No-show",
+      "Rescheduled",
+    ];
     if (!validStatuses.includes(status)) {
       return res
         .status(400)
@@ -160,6 +194,10 @@ const deleteAppointment = async (req, res) => {
   }
 };
 
-
-module.exports = { createAppointment, getAllAppointments, deleteAppointment, updateStatus };
-
+module.exports = {
+  createAppointment,
+  getAllAppointments,
+  deleteAppointment,
+  updateStatus,
+  getDoctorAppointment,
+};

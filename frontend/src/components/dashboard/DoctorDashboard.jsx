@@ -1,49 +1,56 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { message } from "antd";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { hideLoading, showLoading } from "../../redux/features/alertSlice";
 import { Input, Table } from "antd";
+
 const DoctorDashboard = () => {
   const dispatch = useDispatch();
   const [appointments, setAppointments] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const { user } = useSelector((state) => state.user);
+
   useEffect(() => {
     fetchAppointments();
   }, []);
 
+  const userID = user.ID;
+
   const fetchAppointments = async () => {
-    
     try {
-      const response = await axios.get(
-        "/api/v1/appointment/getAllAppointments"
+      const response = await axios.post(
+        "/api/v1/appointment/getDoctorAppointment",
+        { userID }
       );
       setAppointments(response.data.data);
     } catch (error) {
       message.error("Error fetching appointments.");
-    } finally {
-     
     }
   };
-  const filteredAppointments = appointments.filter((appointment) => {
-      const patientName = appointment.patientId?.name?.toLowerCase() || "";
-      const doctorName = appointment.doctorId?.name?.toLowerCase() || "";
-      const status = appointment.status.toLowerCase();
-      return (
-        patientName.includes(searchText.toLowerCase()) ||
-        doctorName.includes(searchText.toLowerCase()) ||
-        status.includes(searchText.toLowerCase())
-      );
-    })
-    .sort((a, b) => {
-      const statusOrder = {
-        Pending: 1,
-        Confirmed: 2,
-        Completed: 3,
-        Cancelled: 4,
-      };
-      return (statusOrder[a.status] || 5) - (statusOrder[b.status] || 5);
-    });
+
+  // Filter, sort, and group appointments by status
+  const statusOrder = ["Pending", "Confirmed", "Completed", "Cancelled"];
+  const groupedAppointments = statusOrder.map((status) => ({
+    status,
+    appointments: appointments
+      .filter((appointment) => appointment.status === status)
+      .filter((appointment) => {
+        const patientName = appointment.patientId?.name?.toLowerCase() || "";
+        const doctorName = appointment.doctorId?.name?.toLowerCase() || "";
+        return (
+          patientName.includes(searchText.toLowerCase()) ||
+          doctorName.includes(searchText.toLowerCase())
+        );
+      })
+      // Sort appointments by recent date and time
+      .sort((a, b) => {
+        const dateA = new Date(a.date + " " + a.time);
+        const dateB = new Date(b.date + " " + b.time);
+        return dateB - dateA; // Sort in descending order (most recent first)
+      }),
+  }));
+
   const appointmentColumns = [
     {
       title: "Patient Name",
@@ -51,12 +58,7 @@ const DoctorDashboard = () => {
       key: "patientId",
       render: (patient) => (patient ? patient.name : "Deleted Patient"),
     },
-    {
-      title: "Doctor Name",
-      dataIndex: "doctorId",
-      key: "doctorId",
-      render: (doctor) => (doctor ? doctor.name : "Deleted Doctor"),
-    },
+
     {
       title: "Date",
       dataIndex: "date",
@@ -70,28 +72,24 @@ const DoctorDashboard = () => {
   return (
     <>
       <h3>All Appointments</h3>
-      <div
-        style={{
-          position: "sticky",
-          top: "20px",
-          zIndex: "2",
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        <Input
-          placeholder="Search by patient name, doctor name, or status"
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          style={{ marginBottom: 16, width: "300px" }}
-        />
-      </div>
-
-      <Table
-        dataSource={filteredAppointments}
-        columns={appointmentColumns}
-        pagination={false}
+      <Input
+        placeholder="Search by patient name or doctor name"
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        style={{ marginBottom: 16, width: "300px" }}
       />
+
+      {groupedAppointments.map((group) => (
+        <div key={group.status} style={{ marginBottom: "40px" }}>
+          <h4>{group.status} Appointments</h4>
+          <Table
+            dataSource={group.appointments}
+            columns={appointmentColumns}
+            pagination={false}
+            rowKey={(record) => record._id}
+          />
+        </div>
+      ))}
     </>
   );
 };

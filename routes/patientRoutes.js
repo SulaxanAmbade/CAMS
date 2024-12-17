@@ -1,6 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const { getAllPatient, addNewPatient, getPatientById, updatePatient, deletePatient } = require("../controllers/patientController");
+const {
+  getAllPatient,
+  addNewPatient,
+  getPatientById,
+  updatePatient,
+  deletePatient,
+  patientLogin,
+} = require("../controllers/patientController");
 
 router.get("/getAllPatient", getAllPatient);
 
@@ -16,6 +23,6 @@ router.put("/updatePatient/:id", updatePatient);
 // Delete a patient by ID
 router.delete("/deletePatient/:id", deletePatient);
 
-
+router.post("/login", patientLogin);
 
 module.exports = router;

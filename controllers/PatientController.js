@@ -1,4 +1,5 @@
 const newPatient = require("../models/Patient"); // Keep the original naming
+const jwt = require("jsonwebtoken")
 const getAllPatient = async (req, res) => {
   try {
     const patients = await newPatient.find(); // Use find() to fetch all patients
@@ -78,10 +79,45 @@ const deletePatient = async (req, res) => {
   }
 };
 
+const patientLogin = async (req, res) => {
+  const { phoneNumber } = req.body;
+
+  if (!phoneNumber) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Phone number is required" });
+  }
+
+  try {
+    // Check if a patient exists with the given phone number
+    const patient = await newPatient.findOne({ contactNo: phoneNumber });
+
+    if (!patient) {
+      return res
+        .status(404)
+        .json({ success: false, message: "patient not found" });
+    }
+    const token = jwt.sign({ id: patient._id }, process.env.JWT_SECRET, {
+      expiresIn: "1hr",
+    });
+    // Login successful
+    return res.status(200).json({
+      success: true,
+      message: "Login successful",
+      patient: { ...patient._doc },
+      token,
+    });
+  } catch (err) {
+    console.error("Error during login:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 module.exports = {
   getAllPatient,
   addNewPatient,
   getPatientById,
   updatePatient,
   deletePatient,
+  patientLogin,
 };

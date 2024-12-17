@@ -27,12 +27,6 @@ const Sidebar = () => {
     setCollapsed(!collapsed);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    dispatch(setUser(null));
-    navigate("/login");
-  };
-
   const handleCompleteProfile = () => {
     navigate("/comProfile");
   };
@@ -60,7 +54,12 @@ const Sidebar = () => {
 
         {user?.role === "Patient" && (
           <>
-            <Menu.Item className="sidemenuItem" key="1" icon={<UserOutlined />}>
+            <Menu.Item
+              className="sidemenuItem"
+              onClick={() => navigate("/patientProfile")}
+              key="1"
+              icon={<UserOutlined />}
+            >
               My Profile
             </Menu.Item>
             <Menu.Item
@@ -75,9 +74,6 @@ const Sidebar = () => {
 
         {user?.role === "Doctor" && (
           <>
-            <Menu.Item className="sidemenuItem" key="1" icon={<UserOutlined />}>
-              Patient List
-            </Menu.Item>
             <Menu.Item
               className="sidemenuItem"
               key="2"
@@ -116,20 +112,6 @@ const Sidebar = () => {
             </Menu.Item>
           </>
         )}
-
-        <Menu.Item
-          key="logout"
-          icon={<LogoutOutlined />}
-          onClick={handleLogout}
-          style={{
-            position: "absolute",
-            bottom: "60px",
-            width: "100%",
-            color: "white",
-          }}
-        >
-          Logout
-        </Menu.Item>
       </Menu>
       <Button
         onClick={toggleCollapse}
