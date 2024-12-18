@@ -1,141 +1,207 @@
 import React, { useState } from "react";
-import { Button, Form, Input, message } from "antd";
+import { Button, Card, Form, Input, Modal, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import "../css/register.css"; 
 import { useDispatch } from "react-redux";
 import { showLoading, hideLoading } from "../redux/features/alertSlice";
-import DoctorLogin from "./DoctorLogin";
+import "../css/register.css";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [staffloginshow, setstaffloginshow] = useState(false);
-  // Function to handle the form submission (login)
-  const onSubmithandle = async (values) => {
+  const [staffloginshow, setStaffLoginShow] = useState(false);
+  const [doctorCard, setDoctorCard] = useState(false);
+  const [patientCard, setPatientCard] = useState(false);
+
+  // Staff Login Handler
+  const onSubmitStaffLogin = async (values) => {
     try {
       dispatch(showLoading());
       const response = await axios.post("/api/v1/user/login", values);
       dispatch(hideLoading());
 
       if (response.data.success) {
-         // Store the JWT token in localStorage
-        localStorage.setItem("token", response.data.token); 
+        localStorage.setItem("token", response.data.token);
         const userData = response.data.user;
-        console.log(userData); 
 
-        // Check if the user's profile is complete
         if (!userData.profileCompleted) {
           message.warning("Please complete your profile.");
-          navigate("/comProfile"); // Navigate to profile completion page
+          navigate("/comProfile");
         } else {
           message.success(response.data.message);
-          navigate("/"); // Navigate to a dashboard or home page
+          navigate("/");
         }
       } else {
         message.error(response.data.message);
       }
     } catch (error) {
       dispatch(hideLoading());
-      message.error(
-        error.response?.data?.message ||
-          "Something went wrong. Please try again."
-      );
+      message.error(error.response?.data?.message || "Something went wrong.");
+    }
+  };
+
+  // Doctor Login Handler
+  const onSubmitDoctorLogin = async (values) => {
+    try {
+      const response = await axios.post("/api/v1/doctor/login", values);
+      if (response.data.success) {
+        localStorage.setItem("token", response.data.token);
+        message.success("Doctor login successful!");
+        navigate("/");
+      } else {
+        message.error(response.data.message || "Invalid phone number.");
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || "An error occurred.");
+    }
+  };
+
+  // Patient Login Handler
+  const onSubmitPatientLogin = async (values) => {
+    try {
+      const response = await axios.post("/api/v1/patient/login", values);
+      if (response.data.success) {
+        localStorage.setItem("token", response.data.token);
+        message.success("Patient login successful!");
+        navigate("/");
+      } else {
+        message.error(response.data.message || "Invalid phone number.");
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || "An error occurred.");
     }
   };
 
   return (
     <div className="formContainer">
-      {staffloginshow && (
-        <>
-          <Form
-            layout="vertical"
-            onFinish={onSubmithandle}
-            className="registerForm"
+      <Card
+        style={{
+          background: "#b7202e",
+          width: "50vh",
+          textAlign: "center",
+          color: "white",
+        }}
+      >
+        <h4>Welcome to </h4>
+        <h2>Clinical Appointment Management System</h2>
+        <h5>Login as</h5>
+        <Button className="LogButton" onClick={() => setDoctorCard(true)}>
+          DOCTOR
+        </Button>
+        <Button className="LogButton" onClick={() => setPatientCard(true)}>
+          PATIENT
+        </Button>
+        <Button className="LogButton" onClick={() => setStaffLoginShow(true)}>
+          STAFF
+        </Button>
+      </Card>
+
+      {/* Staff Login Modal */}
+      <Modal
+        open={staffloginshow}
+        onCancel={() => setStaffLoginShow(false)}
+        footer={null}
+        centered
+      >
+        <Form layout="vertical" onFinish={onSubmitStaffLogin}>
+          <h3 style={{ textAlign: "center", color: "#b7202e" }}>Staff Login</h3>
+          <Form.Item
+            label="Phone Number"
+            name="contactNo"
+            rules={[
+              { required: true, message: "Please input your phone number!" },
+              { pattern: /^\d{10}$/, message: "Invalid phone number format!" },
+            ]}
           >
-            <h3 style={{ textAlign: "center", color: "bisque" }}>Login</h3>
-
-            <Form.Item
-              label="Phone Number"
-              name="contactNo"
-              rules={[
-                { required: true, message: "Please input your phone number!" },
-                {
-                  pattern: /^\d{10}$/,
-                  message: "Invalid phone number format!",
-                },
-              ]}
-            >
-              <Input placeholder="XXXXXXXXXX" />
-            </Form.Item>
-
-            <Form.Item
-              label="Password"
-              name="password"
-              rules={[
-                { required: true, message: "Please input your password!" },
-              ]}
-            >
-              <Input.Password placeholder="Enter your password" />
-            </Form.Item>
-
-            <div
-              style={{
-                textAlign: "center",
-                marginBottom: "10px",
-                color: "bisque",
-              }}
-            >
-              <h6>Not Registered?</h6>
-              <Link
-                to="/register"
-                className="ms-2 text-decoration-none"
-                style={{ color: "pink" }}
-              >
-                Register
-              </Link>
-            </div>
-
+            <Input placeholder="XXXXXXXXXX" />
+          </Form.Item>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: "Please input your password!" }]}
+          >
+            <Input.Password placeholder="Enter your password" />
+          </Form.Item>
+          <Form.Item>
             <Button
+              style={{ textAlign: "center", background: "#b7202e" }}
+              type="primary"
               htmlType="submit"
-              className="login-button"
-              style={{
-                width: "100%",
-                background: "pink",
-                borderColor: "transparent",
-                color: "black",
-              }}
+              block
             >
               Login
             </Button>
-          </Form>
-        </>
-      )}
-      {!staffloginshow && (
-        <>
-          <Button
-            onClick={() => {
-              navigate("/doctor-login");
-            }}
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Doctor Login Modal */}
+      <Modal
+        open={doctorCard}
+        onCancel={() => setDoctorCard(false)}
+        footer={null}
+        centered
+      >
+        <Form layout="vertical" onFinish={onSubmitDoctorLogin}>
+          <h3 style={{ textAlign: "center", color: "#b7202e" }}>
+            Doctor Login
+          </h3>
+          <Form.Item
+            label="Phone Number"
+            name="phoneNumber"
+            rules={[
+              { required: true, message: "Please input your phone number!" },
+              { pattern: /^\d{10}$/, message: "Invalid phone number format!" },
+            ]}
           >
-            LOGIN AS DOCTOR
-          </Button>
-          <Button
-            onClick={() => {
-              navigate("/patient-login");
-            }}
+            <Input placeholder="XXXXXXXXXX" />
+          </Form.Item>
+          <Form.Item>
+            <Button
+              style={{ textAlign: "center", background: "#b7202e" }}
+              type="primary"
+              htmlType="submit"
+              block
+            >
+              Login
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Patient Login Modal */}
+      <Modal
+        open={patientCard}
+        onCancel={() => setPatientCard(false)}
+        footer={null}
+        centered
+      >
+        <Form layout="vertical" onFinish={onSubmitPatientLogin}>
+          <h3 style={{ textAlign: "center", color: "#b7202e" }}>
+            Patient Login
+          </h3>
+          <Form.Item
+            label="Phone Number"
+            name="phoneNumber"
+            rules={[
+              { required: true, message: "Please input your phone number!" },
+              { pattern: /^\d{10}$/, message: "Invalid phone number format!" },
+            ]}
           >
-            LOGIN AS PATIENT
-          </Button>
-          <Button
-            onClick={() => {
-              setstaffloginshow(true);
-            }}
-          >
-            LOGIN AS Staff
-          </Button>
-        </>
-      )}
+            <Input placeholder="XXXXXXXXXX" />
+          </Form.Item>
+          <Form.Item>
+            <Button
+              style={{ textAlign: "center", background: "#b7202e" }}
+              type="primary"
+              htmlType="submit"
+              block
+            >
+              Login
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

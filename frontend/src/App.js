@@ -10,10 +10,8 @@ import PublicRoutes from "./components/requirements/PublicRoutes";
 import ProtectedLayout from "./components/requirements/ProtectedLayout";
 import DoctorManagement from "./components/functions/DoctorManagement";
 import PatientManagement from "./components/functions/PatientManagement";
-import DoctorSchedule from "./components/functions/DoctorSchedule"; 
+import DoctorSchedule from "./components/functions/DoctorSchedule";
 import Sidebar from "./pages/Sidebar";
-import DoctorLogin from "./pages/DoctorLogin";
-import PatientLogin from "./pages/PatientLogin";
 import PatientProfile from "./components/profile/PatientProfile";
 
 function App() {
@@ -52,22 +50,6 @@ function App() {
                     <Homepage />
                   </ProtectedLayout>
                 </ProtectedRoutes>
-              }
-            />
-            <Route
-              path="/doctor-login"
-              element={
-                <PublicRoutes>
-                  <DoctorLogin />
-                </PublicRoutes>
-              }
-            />
-            <Route
-              path="/patient-login"
-              element={
-                <PublicRoutes>
-                  <PatientLogin />
-                </PublicRoutes>
               }
             />
             <Route

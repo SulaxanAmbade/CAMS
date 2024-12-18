@@ -11,8 +11,12 @@
     width: 30vw;
     min-width: 250px;
     padding: 20px;
-    background:rgba(0, 0, 0, 0.188);
-    border-radius: 50px;
+    background:#b7202e;
     color: bisque;
-    box-shadow: -20px 20px 20px -20px  pink;
+    box-shadow: -20px 20px 20px -20px  pink
+}
+.LogButton{
+    color: #b7202e;
+    margin: 10px;
+    width: 10vw;
 }
