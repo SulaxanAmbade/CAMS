@@ -4,11 +4,9 @@ import {
   Button,
   Modal,
   notification as message,
-  DatePicker,
   Spin,
-  Alert,
-  Select,
   Input,
+  Select,
 } from "antd";
 import axios from "axios";
 import moment from "moment"; // Import moment for date handling
@@ -22,7 +20,6 @@ export const StaffDashboard = () => {
   const [searchText, setSearchText] = useState(""); // Search text state
   const [APPform, setAPPform] = useState(false);
   const { Option } = Select;
-
   useEffect(() => {
     fetchPatients();
     fetchDoctors();
@@ -76,27 +73,35 @@ export const StaffDashboard = () => {
     }
   };
 
-  // Filter and sort appointments by status order and search text
-  const filteredAppointments = appointments
-    .filter((appointment) => {
-      const patientName = appointment.patientId?.name?.toLowerCase() || "";
-      const doctorName = appointment.doctorId?.name?.toLowerCase() || "";
-      const status = appointment.status.toLowerCase();
-      return (
-        patientName.includes(searchText.toLowerCase()) ||
-        doctorName.includes(searchText.toLowerCase()) ||
-        status.includes(searchText.toLowerCase())
-      );
-    })
-    .sort((a, b) => {
-      const statusOrder = {
-        Pending: 1,
-        Confirmed: 2,
-        Completed: 3,
-        Cancelled: 4,
-      };
-      return (statusOrder[a.status] || 5) - (statusOrder[b.status] || 5);
-    });
+  // Define the order for grouping statuses
+  const statusOrder = [
+    "Pending",
+    "Confirmed",
+    "Completed",
+    "Cancelled",
+    "No-Show",
+  ];
+
+  // Group appointments by status
+  const groupedAppointments = statusOrder.map((status) => ({
+    status,
+    appointments: appointments
+      .filter((appointment) => appointment.status === status)
+      .filter((appointment) => {
+        const patientName = appointment.patientId?.name?.toLowerCase() || "";
+        const doctorName = appointment.doctorId?.name?.toLowerCase() || "";
+        return (
+          patientName.includes(searchText.toLowerCase()) ||
+          doctorName.includes(searchText.toLowerCase())
+        );
+      })
+      // Sort appointments by date and time in descending order
+      .sort((a, b) => {
+        const dateA = new Date(a.date + " " + a.time);
+        const dateB = new Date(b.date + " " + b.time);
+        return dateB - dateA;
+      }),
+  }));
 
   const appointmentColumns = [
     {
@@ -128,11 +133,11 @@ export const StaffDashboard = () => {
           onChange={(newStatus) => handleStatusChange(record._id, newStatus)}
           style={{ width: 120 }}
         >
-          <Option value="Pending">Pending</Option>
-          <Option value="Confirmed">Confirmed</Option>
-          <Option value="Cancelled">Cancelled</Option>
-          <Option value="Completed">Completed</Option>
-          <Option value="No-Show">No-Show</Option>
+          <Select.Option value="Pending">Pending</Select.Option>
+          <Select.Option value="Confirmed">Confirmed</Select.Option>
+          <Select.Option value="Cancelled">Cancelled</Select.Option>
+          <Select.Option value="Completed">Completed</Select.Option>
+          <Select.Option value="No-Show">No-Show</Select.Option>
         </Select>
       ),
     },
@@ -151,7 +156,7 @@ export const StaffDashboard = () => {
         }}
       >
         <Input
-          placeholder="Search by patient name, doctor name, or status"
+          placeholder="Search by patient name or doctor name"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           style={{ marginBottom: 16, width: "300px" }}
@@ -162,11 +167,17 @@ export const StaffDashboard = () => {
       {loadingAppointments ? (
         <Spin size="large" />
       ) : (
-        <Table
-          dataSource={filteredAppointments}
-          columns={appointmentColumns}
-          pagination={false}
-        />
+        groupedAppointments.map((group) => (
+          <div key={group.status} style={{ marginBottom: "40px" }}>
+            <h4>{group.status} Appointments</h4>
+            <Table
+              dataSource={group.appointments}
+              columns={appointmentColumns}
+              pagination={false}
+              rowKey={(record) => record._id}
+            />
+          </div>
+        ))
       )}
 
       <Modal open={APPform} footer={null} onCancel={handleAppFormClose}>

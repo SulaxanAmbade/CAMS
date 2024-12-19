@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User"); // Adjust the path to your User model
 const Doctor = require("../models/Doctor"); // Adjust the path to your Doctor model
 const Patient = require("../models/Patient");
-
+const Staff = require("../models/Staff");
 module.exports = async (req, res, next) => {
   try {
     const token = req.headers["authorization"].split(" ")[1];
@@ -37,6 +37,13 @@ module.exports = async (req, res, next) => {
           return next();
         }
 
+        const staff = await Staff.findById(decode.id);
+        if (staff) {
+          req.body.userId = staff._id;
+          req.body.role = "staff"; // Mark role as doctor
+          return next();
+        }
+
         // If neither found, return error
         return res
           .status(404)
@@ -44,7 +51,7 @@ module.exports = async (req, res, next) => {
       } catch (dbError) {
         return res
           .status(500)
-          .send({ message: "Database Error", success: false });
+          .send({ message: "Database Error", dbError, success: false });
       }
     });
   } catch (error) {

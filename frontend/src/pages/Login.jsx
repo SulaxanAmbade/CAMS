@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Button, Card, Form, Input, Modal, message } from "antd";
+import React, { useEffect, useState } from "react";
+import { Button, Card, Form, Input, Modal, Table, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
@@ -9,28 +9,38 @@ import "../css/register.css";
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [staffData, setStaffData] = useState([]);
+
   const [staffloginshow, setStaffLoginShow] = useState(false);
   const [doctorCard, setDoctorCard] = useState(false);
   const [patientCard, setPatientCard] = useState(false);
+  const [registerModal, setRegisterModal] = useState(false);
+  const fetchStaff = async () => {
+    try {
+      const response = await fetch("/api/v1/staff/getAllStaff");
+      if (!response.ok) throw new Error("Failed to fetch staff");
+      const data = await response.json();
+      setStaffData(data.data || []);
+    } catch (error) {
+      message.error({ message: error.message });
+    }
+  };
 
+  const handleRegister = () => {
+    setRegisterModal(true);
+    fetchStaff();
+  };
   // Staff Login Handler
   const onSubmitStaffLogin = async (values) => {
     try {
       dispatch(showLoading());
-      const response = await axios.post("/api/v1/user/login", values);
+      const response = await axios.post("/api/v1/staff/login", values);
       dispatch(hideLoading());
 
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
-        const userData = response.data.user;
-
-        if (!userData.profileCompleted) {
-          message.warning("Please complete your profile.");
-          navigate("/comProfile");
-        } else {
-          message.success(response.data.message);
-          navigate("/");
-        }
+        message.success(response.data.message);
+        navigate("/");
       } else {
         message.error(response.data.message);
       }
@@ -72,18 +82,29 @@ const Login = () => {
     }
   };
 
+  const StaffColumn = [
+    { title: "Name", dataIndex: "name", key: "name" },
+    { title: "Contact No", dataIndex: "contactNo", key: "contactNo" },
+  ];
+
   return (
     <div className="formContainer">
       <Card
         style={{
           background: "#b7202e",
-          width: "50vh",
+          width: "110vh",
           textAlign: "center",
           color: "white",
         }}
       >
         <h4>Welcome to </h4>
-        <h2>Clinical Appointment Management System</h2>
+        <h2 style={{ textAlign: "center", marginLeft: "10px", color: "pink" }}>
+          <b style={{ color: "white" }}>C</b>linical{" "}
+          <b style={{ color: "white" }}>A</b>ppointment{" "}
+          <b style={{ color: "white" }}>M</b>anagement{" "}
+          <b style={{ color: "white" }}>S</b>ystem
+        </h2>
+        <hr />
         <h5>Login as</h5>
         <Button className="LogButton" onClick={() => setDoctorCard(true)}>
           DOCTOR
@@ -94,6 +115,16 @@ const Login = () => {
         <Button className="LogButton" onClick={() => setStaffLoginShow(true)}>
           STAFF
         </Button>
+        <div>
+          {" "}
+          <Button
+            type="text"
+            onClick={handleRegister}
+            style={{ color: "white" }}
+          >
+            Registeration details
+          </Button>
+        </div>
       </Card>
 
       {/* Staff Login Modal */}
@@ -110,7 +141,10 @@ const Login = () => {
             name="contactNo"
             rules={[
               { required: true, message: "Please input your phone number!" },
-              { pattern: /^\d{10}$/, message: "Invalid phone number format!" },
+              {
+                pattern: /^\+91\d{10}$/,
+                message: "Invalid phone number format!",
+              },
             ]}
           >
             <Input placeholder="XXXXXXXXXX" />
@@ -151,7 +185,10 @@ const Login = () => {
             name="phoneNumber"
             rules={[
               { required: true, message: "Please input your phone number!" },
-              { pattern: /^\d{10}$/, message: "Invalid phone number format!" },
+              {
+                pattern: /^\+91\d{10}$/,
+                message: "Invalid phone number format!",
+              },
             ]}
           >
             <Input placeholder="XXXXXXXXXX" />
@@ -185,7 +222,10 @@ const Login = () => {
             name="phoneNumber"
             rules={[
               { required: true, message: "Please input your phone number!" },
-              { pattern: /^\d{10}$/, message: "Invalid phone number format!" },
+              {
+                pattern: /^\+91\d{10}$/,
+                message: "Invalid phone number format!",
+              },
             ]}
           >
             <Input placeholder="XXXXXXXXXX" />
@@ -201,6 +241,17 @@ const Login = () => {
             </Button>
           </Form.Item>
         </Form>
+      </Modal>
+      <Modal
+        open={registerModal}
+        onCancel={() => {
+          setRegisterModal(false);
+        }}
+        footer={null}
+        centered
+      >
+        <p>CONTACT :</p>
+        <Table dataSource={staffData} columns={StaffColumn}></Table>
       </Modal>
     </div>
   );

@@ -46,7 +46,6 @@ export default function ProtectedRoutes({ children }) {
   // Check token presence before rendering children
   if (!token) {
     return <Navigate to="/login" />;
-    localStorage.clear();
   }
   return children;
 }

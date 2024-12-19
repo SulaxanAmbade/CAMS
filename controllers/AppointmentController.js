@@ -135,15 +135,18 @@ const updateStatus = async (req, res) => {
       "Pending",
       "Cancelled",
       "Completed",
-      "No-show",
-      "Rescheduled",
+      "No-Show",
+      "Confirmed",
     ];
+
+    // Ensure the status provided is valid
     if (!validStatuses.includes(status)) {
       return res
         .status(400)
         .json({ success: false, message: "Invalid status value." });
     }
 
+    // Find the appointment by ID
     const appointment = await Appointment.findById(appointmentId);
     if (!appointment) {
       return res
@@ -151,12 +154,29 @@ const updateStatus = async (req, res) => {
         .json({ success: false, message: "Appointment not found." });
     }
 
-    appointment.status = status;
+    // Check if any field other than "status" is null or undefined
+    const fieldsToCheck = ["patientId", "doctorId", "date","time"];
+    const hasNullFields = fieldsToCheck.some(
+      (field) => appointment[field] == null // Check for null or undefined
+    );
+
+    // If any null fields are found, set status to "Cancelled"
+    if (hasNullFields) {
+      appointment.status = "Cancelled";
+    } else {
+      appointment.status = status; // Otherwise, update the status normally
+    }
+
+    // Save the updated appointment
     await appointment.save();
 
     res.status(200).json({
       success: true,
-      message: "Appointment status updated successfully.",
+      message: `Appointment status ${
+        hasNullFields
+          ? "set to Cancelled due to incomplete fields"
+          : "updated successfully"
+      }.`,
       appointment,
     });
   } catch (error) {
@@ -167,6 +187,7 @@ const updateStatus = async (req, res) => {
     });
   }
 };
+
 const deleteAppointment = async (req, res) => {
   try {
     const { appointmentId } = req.params;

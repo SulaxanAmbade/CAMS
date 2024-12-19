@@ -69,7 +69,7 @@ const authController = async (req, res) => {
       return res.status(200).send({
         success: true,
         data: {
-          ID:user._id,
+          ID: user._id,
           name: user.name,
           contactNo: user.contactNo,
           role: user.role,
@@ -83,7 +83,7 @@ const authController = async (req, res) => {
       return res.status(200).send({
         success: true,
         data: {
-          ID:doctor._id,
+          ID: doctor._id,
           name: doctor.name,
           contactNo: doctor.contact,
           specialization: doctor.specialization,
@@ -96,13 +96,25 @@ const authController = async (req, res) => {
       return res.status(200).send({
         success: true,
         data: {
-          ID:patient._id,
+          ID: patient._id,
           name: patient.name,
           contactNo: patient.contactNo,
           dateOfBirth: patient.dateOfBirth,
           gender: patient.gender,
           medicalHistory: patient.medicalHistory,
           role: "Patient",
+        },
+      });
+    }
+    const staff = await Staff.findOne({ _id: req.body.userId });
+    if (staff) {
+      return res.status(200).send({
+        success: true,
+        data: {
+          ID: staff._id,
+          name: staff.name,
+          contactNo: staff.contactNo,
+          role: "Staff",
         },
       });
     }
