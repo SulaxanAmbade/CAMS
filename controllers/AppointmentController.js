@@ -107,7 +107,36 @@ const getDoctorAppointment = async (req, res) => {
     if (!appointments || appointments.length === 0) {
       return res.status(404).json({
         success: false,
-        message: `No appointments found for this doctor.${doctorId}`,
+        message: `No appointments found for this doctor.`,
+      });
+    }
+
+    // Return appointments if found
+    res.status(200).json({
+      success: true,
+      data: appointments,
+    });
+  } catch (error) {
+    console.error("Error fetching appointments:", error); // Log the error details
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+const getPatientAppointment = async (req, res) => {
+  try {
+    const appointments = await Appointment.find({ patientId: req.body.userID })
+      .populate({ path: "patientId", select: "name" })
+      .populate({ path: "doctorId", select: "name" });
+
+    // Check if appointments are empty
+    if (!appointments || appointments.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `No appointments found for this patient.`,
       });
     }
 
@@ -155,7 +184,7 @@ const updateStatus = async (req, res) => {
     }
 
     // Check if any field other than "status" is null or undefined
-    const fieldsToCheck = ["patientId", "doctorId", "date","time"];
+    const fieldsToCheck = ["patientId", "doctorId", "date", "time"];
     const hasNullFields = fieldsToCheck.some(
       (field) => appointment[field] == null // Check for null or undefined
     );
@@ -221,4 +250,5 @@ module.exports = {
   deleteAppointment,
   updateStatus,
   getDoctorAppointment,
+  getPatientAppointment,
 };

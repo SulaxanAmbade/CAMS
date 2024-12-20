@@ -12,7 +12,7 @@ import DoctorManagement from "./components/functions/DoctorManagement";
 import PatientManagement from "./components/functions/PatientManagement";
 import DoctorSchedule from "./components/functions/DoctorSchedule";
 import Sidebar from "./pages/Sidebar";
-import PatientProfile from "./components/profile/PatientProfile";
+import Profile from "./components/profile/Profile";
 
 function App() {
   const { loading } = useSelector((state) => state.alerts);
@@ -63,11 +63,11 @@ function App() {
               }
             />
             <Route
-              path="/patientProfile"
+              path="/profile"
               element={
                 <ProtectedRoutes>
                   <ProtectedLayout>
-                    <PatientProfile />
+                    <Profile />
                   </ProtectedLayout>
                 </ProtectedRoutes>
               }

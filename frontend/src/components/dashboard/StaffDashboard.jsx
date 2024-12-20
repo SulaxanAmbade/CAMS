@@ -7,6 +7,7 @@ import {
   Spin,
   Input,
   Select,
+  Timeline,
 } from "antd";
 import axios from "axios";
 import moment from "moment"; // Import moment for date handling
@@ -97,9 +98,20 @@ export const StaffDashboard = () => {
       })
       // Sort appointments by date and time in descending order
       .sort((a, b) => {
-        const dateA = new Date(a.date + " " + a.time);
-        const dateB = new Date(b.date + " " + b.time);
-        return dateB - dateA;
+        // Parse dates
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+
+        // Compare dates first
+        if (dateA.getTime() !== dateB.getTime()) {
+          return dateA - dateB; // Ascending order by date
+        }
+
+        // If dates are the same, compare times
+        const timeA = moment(a.time, "HH:mm");
+        const timeB = moment(b.time, "HH:mm");
+
+        return timeA - timeB; // Ascending order by time
       }),
   }));
 
@@ -159,9 +171,19 @@ export const StaffDashboard = () => {
           placeholder="Search by patient name or doctor name"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          style={{ marginBottom: 16, width: "300px" }}
+          style={{
+            marginBottom: 16,
+            width: "300px",
+            background: "#b7202eaa",
+            color: "white",
+          }}
         />
-        <Button onClick={handleAppointmentButton}>Add Appointment</Button>
+        <Button
+          style={{ background: "#b7202eee", color: "white" }}
+          onClick={handleAppointmentButton}
+        >
+          Add Appointment
+        </Button>
       </div>
 
       {loadingAppointments ? (

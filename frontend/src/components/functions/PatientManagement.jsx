@@ -11,6 +11,8 @@ import {
 import React, { useEffect, useState } from "react";
 import moment from "moment";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 
 export const PatientManagement = () => {
   const { user } = useSelector((state) => state.user);
@@ -106,14 +108,29 @@ export const PatientManagement = () => {
       ),
     },
   ];
+  const navigate = useNavigate();
 
   return (
     <>
       {user?.role === "Staff" ? (
         <>
-          <Button type="primary" onClick={() => setIsPatientModalVisible(true)}>
-            Add New Patient
-          </Button>
+          {" "}
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            {" "}
+            <Button
+              style={{ background: "#b7202eee", color: "white" }}
+              size="large"
+              onClick={() => navigate("/")}
+            >
+              <ArrowLeftOutlined />
+            </Button>
+            <Button
+              style={{ background: "#b7202eee", color: "white" }}
+              onClick={() => setIsPatientModalVisible(true)}
+            >
+              Add New Patient
+            </Button>
+          </div>
           <Table
             dataSource={patientData}
             columns={columns}
@@ -179,6 +196,7 @@ export const PatientManagement = () => {
                 name="contactNo"
                 rules={[
                   {
+                    pattern: /^\+91\d{10}$/,
                     required: true,
                     message: "Please input the patient's contact number!",
                   },
@@ -191,6 +209,7 @@ export const PatientManagement = () => {
                 name="emergencyContact"
                 rules={[
                   {
+                    pattern: /^\+91\d{10}$/,
                     required: true,
                     message: "Please input the emergency contact!",
                   },
