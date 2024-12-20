@@ -63,7 +63,7 @@ const PatientDashboard = () => {
       title: "Date",
       dataIndex: "date",
       key: "date",
-      render: (date) => new Date(date).toLocaleDateString(),
+      render: (date) => new Date(date).toLocaleDateString("en-GB"),
     },
     { title: "Time", dataIndex: "time", key: "time" },
     { title: "Status", dataIndex: "status", key: "status" },
@@ -72,12 +72,22 @@ const PatientDashboard = () => {
   return (
     <>
       <h3>All Appointments</h3>
-      <Input
-        placeholder="Search by patient name or doctor name"
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        style={{ marginBottom: 16, width: "300px" }}
-      />
+      <div
+        style={{
+          position: "sticky",
+          top: "20px",
+          zIndex: "2",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <Input
+          placeholder="Search by patient name or doctor name"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          style={{ marginBottom: 16, width: "300px" }}
+        />
+      </div>
 
       {groupedAppointments.map((group) => (
         <div key={group.status} style={{ marginBottom: "40px" }}>

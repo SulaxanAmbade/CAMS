@@ -132,7 +132,7 @@ export const StaffDashboard = () => {
       title: "Date",
       dataIndex: "date",
       key: "date",
-      render: (date) => new Date(date).toLocaleDateString(),
+      render: (date) => new Date(date).toLocaleDateString("en-GB"),
     },
     { title: "Time", dataIndex: "time", key: "time" },
     { title: "Status", dataIndex: "status", key: "status" },
@@ -174,8 +174,6 @@ export const StaffDashboard = () => {
           style={{
             marginBottom: 16,
             width: "300px",
-            background: "#b7202eaa",
-            color: "white",
           }}
         />
         <Button

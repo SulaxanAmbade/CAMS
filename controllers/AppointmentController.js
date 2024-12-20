@@ -11,7 +11,7 @@ const createAppointment = async (req, res) => {
     const { patientId, doctorId, date, time } = req.body;
 
     // Check if the patient and doctor IDs are valid
-    const patient = await Patient.findById(patientId);
+    const patient = await Patient.find(patientId);
     const doctor = await Doctor.findById(doctorId);
     if (!patient || !doctor) {
       return res
@@ -169,7 +169,9 @@ const updateStatus = async (req, res) => {
     ];
 
     // Ensure the status provided is valid
-    if (!validStatuses.includes(status)) {
+    if (
+      !validStatuses.map((s) => s.toLowerCase()).includes(status.toLowerCase())
+    ) {
       return res
         .status(400)
         .json({ success: false, message: "Invalid status value." });
@@ -183,15 +185,12 @@ const updateStatus = async (req, res) => {
         .json({ success: false, message: "Appointment not found." });
     }
 
-    // Check if any field other than "status" is null or undefined
-    const fieldsToCheck = ["patientId", "doctorId", "date", "time"];
-    const hasNullFields = fieldsToCheck.some(
-      (field) => appointment[field] == null // Check for null or undefined
-    );
+    // Validate patient and doctor existence
+    const patient = await Patient.findById(appointment.patientId);
+    const doctor = await Doctor.findById(appointment.doctorId);
 
-    // If any null fields are found, set status to "Cancelled"
-    if (hasNullFields) {
-      appointment.status = "Cancelled";
+    if (!patient || !doctor) {
+      appointment.status = "Cancelled"; // Set to cancelled if either is missing
     } else {
       appointment.status = status; // Otherwise, update the status normally
     }
@@ -201,14 +200,11 @@ const updateStatus = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `Appointment status ${
-        hasNullFields
-          ? "set to Cancelled due to incomplete fields"
-          : "updated successfully"
-      }.`,
+      message: `Appointment status updated to ${appointment.status}.`,
       appointment,
     });
   } catch (error) {
+    console.error("Error updating appointment status:", error.stack);
     res.status(500).json({
       success: false,
       message: "Error updating appointment status.",

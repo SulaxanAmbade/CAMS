@@ -11,8 +11,9 @@ import {
 } from "antd";
 import React, { useEffect, useState } from "react";
 import moment from "moment";
-import { useNavigate } from "react-router-dom"; 
-import DoctorSchedule from "./DoctorSchedule"; 
+import { useNavigate } from "react-router-dom";
+import DoctorSchedule from "./DoctorSchedule";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 
 export const DoctorManagement = () => {
   const [doctorData, setDoctorData] = useState([]);
@@ -31,7 +32,7 @@ export const DoctorManagement = () => {
     "Saturday",
     "Sunday",
   ];
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
@@ -74,7 +75,7 @@ export const DoctorManagement = () => {
           Delete
         </Button>
       ),
-    }
+    },
   ];
 
   const fetchDoctors = async () => {
@@ -171,9 +172,21 @@ export const DoctorManagement = () => {
 
   return (
     <>
-      <Button type="primary" onClick={() => setIsDoctorModalVisible(true)}>
-        Add New Doctor
-      </Button>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <Button
+          style={{ background: "#b7202eee", color: "white" }}
+          size="large"
+          onClick={() => navigate("/")}
+        >
+          <ArrowLeftOutlined />
+        </Button>
+        <Button
+          style={{ background: "#b7202eee", color: "white" }}
+          onClick={() => setIsDoctorModalVisible(true)}
+        >
+          Add New Doctor
+        </Button>
+      </div>
       <Table
         dataSource={doctorData}
         columns={columns}
