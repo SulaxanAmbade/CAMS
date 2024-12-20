@@ -11,7 +11,7 @@ const createAppointment = async (req, res) => {
     const { patientId, doctorId, date, time } = req.body;
 
     // Check if the patient and doctor IDs are valid
-    const patient = await Patient.find(patientId);
+    const patient = await Patient.findById(patientId);
     const doctor = await Doctor.findById(doctorId);
     if (!patient || !doctor) {
       return res
