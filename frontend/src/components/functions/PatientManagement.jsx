@@ -85,7 +85,7 @@ export const PatientManagement = () => {
       title: "Date of Birth",
       dataIndex: "dateOfBirth",
       key: "dateOfBirth",
-      render: (text) => moment(text).format("YYYY-MM-DD"),
+      render: (text) => new Date(text).toLocaleDateString("en-GB"),
     },
     { title: "Contact No", dataIndex: "contactNo", key: "contactNo" },
     {

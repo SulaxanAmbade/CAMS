@@ -5,6 +5,7 @@ import { UserOutlined } from "@ant-design/icons";
 const PatientProfile = () => {
   const { user } = useSelector((state) => state.user);
   const cardDetails = { color: "white" };
+  const dob = new Date(user?.dateOfBirth).toLocaleDateString("en-GB");
   return (
     <>
       <Card style={{ background: "#b7202eee", height: "100%" }}>
@@ -17,7 +18,7 @@ const PatientProfile = () => {
                 </b>
                 <h3>Name : {user?.name}</h3> <h3>{user?.gender}</h3>
                 <h3>Contact Number : {user?.contactNo}</h3>
-                <h3>Date of Birth : {user?.dateOfBirth.split("T")[0]}</h3>
+                <h3>Date of Birth : {dob}</h3>
                 <h4>Medical History : {user?.medicalHistory}</h4>
               </>
             )}

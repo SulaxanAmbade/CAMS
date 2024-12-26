@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { message } from "antd";
+import { message, Input, Table, Button } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { hideLoading, showLoading } from "../../redux/features/alertSlice";
-import { Input, Table } from "antd";
 
 const DoctorDashboard = () => {
-  const dispatch = useDispatch();
   const [appointments, setAppointments] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const [showTodayOnly, setShowTodayOnly] = useState(false); // Toggle for today's appointments
   const { user } = useSelector((state) => state.user);
+
+  const userID = user.ID; // Doctor's user ID
 
   useEffect(() => {
     fetchAppointments();
   }, []);
-
-  const userID = user.ID;
 
   const fetchAppointments = async () => {
     try {
@@ -29,25 +27,31 @@ const DoctorDashboard = () => {
     }
   };
 
-  // Filter, sort, and group appointments by status
+  // Define today's date
+  const today = new Date().toISOString().split("T")[0];
+
+  // Filter, sort, and group appointments
   const statusOrder = ["Pending", "Confirmed", "Completed", "Cancelled"];
   const groupedAppointments = statusOrder.map((status) => ({
     status,
     appointments: appointments
       .filter((appointment) => appointment.status === status)
       .filter((appointment) => {
+        const isToday = showTodayOnly
+          ? new Date(appointment.date).toISOString().split("T")[0] === today
+          : true;
+
         const patientName = appointment.patientId?.name?.toLowerCase() || "";
-        const doctorName = appointment.doctorId?.name?.toLowerCase() || "";
         return (
-          patientName.includes(searchText.toLowerCase()) ||
-          doctorName.includes(searchText.toLowerCase())
+          isToday &&
+          patientName.includes(searchText.toLowerCase())
         );
       })
-      // Sort appointments by recent date and time
+      // Sort appointments by time in ascending order
       .sort((a, b) => {
-        const dateA = new Date(a.date + " " + a.time);
-        const dateB = new Date(b.date + " " + b.time);
-        return dateB - dateA; // Sort in descending order (most recent first)
+        const timeA = new Date(`${a.date} ${a.time}`);
+        const timeB = new Date(`${b.date} ${b.time}`);
+        return timeA - timeB; // Earliest time first
       }),
   }));
 
@@ -58,7 +62,6 @@ const DoctorDashboard = () => {
       key: "patientId",
       render: (patient) => (patient ? patient.name : "Deleted Patient"),
     },
-
     {
       title: "Date",
       dataIndex: "date",
@@ -70,8 +73,8 @@ const DoctorDashboard = () => {
   ];
 
   return (
-    <>
-      <h3>All Appointments</h3>
+    <div>
+      <h3>{showTodayOnly ? "Today's Appointments" : "All Appointments"}</h3>
       <div
         style={{
           position: "sticky",
@@ -82,11 +85,17 @@ const DoctorDashboard = () => {
         }}
       >
         <Input
-          placeholder="Search by patient name or doctor name"
+          placeholder="Search by patient name"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           style={{ marginBottom: 16, width: "300px" }}
         />
+        <Button
+          style={{ background: "#4CAF50", color: "white" }}
+          onClick={() => setShowTodayOnly(!showTodayOnly)}
+        >
+          {showTodayOnly ? "Show All Appointments" : "Show Today's Appointments"}
+        </Button>
       </div>
 
       {groupedAppointments.map((group) => (
@@ -100,7 +109,7 @@ const DoctorDashboard = () => {
           />
         </div>
       ))}
-    </>
+    </div>
   );
 };
 

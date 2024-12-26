@@ -7,11 +7,13 @@ import {
   Spin,
   Input,
   Select,
-  Timeline,
+  DatePicker,
+  TimePicker,
 } from "antd";
 import axios from "axios";
-import moment from "moment"; // Import moment for date handling
-import AppointmentForm from "../functions/AppointmentForm";
+import moment from "moment";
+
+const { Option } = Select;
 
 export const StaffDashboard = () => {
   const [patientData, setPatientData] = useState([]);
@@ -19,8 +21,14 @@ export const StaffDashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [loadingAppointments, setLoadingAppointments] = useState(false);
   const [searchText, setSearchText] = useState(""); // Search text state
-  const [APPform, setAPPform] = useState(false);
-  const { Option } = Select;
+  const [showTodayOnly, setShowTodayOnly] = useState(false); // Today's filter state
+  const [showAppointmentForm, setShowAppointmentForm] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState("");
+  const [selectedDoctor, setSelectedDoctor] = useState("");
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [loadingForm, setLoadingForm] = useState(false);
+
   useEffect(() => {
     fetchPatients();
     fetchDoctors();
@@ -59,8 +67,62 @@ export const StaffDashboard = () => {
     }
   };
 
-  const handleAppointmentButton = () => setAPPform(true);
-  const handleAppFormClose = () => setAPPform(false);
+  const handleScheduleAppointment = async () => {
+    if (selectedPatient && selectedDoctor && selectedDate && selectedTime) {
+      setLoadingForm(true);
+
+      // Find the selected doctor and check their visiting hours
+      const doctor = doctorData.find((doc) => doc._id === selectedDoctor);
+
+      if (doctor) {
+        const { visitingHours } = doctor;
+        const startHour = visitingHours.start;
+        const endHour = visitingHours.end;
+        const selectedHour = selectedTime.format("HH:mm");
+
+        if (selectedHour < startHour || selectedHour > endHour) {
+          message.error(
+            `Selected time is outside the doctor's visiting hours. Please select a time between ${startHour} and ${endHour}.`
+          );
+          setLoadingForm(false);
+          return;
+        }
+      }
+
+      try {
+        const response = await axios.post(
+          "/api/v1/appointment/createAppointment",
+          {
+            patientId: selectedPatient,
+            doctorId: selectedDoctor,
+            date: selectedDate.format("YYYY-MM-DD"),
+            time: selectedTime.format("HH:mm"),
+          }
+        );
+
+        if (response.data.success) {
+          message.success("Appointment scheduled successfully");
+          setShowAppointmentForm(false);
+          setSelectedPatient("");
+          setSelectedDoctor("");
+          setSelectedDate(null);
+          setSelectedTime(null);
+          fetchAppointments();
+        } else {
+          message.error("Failed to schedule appointment. Please try again.");
+        }
+      } catch (error) {
+        message.error(
+          "Failed to schedule appointment. Please try again.",
+          error
+        );
+      } finally {
+        setLoadingForm(false);
+      }
+    } else {
+      message.info("Please fill all fields.");
+    }
+  };
 
   const handleStatusChange = async (appointmentId, newStatus) => {
     try {
@@ -68,13 +130,12 @@ export const StaffDashboard = () => {
         status: newStatus,
       });
       message.success({ message: "Status updated successfully" });
-      fetchAppointments(); // Refresh appointments after status update
+      fetchAppointments();
     } catch (error) {
       message.error({ message: "Error updating status." });
     }
   };
 
-  // Define the order for grouping statuses
   const statusOrder = [
     "Pending",
     "Confirmed",
@@ -83,35 +144,33 @@ export const StaffDashboard = () => {
     "No-Show",
   ];
 
-  // Group appointments by status
+  const today = moment().format("YYYY-MM-DD");
+
   const groupedAppointments = statusOrder.map((status) => ({
     status,
     appointments: appointments
       .filter((appointment) => appointment.status === status)
       .filter((appointment) => {
+        const isToday = showTodayOnly
+          ? moment(appointment.date).format("YYYY-MM-DD") === today
+          : true;
+
         const patientName = appointment.patientId?.name?.toLowerCase() || "";
         const doctorName = appointment.doctorId?.name?.toLowerCase() || "";
+
         return (
-          patientName.includes(searchText.toLowerCase()) ||
-          doctorName.includes(searchText.toLowerCase())
+          isToday &&
+          (patientName.includes(searchText.toLowerCase()) ||
+            doctorName.includes(searchText.toLowerCase()))
         );
       })
-      // Sort appointments by date and time in descending order
       .sort((a, b) => {
-        // Parse dates
         const dateA = new Date(a.date);
         const dateB = new Date(b.date);
-
-        // Compare dates first
         if (dateA.getTime() !== dateB.getTime()) {
-          return dateA - dateB; // Ascending order by date
+          return dateA - dateB;
         }
-
-        // If dates are the same, compare times
-        const timeA = moment(a.time, "HH:mm");
-        const timeB = moment(b.time, "HH:mm");
-
-        return timeA - timeB; // Ascending order by time
+        return moment(a.time, "HH:mm") - moment(b.time, "HH:mm");
       }),
   }));
 
@@ -145,11 +204,11 @@ export const StaffDashboard = () => {
           onChange={(newStatus) => handleStatusChange(record._id, newStatus)}
           style={{ width: 120 }}
         >
-          <Select.Option value="Pending">Pending</Select.Option>
-          <Select.Option value="Confirmed">Confirmed</Select.Option>
-          <Select.Option value="Cancelled">Cancelled</Select.Option>
-          <Select.Option value="Completed">Completed</Select.Option>
-          <Select.Option value="No-Show">No-Show</Select.Option>
+          <Option value="Pending">Pending</Option>
+          <Option value="Confirmed">Confirmed</Option>
+          <Option value="Cancelled">Cancelled</Option>
+          <Option value="Completed">Completed</Option>
+          <Option value="No-Show">No-Show</Option>
         </Select>
       ),
     },
@@ -178,7 +237,13 @@ export const StaffDashboard = () => {
         />
         <Button
           style={{ background: "#b7202eee", color: "white" }}
-          onClick={handleAppointmentButton}
+          onClick={() => setShowTodayOnly(!showTodayOnly)}
+        >
+          {showTodayOnly ? "Show All" : "Show Today's Appointments"}
+        </Button>
+        <Button
+          style={{ background: "#b7202eee", color: "white" }}
+          onClick={() => setShowAppointmentForm(true)}
         >
           Add Appointment
         </Button>
@@ -200,8 +265,61 @@ export const StaffDashboard = () => {
         ))
       )}
 
-      <Modal open={APPform} footer={null} onCancel={handleAppFormClose}>
-        <AppointmentForm />
+      <Modal
+        open={showAppointmentForm}
+        footer={null}
+        onCancel={() => setShowAppointmentForm(false)}
+      >
+        <h2>Schedule Appointment</h2>
+        <Select
+          placeholder="Select Patient"
+          value={selectedPatient}
+          onChange={setSelectedPatient}
+          style={{ width: "100%", marginBottom: "1rem" }}
+        >
+          {patientData.map((patient) => (
+            <Option key={patient._id} value={patient._id}>
+              {patient.name}
+            </Option>
+          ))}
+        </Select>
+        <Select
+          placeholder="Select Doctor"
+          value={selectedDoctor}
+          onChange={setSelectedDoctor}
+          style={{ width: "100%", marginBottom: "1rem" }}
+        >
+          {doctorData.map((doctor) => (
+            <Option key={doctor._id} value={doctor._id}>
+              {doctor.name}
+            </Option>
+          ))}
+        </Select>
+        <DatePicker
+          placeholder="Select Date"
+          onChange={setSelectedDate}
+          disabled={!selectedDoctor}
+          style={{ width: "100%", marginBottom: "1rem" }}
+          disabledDate={(current) =>
+            current && current < moment().startOf("day")
+          }
+        />
+        <TimePicker
+          placeholder="Select Time"
+          value={selectedTime}
+          onChange={setSelectedTime}
+          disabled={!selectedDoctor || !selectedDate}
+          format="HH:mm"
+          style={{ width: "100%", marginBottom: "1rem" }}
+        />
+        <Button
+          type="primary"
+          onClick={handleScheduleAppointment}
+          loading={loadingForm}
+          style={{ marginTop: "1rem" }}
+        >
+          Schedule Appointment
+        </Button>
       </Modal>
     </>
   );
