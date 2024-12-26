@@ -81,9 +81,9 @@ export const StaffDashboard = () => {
         const selectedHour = selectedTime.format("HH:mm");
 
         if (selectedHour < startHour || selectedHour > endHour) {
-          message.error(
-            `Selected time is outside the doctor's visiting hours. Please select a time between ${startHour} and ${endHour}.`
-          );
+          message.error({
+            message: `Selected time is outside the doctor's visiting hours. Please select a time between ${startHour} and ${endHour}.`,
+          });
           setLoadingForm(false);
           return;
         }
@@ -101,7 +101,7 @@ export const StaffDashboard = () => {
         );
 
         if (response.data.success) {
-          message.success("Appointment scheduled successfully");
+          message.success({ message: "Appointment scheduled successfully" });
           setShowAppointmentForm(false);
           setSelectedPatient("");
           setSelectedDoctor("");
@@ -109,18 +109,20 @@ export const StaffDashboard = () => {
           setSelectedTime(null);
           fetchAppointments();
         } else {
-          message.error("Failed to schedule appointment. Please try again.");
+          message.error({
+            message: "Failed to schedule appointment. Please try again.",
+          });
         }
       } catch (error) {
-        message.error(
-          "Failed to schedule appointment. Please try again.",
-          error
-        );
+        message.error({
+          message: "Failed to schedule appointment. Please try again.",
+          error,
+        });
       } finally {
         setLoadingForm(false);
       }
     } else {
-      message.info("Please fill all fields.");
+      message.info({ message: "Please fill all fields." });
     }
   };
 
@@ -297,6 +299,7 @@ export const StaffDashboard = () => {
         </Select>
         <DatePicker
           placeholder="Select Date"
+          value={selectedDate}
           onChange={setSelectedDate}
           disabled={!selectedDoctor}
           style={{ width: "100%", marginBottom: "1rem" }}
