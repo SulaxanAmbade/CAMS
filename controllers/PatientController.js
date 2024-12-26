@@ -1,5 +1,5 @@
 const newPatient = require("../models/Patient"); // Keep the original naming
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 const getAllPatient = async (req, res) => {
   try {
     const patients = await newPatient.find(); // Use find() to fetch all patients
@@ -20,6 +20,16 @@ const getAllPatient = async (req, res) => {
 // Add a new patient
 const addNewPatient = async (req, res) => {
   try {
+    const { contactNo } = req.body;
+
+    // Check if a doctor with the same contact already exists
+    const existingPatient = await newPatient.findOne({ contactNo });
+    if (existingPatient) {
+      return res.status(400).json({
+        success: false,
+        message: "Patient with this contact already exists.",
+      });
+    }
     const newPatientData = new newPatient(req.body); // Create a new patient instance
     const savedPatient = await newPatientData.save(); // Save to the database
     res.status(201).json({ success: true, data: savedPatient });

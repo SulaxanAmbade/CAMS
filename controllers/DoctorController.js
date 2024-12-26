@@ -17,6 +17,20 @@ const getAllDoctors = async (req, res) => {
 
 const addDoctor = async (req, res) => {
   try {
+    const { contact } = req.body;
+
+    // Check if a doctor with the same contact already exists
+    const existingDoctor = await Doctor.findOne({ contact });
+    if (existingDoctor) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Doctor with this contact already exists.",
+        });
+    }
+
+    // If no existing doctor, proceed to add a new doctor
     const DoctorData = new Doctor(req.body);
     const savedDoctor = await DoctorData.save();
     res.status(201).json({ success: true, data: savedDoctor });
@@ -63,14 +77,12 @@ const doctorLogin = async (req, res) => {
       expiresIn: "1hr",
     });
     // Login successful
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: "Login successful",
-        doctor: { ...doctor._doc },
-        token,
-      });
+    return res.status(200).json({
+      success: true,
+      message: "Login successful",
+      doctor: { ...doctor._doc },
+      token,
+    });
   } catch (err) {
     console.error("Error during login:", err);
     return res.status(500).json({ success: false, message: "Server error" });

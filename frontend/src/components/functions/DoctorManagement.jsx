@@ -23,15 +23,7 @@ export const DoctorManagement = () => {
     start: "",
     end: "",
   });
-  const daysOfWeek = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ];
+
   const navigate = useNavigate();
 
   const columns = [
@@ -51,12 +43,6 @@ export const DoctorManagement = () => {
       title: "Visiting Hours End",
       dataIndex: ["visitingHours", "end"],
       key: "visitingHours.end",
-    },
-    {
-      title: "Visiting Days",
-      dataIndex: ["visitingHours", "days"],
-      key: "visitingHours.days",
-      render: (days) => (days ? days.join(", ") : "N/A"),
     },
     {
       title: "Time slot Duration",
@@ -93,10 +79,6 @@ export const DoctorManagement = () => {
     fetchDoctors();
   }, []);
 
-  const viewSchedule = (doctorId) => {
-    navigate(`/schedule/${doctorId}`); // Navigate to the schedule page for the selected doctor
-  };
-
   const handleAddDoctor = async (values) => {
     try {
       console.log("Form values:", values);
@@ -109,7 +91,6 @@ export const DoctorManagement = () => {
       const visitingHours = {
         start: visitingTimeStrings.start,
         end: visitingTimeStrings.end,
-        days: values.visitingDays || [],
         slot: values.slotsDuration,
       };
 
@@ -137,6 +118,7 @@ export const DoctorManagement = () => {
       setIsDoctorModalVisible(false);
       doctorForm.resetFields();
       setVisitingTimeStrings({ start: "", end: "" }); // Reset the time strings
+      fetchDoctors();
       message.success({ message: "Doctor added successfully!" });
     } catch (error) {
       message.error({ message: error.message });
@@ -253,21 +235,7 @@ export const DoctorManagement = () => {
               }}
             />
           </Form.Item>
-          <Form.Item
-            label="Visiting Days"
-            name="visitingDays"
-            rules={[
-              { required: true, message: "Please select visiting days!" },
-            ]}
-          >
-            <Select mode="multiple" placeholder="Select visiting days">
-              {daysOfWeek.map((day) => (
-                <Select.Option key={day} value={day}>
-                  {day}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
+
           <Form.Item
             label="Slot Duration"
             name="slotsDuration"

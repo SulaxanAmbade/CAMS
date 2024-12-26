@@ -254,7 +254,7 @@ export const StaffDashboard = () => {
       {loadingAppointments ? (
         <Spin size="large" />
       ) : (
-        groupedAppointments.map((group) => (
+        groupedAppointments?.map((group) => (
           <div key={group.status} style={{ marginBottom: "40px" }}>
             <h4>{group.status} Appointments</h4>
             <Table
@@ -279,7 +279,7 @@ export const StaffDashboard = () => {
           onChange={setSelectedPatient}
           style={{ width: "100%", marginBottom: "1rem" }}
         >
-          {patientData.map((patient) => (
+          {patientData?.map((patient) => (
             <Option key={patient._id} value={patient._id}>
               {patient.name}
             </Option>
@@ -291,7 +291,7 @@ export const StaffDashboard = () => {
           onChange={setSelectedDoctor}
           style={{ width: "100%", marginBottom: "1rem" }}
         >
-          {doctorData.map((doctor) => (
+          {doctorData?.map((doctor) => (
             <Option key={doctor._id} value={doctor._id}>
               {doctor.name}
             </Option>

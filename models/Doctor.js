@@ -7,7 +7,6 @@ const DoctorSchema = new mongoose.Schema({
   visitingHours: {
     start: { type: String, required: true },
     end: { type: String, required: true },
-    days: { type: [String], required: true },
     slot: { type: Number, required: true }, // Duration in minutes
   },
 });
