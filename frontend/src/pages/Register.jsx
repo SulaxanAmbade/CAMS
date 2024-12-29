@@ -15,7 +15,7 @@ const Register = () => {
   const onSubmithandle = async (values) => {
     try {
       dispatch(showLoading());
-      const response = await axios.post("/api/v1/user/register", values);
+      const response = await axios.post("https://cams-b7fw.onrender.com/api/v1/user/register", values);
       dispatch(hideLoading());
       if (response.data.success) {
         message.success("Registered Successfully!!");

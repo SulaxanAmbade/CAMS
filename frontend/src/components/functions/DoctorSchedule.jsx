@@ -9,7 +9,7 @@ const DoctorSchedule = () => {
   useEffect(() => {
     const fetchSchedule = async () => {
       try {
-        const response = await fetch(`/api/v1/schedule/${doctorId}`); 
+        const response = await fetch(`https://cams-b7fw.onrender.com/api/v1/schedule/${doctorId}`); 
         if (!response.ok) throw new Error('Failed to fetch schedule');
         const data = await response.json();
         setScheduleData(data); // Adjust based on your API response structure

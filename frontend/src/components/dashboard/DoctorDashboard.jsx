@@ -18,7 +18,7 @@ const DoctorDashboard = () => {
   const fetchAppointments = async () => {
     try {
       const response = await axios.post(
-        "/api/v1/appointment/getDoctorAppointment",
+        "https://cams-b7fw.onrender.com/api/v1/appointment/getDoctorAppointment",
         { userID }
       );
       setAppointments(response.data.data);
