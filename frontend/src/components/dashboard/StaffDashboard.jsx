@@ -70,41 +70,16 @@ export const StaffDashboard = () => {
   const handleScheduleAppointment = async () => {
     if (selectedPatient && selectedDoctor && selectedDate && selectedTime) {
       setLoadingForm(true);
-  
+
       // Find the selected doctor and check their visiting hours
       const doctor = doctorData.find((doc) => doc._id === selectedDoctor);
-  
+
       if (doctor) {
         const { visitingHours } = doctor;
         const startHour = visitingHours.start;
         const endHour = visitingHours.end;
-  
-        // Selected time and date
         const selectedHour = selectedTime.format("HH:mm");
-        const selectedDateTime = moment(
-          `${selectedDate.format("YYYY-MM-DD")} ${selectedTime.format("HH:mm")}`,
-          "YYYY-MM-DD HH:mm"
-        );
-  
-        // Current date and time
-        const currentDateTime = moment();
-  
-        // Debug: Log the current time
-        console.log("Current DateTime:", currentDateTime.format("YYYY-MM-DD HH:mm"));
-        console.log("Selected DateTime:", selectedDateTime.format("YYYY-MM-DD HH:mm"));
-  
-        // Check if the selected time is in the past
-        if (selectedDateTime.isBefore(currentDateTime)) {
-          message.error({
-            message: `Selected time (${selectedDateTime.format(
-              "HH:mm"
-            )}) is in the past. Please choose a future time.`,
-          });
-          setLoadingForm(false);
-          return;
-        }
-  
-        // Check if the selected time is outside the doctor's visiting hours
+
         if (selectedHour < startHour || selectedHour > endHour) {
           message.error({
             message: `Selected time is outside the doctor's visiting hours. Please select a time between ${startHour} and ${endHour}.`,
@@ -113,7 +88,7 @@ export const StaffDashboard = () => {
           return;
         }
       }
-  
+
       try {
         const response = await axios.post(
           "https://cams-b7fw.onrender.com/api/v1/appointment/createAppointment",
@@ -124,7 +99,7 @@ export const StaffDashboard = () => {
             time: selectedTime.format("HH:mm"),
           }
         );
-  
+
         if (response.data.success) {
           message.success({ message: "Appointment scheduled successfully" });
           setShowAppointmentForm(false);
@@ -150,7 +125,6 @@ export const StaffDashboard = () => {
       message.info({ message: "Please fill all fields." });
     }
   };
-  
 
   const handleStatusChange = async (appointmentId, newStatus) => {
     try {
