@@ -14,7 +14,7 @@ export default function ProtectedRoutes({ children }) {
     try {
       dispatch(showLoading());
       const res = await axios.post(
-        "https://cams-b7fw.onrender.com/api/v1/user/getUserData",
+        "/api/v1/user/getUserData",
         { token },
         {
           headers: {
