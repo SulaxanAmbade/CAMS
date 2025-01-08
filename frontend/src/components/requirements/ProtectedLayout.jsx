@@ -1,6 +1,5 @@
 import React from "react";
 import { Layout } from "antd";
-import Sidebar from "../../pages/Sidebar";
 const ProtectedLayout = ({ children }) => {
   return (
     <Layout style={{ height: "100vh" }}>

@@ -11,7 +11,6 @@ import ProtectedLayout from "./components/requirements/ProtectedLayout";
 import DoctorManagement from "./components/functions/DoctorManagement";
 import PatientManagement from "./components/functions/PatientManagement";
 import DoctorSchedule from "./components/functions/DoctorSchedule";
-import Sidebar from "./pages/Sidebar";
 import Profile from "./components/profile/Profile";
 
 function App() {
