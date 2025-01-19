@@ -12,6 +12,7 @@ connectDB();
 
 // Initialize express
 const app = express();
+const port = process.env.PORT || 3001;
 
 // Middleware
 app.use(express.json());
@@ -32,7 +33,6 @@ app.get("/", (req, res) => {
 });
 
 // Listen to port
-const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(
     `Server is Running in ${process.env.NODE_ENV} mode on port ${port}`.blue

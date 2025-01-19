@@ -20,7 +20,7 @@ const PatientDashboard = () => {
   const fetchAppointments = async () => {
     try {
       const response = await axios.post(
-        "/api/v1/appointment/getPatientAppointment",
+        "https://cams-qgq9.onrender.com/api/v1/appointment/getPatientAppointment",
         { userID }
       );
       setAppointments(response.data.data);

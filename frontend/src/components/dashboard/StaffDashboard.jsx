@@ -37,7 +37,7 @@ export const StaffDashboard = () => {
 
   const fetchPatients = async () => {
     try {
-      const response = await axios.get("/api/v1/patient/getAllPatient");
+      const response = await axios.get("https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient");
       setPatientData(response.data.data);
     } catch (error) {
       message.error("Failed to fetch patients.");
@@ -46,7 +46,7 @@ export const StaffDashboard = () => {
 
   const fetchDoctors = async () => {
     try {
-      const response = await axios.get("/api/v1/doctor/getAllDoctors");
+      const response = await axios.get("https://cams-qgq9.onrender.com/api/v1/doctor/getAllDoctors");
       setDoctorData(response.data.data);
     } catch (error) {
       message.error("Failed to fetch doctors.");
@@ -57,7 +57,7 @@ export const StaffDashboard = () => {
     setLoadingAppointments(true);
     try {
       const response = await axios.get(
-        "/api/v1/appointment/getAllAppointments"
+        "https://cams-qgq9.onrender.com/api/v1/appointment/getAllAppointments"
       );
       setAppointments(response.data.data);
     } catch (error) {
@@ -116,7 +116,7 @@ export const StaffDashboard = () => {
   
       try {
         const response = await axios.post(
-          "/api/v1/appointment/createAppointment",
+          "https://cams-qgq9.onrender.com/api/v1/appointment/createAppointment",
           {
             patientId: selectedPatient,
             doctorId: selectedDoctor,
@@ -153,7 +153,7 @@ export const StaffDashboard = () => {
   
   const handleStatusChange = async (appointmentId, newStatus) => {
     try {
-      await axios.put(`/api/v1/appointment/updateStatus/${appointmentId}`, {
+      await axios.put(`https://cams-qgq9.onrender.com/api/v1/appointment/updateStatus/${appointmentId}`, {
         status: newStatus,
       });
       message.success({ message: "Status updated successfully" });
