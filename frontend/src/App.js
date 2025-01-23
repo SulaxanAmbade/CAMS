@@ -42,7 +42,7 @@ function App() {
               }
             />
             <Route
-              path="/"
+              path="/*"
               element={
                 <ProtectedRoutes>
                   <ProtectedLayout>
