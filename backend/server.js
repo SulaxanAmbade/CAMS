@@ -14,7 +14,13 @@ connectDB();
 // Initialize express
 const app = express();
 const port = process.env.PORT || 3001;
-app.use(cors);
+app.use(
+  cors({
+    origin: "https://cams-hx0j.onrender.com/",
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true,
+  })
+);
 // Middleware
 app.use(express.json());
 app.use(morgan("dev"));
