@@ -17,8 +17,7 @@ const port = process.env.PORT || 3001;
 app.use(
   cors({
     origin: "https://cams-hx0j.onrender.com/",
-    methods: "GET,POST,PUT,DELETE",
-    credentials: true,
+    
   })
 );
 // Middleware
