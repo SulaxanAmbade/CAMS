@@ -16,8 +16,8 @@ const app = express();
 const port = process.env.PORT || 3001;
 app.use(
   cors({
-    origin: "https://cams-hx0j.onrender.com/",
-    
+    origin: "https://cams-hx0j.onrender.com",
+
   })
 );
 // Middleware
