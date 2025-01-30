@@ -25,12 +25,6 @@ app.use(
 app.use(express.json());
 app.use(morgan("dev"));
 
-// Serve static frontend files
-app.use(express.static(path.join(__dirname, "frontend", "build")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "build", "index.html"));
-});
 // API routes
 app.use("/api/v1/user", require("./routes/userRoutes"));
 app.use("/api/v1/patient", require("./routes/patientRoutes.js"));
