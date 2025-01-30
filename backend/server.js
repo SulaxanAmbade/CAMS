@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const cors = require("cors");
+const path = require("path");
 // dotenv config
 dotenv.config();
 
@@ -18,6 +19,12 @@ app.use(cors);
 app.use(express.json());
 app.use(morgan("dev"));
 
+// Serve static frontend files
+app.use(express.static(path.join(__dirname, "client", "build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+});
 // API routes
 app.use("/api/v1/user", require("./routes/userRoutes"));
 app.use("/api/v1/patient", require("./routes/patientRoutes.js"));
