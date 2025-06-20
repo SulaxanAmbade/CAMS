@@ -87,6 +87,7 @@ const authController = async (req, res) => {
           name: doctor.name,
           contactNo: doctor.contact,
           specialization: doctor.specialization,
+          visitingHours: doctor.visitingHours,
           role: "Doctor",
         },
       });

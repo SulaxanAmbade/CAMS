@@ -8,7 +8,7 @@ const moment = require("moment"); // Make sure to import moment
 
 const createAppointment = async (req, res) => {
   try {
-    const { patientId, doctorId, date, time } = req.body;
+    const { patientId, doctorId, date, time, status, remarks } = req.body;
 
     // Check if the patient and doctor IDs are valid
     const patient = await Patient.findById(patientId);
@@ -62,6 +62,8 @@ const createAppointment = async (req, res) => {
       doctorId,
       date,
       time,
+      status,
+      remarks,
     });
     await appointment.save();
 
@@ -147,6 +149,34 @@ const getPatientAppointment = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching appointments:", error); // Log the error details
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+const getAppointmentsByPatientId = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    const appointments = await Appointment.find({ patientId }).populate({
+      path: "doctorId",
+      select: "name",
+    });
+    if (!appointments || appointments.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No appointments found for this patient.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: appointments,
+    });
+  } catch (error) {
+    console.error("Error fetching patient appointments:", error);
     res.status(500).json({
       success: false,
       message: "Server error",
@@ -247,4 +277,5 @@ module.exports = {
   updateStatus,
   getDoctorAppointment,
   getPatientAppointment,
+  getAppointmentsByPatientId,
 };

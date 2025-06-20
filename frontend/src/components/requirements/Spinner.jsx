@@ -5,7 +5,7 @@ import React from "react";
 const Spinner = () => {
   return (
     <div className="spinner">
-      <ClipLoader color="white"/>
+      <ClipLoader color="white" />
     </div>
   );
 };

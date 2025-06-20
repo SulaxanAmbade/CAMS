@@ -5,7 +5,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { showLoading, hideLoading } from "../redux/features/alertSlice";
 import "../css/register.css";
-
+//https://cams-qgq9.onrender.com
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -91,18 +91,19 @@ const Login = () => {
     <div className="formContainer">
       <Card
         style={{
-          background: "#b7202e",
+          background: "#fc840311",
+          backdropFilter: "blur(8px)",
           width: "110vh",
           textAlign: "center",
-          color: "white",
+          color: "#291806",
         }}
       >
         <h4>Welcome to </h4>
-        <h2 style={{ textAlign: "center", marginLeft: "10px", color: "pink" }}>
-          <b style={{ color: "white" }}>C</b>linical{" "}
-          <b style={{ color: "white" }}>A</b>ppointment{" "}
-          <b style={{ color: "white" }}>M</b>anagement{" "}
-          <b style={{ color: "white" }}>S</b>ystem
+        <h2 style={{ textAlign: "center", marginLeft: "10px" }}>
+          <b style={{ color: "gold" }}>C</b>linical{" "}
+          <b style={{ color: "gold" }}>A</b>ppointment{" "}
+          <b style={{ color: "gold" }}>M</b>anagement{" "}
+          <b style={{ color: "gold" }}>S</b>ystem
         </h2>
         <hr />
         <h5>Login as</h5>
@@ -120,7 +121,7 @@ const Login = () => {
           <Button
             type="text"
             onClick={handleRegister}
-            style={{ color: "white" }}
+            style={{ color: "#291806" }}
           >
             Registeration details
           </Button>
@@ -135,7 +136,7 @@ const Login = () => {
         centered
       >
         <Form layout="vertical" onFinish={onSubmitStaffLogin}>
-          <h3 style={{ textAlign: "center", color: "#b7202e" }}>Staff Login</h3>
+          <h3 style={{ textAlign: "center", color: "#291806" }}>Staff Login</h3>
           <Form.Item
             label="Phone Number"
             name="contactNo"
@@ -158,7 +159,7 @@ const Login = () => {
           </Form.Item>
           <Form.Item>
             <Button
-              style={{ textAlign: "center", background: "#b7202e" }}
+              style={{ textAlign: "center", background: "#4d2a05" }}
               type="primary"
               htmlType="submit"
               block
@@ -177,7 +178,7 @@ const Login = () => {
         centered
       >
         <Form layout="vertical" onFinish={onSubmitDoctorLogin}>
-          <h3 style={{ textAlign: "center", color: "#b7202e" }}>
+          <h3 style={{ textAlign: "center", color: "#291806" }}>
             Doctor Login
           </h3>
           <Form.Item
@@ -193,9 +194,16 @@ const Login = () => {
           >
             <Input placeholder="XXXXXXXXXX" />
           </Form.Item>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: "Please input your password!" }]}
+          >
+            <Input.Password placeholder="Enter your password" />
+          </Form.Item>
           <Form.Item>
             <Button
-              style={{ textAlign: "center", background: "#b7202e" }}
+              style={{ textAlign: "center", background: "#4d2a05" }}
               type="primary"
               htmlType="submit"
               block
@@ -214,7 +222,7 @@ const Login = () => {
         centered
       >
         <Form layout="vertical" onFinish={onSubmitPatientLogin}>
-          <h3 style={{ textAlign: "center", color: "#b7202e" }}>
+          <h3 style={{ textAlign: "center", color: "#291806" }}>
             Patient Login
           </h3>
           <Form.Item
@@ -232,7 +240,7 @@ const Login = () => {
           </Form.Item>
           <Form.Item>
             <Button
-              style={{ textAlign: "center", background: "#b7202e" }}
+              style={{ textAlign: "center", background: "#4d2a05" }}
               type="primary"
               htmlType="submit"
               block

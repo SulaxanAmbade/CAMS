@@ -7,6 +7,9 @@ import {
   Select,
   notification as message,
   DatePicker,
+  Card,
+  Row,
+  Col,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import moment from "moment";
@@ -18,8 +21,27 @@ export const PatientManagement = () => {
   const { user } = useSelector((state) => state.user);
   const [patientData, setPatientData] = useState([]);
   const [isPatientModalVisible, setIsPatientModalVisible] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [isAppointmentModalVisible, setIsAppointmentModalVisible] =
+    useState(false);
+  const [appointments, setAppointments] = useState([]);
+
   const [patientForm] = Form.useForm();
   const { Option } = Select;
+  const fetchAppointments = async (patientId) => {
+    try {
+      const response = await fetch(
+        `https://cams-qgq9.onrender.com/api/v1/appointment/getAppointmentsByPatientId/${patientId}`
+      );
+      if (!response.ok) throw new Error("Failed to fetch appointments");
+      const data = await response.json();
+      setAppointments(data.data || []);
+      setIsAppointmentModalVisible(true);
+    } catch (error) {
+      message.error({ message: error.message });
+    }
+  };
+
   const fetchPatients = async () => {
     try {
       const response = await fetch("https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient");
@@ -135,6 +157,15 @@ export const PatientManagement = () => {
             dataSource={patientData}
             columns={columns}
             pagination={false}
+            rowKey="_id"
+            onRow={(record) => {
+              return {
+                onClick: () => {
+                  setSelectedPatient(record);
+                  fetchAppointments(record._id);
+                },
+              };
+            }}
           />
           <Modal
             title="Add New Patient"
@@ -227,11 +258,40 @@ export const PatientManagement = () => {
               </Form.Item>
             </Form>
           </Modal>
+          <Modal
+            title={`Appointment History: ${selectedPatient?.name}`}
+            open={isAppointmentModalVisible}
+            onCancel={() => setIsAppointmentModalVisible(false)}
+            footer={null}
+            centered
+            width="50vw"
+          >
+            {appointments.length === 0 ? (
+              <p>No appointments found for this patient.</p>
+            ) : (
+              <Row gutter={[8, 8]}>
+                {appointments.map((appt) => (
+                  <Col xs={48} sm={24} md={16} lg={12} key={appt._id}>
+                    <Card key={appt._id}>
+                      <strong>Date:</strong>{" "}
+                      {moment(appt.date).format("DD MMMM YYYY")}
+                      <br />
+                      <strong>Time:</strong> {appt.time}
+                      <br />
+                      <strong>Doctor:</strong> {appt.doctorId.name}
+                      <br />
+                      <strong>Remark:</strong> {appt.remarks || "N/A"}
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            )}
+          </Modal>
         </>
       ) : (
         <div style={{ textAlign: "center" }}>
           <h2 style={{ color: "red" }}>
-            ERROR 404 : This page is not developed or you are not allowed!
+            ERROR 404 : Sorry You Don't have Access to the Page
           </h2>
         </div>
       )}

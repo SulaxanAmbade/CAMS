@@ -4,6 +4,7 @@ import {
   Input,
   Button,
   Modal,
+  Card,
   notification as message,
   Select,
   TimePicker,
@@ -19,6 +20,9 @@ export const DoctorManagement = () => {
   const [doctorData, setDoctorData] = useState([]);
   const [isDoctorModalVisible, setIsDoctorModalVisible] = useState(false);
   const [doctorForm] = Form.useForm();
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [showDoctorDetailsModal, setShowDoctorDetailsModal] = useState(false);
+
   const [visitingTimeStrings, setVisitingTimeStrings] = useState({
     start: "",
     end: "",
@@ -29,12 +33,6 @@ export const DoctorManagement = () => {
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
     {
-      title: "Specialization",
-      dataIndex: "specialization",
-      key: "specialization",
-    },
-    { title: "Contact", dataIndex: "contact", key: "contact" },
-    {
       title: "Visiting Hours Start",
       dataIndex: ["visitingHours", "start"],
       key: "visitingHours.start",
@@ -44,11 +42,8 @@ export const DoctorManagement = () => {
       dataIndex: ["visitingHours", "end"],
       key: "visitingHours.end",
     },
-    {
-      title: "Time slot Duration",
-      dataIndex: ["visitingHours", "slot"],
-      key: "visitingHours.slot",
-    },
+    { title: "Contact", dataIndex: "contact", key: "contact" },
+
     {
       title: "Action",
       key: "action",
@@ -98,6 +93,7 @@ export const DoctorManagement = () => {
 
       const doctorDataToSend = {
         name: values.name,
+        password: values.password,
         specialization: values.specialization,
         contact: values.contact || "",
         visitingHours, // Use the formatted visiting hours
@@ -174,6 +170,12 @@ export const DoctorManagement = () => {
         columns={columns}
         rowKey="_id"
         pagination={false}
+        onRow={(record) => ({
+          onClick: () => {
+            setSelectedDoctor(record);
+            setShowDoctorDetailsModal(true);
+          },
+        })}
       />
       <Modal
         title="Add New Doctor"
@@ -187,6 +189,18 @@ export const DoctorManagement = () => {
             name="name"
             rules={[
               { required: true, message: "Please input the doctor's name!" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[
+              {
+                required: true,
+                message: "Please input the doctor's Password!",
+              },
             ]}
           >
             <Input />
@@ -251,6 +265,28 @@ export const DoctorManagement = () => {
             </Button>
           </Form.Item>
         </Form>
+      </Modal>
+      <Modal
+        title="Doctor Details"
+        open={showDoctorDetailsModal}
+        onCancel={() => setShowDoctorDetailsModal(false)}
+        footer={null}
+      >
+        <Card>
+          <p>
+            <b>Name:</b> {selectedDoctor?.name}
+          </p>
+          <p>
+            <b>Specialization:</b> {selectedDoctor?.specialization}
+          </p>
+          <p>
+            <b>Contact:</b> {selectedDoctor?.contact}
+          </p>
+          <p>
+            <b>Visiting Hours:</b>{" "}
+            {`${selectedDoctor?.visitingHours?.start} - ${selectedDoctor?.visitingHours?.end}`}
+          </p>
+        </Card>
       </Modal>
     </>
   );

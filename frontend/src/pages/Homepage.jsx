@@ -1,94 +1,136 @@
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import axios from "axios";
-import { Card, Button } from "antd";
+import { useNavigate } from "react-router-dom";
+import {
+  Layout,
+  Menu,
+  Button,
+  Avatar,
+  Dropdown,
+  Space,
+  Typography,
+  Divider,
+} from "antd";
+import {
+  UserOutlined,
+  LogoutOutlined,
+  ScheduleOutlined,
+  TeamOutlined,
+  UsergroupAddOutlined,
+  ProfileOutlined,
+} from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { StaffDashboard } from "../components/dashboard/StaffDashboard";
+
+import StaffDashboard from "../components/dashboard/StaffDashboard";
 import DoctorDashboard from "../components/dashboard/DoctorDashboard";
 import PatientDashboard from "../components/dashboard/PatientDashboard";
 import { setUser } from "../redux/features/userSlice";
-import { LogoutOutlined } from "@ant-design/icons";
 import Profile from "../components/profile/Profile";
+
+const { Header, Content } = Layout;
+const { Title } = Typography;
+
 const HomePage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.user);
-  const [profileCard, setProfileCard] = useState(false);
+  const [view, setView] = useState("appointments");
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     dispatch(setUser(null));
     navigate("/login");
   };
+
+  const menuItems = [
+    {
+      key: "appointments",
+      icon: <ScheduleOutlined />,
+      label: "Appointments",
+    },
+    {
+      key: "profile",
+      icon: <ProfileOutlined />,
+      label: "My Profile",
+    },
+  ];
+
+  if (user?.role === "Staff") {
+    menuItems.splice(1, 0,
+      {
+        key: "patients",
+        icon: <TeamOutlined />,
+        label: "Patients",
+      },
+      {
+        key: "doctors",
+        icon: <UsergroupAddOutlined />,
+        label: "Doctors",
+      }
+    );
+  }
+
+  const renderDashboard = () => {
+    if (view === "profile") return <Profile />;
+    if (user?.role === "Staff") return <StaffDashboard />;
+    if (user?.role === "Doctor") return <DoctorDashboard />;
+    if (user?.role === "Patient") return <PatientDashboard />;
+    return null;
+  };
+
   return (
-    <div style={{ maxWidth: "100vw" }}>
-      <Card style={{ background: "#b7202eee", padding: "10px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <h1 style={{ color: "white" }}>CAMS</h1>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              flexGrow: 0.5,
-            }}
-          >
-            {!profileCard ? (
-              <>
-                {" "}
-                <Button
-                  className="LogButton"
-                  onClick={() => {
-                    setProfileCard(true);
-                  }}
-                >
-                  My Profile
-                </Button>
-              </>
-            ) : (
-              <Button
-                className="LogButton"
-                onClick={() => {
-                  setProfileCard(false);
-                }}
-              >
-                Appointments
-              </Button>
-            )}
-            {user?.role === "Staff" && (
-              <>
-                <Button
-                  className="LogButton"
-                  onClick={() => navigate("/manage-patients")}
-                >
-                  Patients
-                </Button>
-                <Button
-                  className="LogButton"
-                  onClick={() => navigate("/manage-doctors")}
-                >
-                  Doctors
-                </Button>
-              </>
-            )}
-            <Button
-              className="LogButton"
-              onClick={handleLogout}
-              icon={<LogoutOutlined />}
-            />
-          </div>
-        </div>
-      </Card>
-      {profileCard ? (
-        <Profile />
-      ) : (
-        <div style={{ padding: "10px" }}>
-          {" "}
-          {user?.role === "Staff" && <StaffDashboard />}
-          {user?.role === "Patient" && <PatientDashboard />}
-          {user?.role === "Doctor" && <DoctorDashboard />}
-        </div>
-      )}
-    </div>
+    <Layout style={{ minHeight: "100vh" }}>
+      <Header
+        style={{
+          backgroundColor: "#b7202e",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 20px",
+        }}
+      >
+        <Title level={3} style={{ color: "white", margin: 0 }}>
+          CAMS
+        </Title>
+
+        <Menu
+          theme="dark"
+          mode="horizontal"
+          selectedKeys={[view]}
+          onClick={(e) => {
+            if (e.key === "patients") navigate("/manage-patients");
+            else if (e.key === "doctors") navigate("/manage-doctors");
+            else setView(e.key);
+          }}
+          items={menuItems}
+          style={{
+            backgroundColor: "#b7202e",
+            borderBottom: "none",
+            flex: 1,
+            justifyContent: "center",
+          }}
+        />
+
+        <Dropdown
+          trigger={["click"]}
+          overlay={
+            <Menu>
+              <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+                Logout
+              </Menu.Item>
+            </Menu>
+          }
+        >
+          <Space style={{ cursor: "pointer" }}>
+            <Avatar icon={<UserOutlined />} />
+            <span style={{ color: "white" }}>{user?.name}</span>
+          </Space>
+        </Dropdown>
+      </Header>
+
+      <Content style={{ padding: 24 }}>
+        {renderDashboard()}
+      </Content>
+    </Layout>
   );
 };
 

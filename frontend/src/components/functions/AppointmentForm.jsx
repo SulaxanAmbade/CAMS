@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { DatePicker, Button, Select, message, TimePicker } from "antd";
 import moment from "moment";
+import TextArea from "antd/es/input/TextArea";
 
 const { Option } = Select;
 
@@ -11,6 +12,7 @@ const AppointmentForm = () => {
   const [selectedDoctor, setSelectedDoctor] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
+  const [remark, setRemark] = useState("");
   const [loading, setLoading] = useState(false);
 
   // Fetch patients and doctors on component mount
@@ -75,6 +77,7 @@ const AppointmentForm = () => {
             doctorId: selectedDoctor,
             date: selectedDate.format("YYYY-MM-DD"),
             time: selectedTime.format("HH:mm"),
+            remark: remark,
           }),
         });
 
@@ -93,6 +96,7 @@ const AppointmentForm = () => {
           setSelectedDoctor("");
           setSelectedDate(null);
           setSelectedTime(null);
+          setRemark("");
         } else {
           console.error("Error response:", result); // Log detailed error from the server
           message.error("Failed to schedule appointment. Please try again.");
@@ -162,7 +166,13 @@ const AppointmentForm = () => {
         format="HH:mm"
         style={{ width: "100%", marginBottom: "1rem" }}
       />
-
+      <TextArea
+        rows={4}
+        placeholder="Enter any remarks (optional)"
+        value={remark}
+        onChange={(e) => setRemark(e.target.value)}
+        style={{ marginBottom: 16 }}
+      />
       <Button
         type="primary"
         onClick={handleScheduleAppointment}

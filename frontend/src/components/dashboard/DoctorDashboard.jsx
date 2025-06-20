@@ -1,114 +1,366 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { message, Input, Table, Button } from "antd";
-import { useDispatch, useSelector } from "react-redux";
+import {
+  message,
+  Input,
+  Button,
+  Select,
+  Spin,
+  Modal,
+  DatePicker,
+  TimePicker,
+  Card,
+  Radio,
+  Row,
+  Col,
+} from "antd";
+import moment from "moment";
+import { useSelector } from "react-redux";
+
+const { Option } = Select;
+const { TextArea } = Input;
 
 const DoctorDashboard = () => {
-  const [appointments, setAppointments] = useState([]);
-  const [searchText, setSearchText] = useState("");
-  const [showTodayOnly, setShowTodayOnly] = useState(false); // Toggle for today's appointments
   const { user } = useSelector((state) => state.user);
+  const userID = user.ID;
 
-  const userID = user.ID; // Doctor's user ID
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [showTodayOnly, setShowTodayOnly] = useState(false);
+  const [filterStatus, setFilterStatus] = useState("All");
+  const [remark, setRemark] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
+
+  const [patients, setPatients] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState("");
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("Pending");
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   useEffect(() => {
     fetchAppointments();
+    fetchPatients();
   }, []);
 
-  const fetchAppointments = async () => {
+  const fetchPatients = async () => {
     try {
-      const response = await axios.post(
-        "https://cams-qgq9.onrender.com/api/v1/appointment/getDoctorAppointment",
-        { userID }
-      );
-      setAppointments(response.data.data);
-    } catch (error) {
-      message.error("Error fetching appointments.");
+      const res = await axios.get("https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient");
+      setPatients(res.data.data);
+    } catch {
+      message.error("Failed to fetch patients.");
     }
   };
 
-  // Define today's date
-  const today = new Date().toISOString().split("T")[0];
+  const fetchAppointments = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.post("https://cams-qgq9.onrender.com/api/v1/appointment/getDoctorAppointment", {
+        userID,
+      });
+      setAppointments(res.data.data);
+    } catch {
+      message.error("Error fetching appointments.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Filter, sort, and group appointments
-  const statusOrder = ["Pending", "Confirmed", "Completed", "Cancelled"];
-  const groupedAppointments = statusOrder.map((status) => ({
-    status,
-    appointments: appointments
-      .filter((appointment) => appointment.status === status)
-      .filter((appointment) => {
-        const isToday = showTodayOnly
-          ? new Date(appointment.date).toISOString().split("T")[0] === today
-          : true;
+  const handleStatusChange = async (appointmentId, newStatus) => {
+    try {
+      await axios.put(`https://cams-qgq9.onrender.com/api/v1/appointment/updateStatus/${appointmentId}`, {
+        status: newStatus,
+      });
+      message.success("Status updated");
+      fetchAppointments();
+    } catch {
+      message.error("Failed to update status");
+    }
+  };
 
-        const patientName = appointment.patientId?.name?.toLowerCase() || "";
-        return (
-          isToday &&
-          patientName.includes(searchText.toLowerCase())
+  const openAddModal = () => {
+    setSelectedPatient("");
+    setSelectedDate(null);
+    setSelectedTime(null);
+    setRemark("");
+    setSelectedStatus("Confirmed");
+    setShowModal(true);
+  };
+
+  const handleAddSubmit = async () => {
+    if (!selectedPatient || !selectedDate || !selectedTime) {
+      message.info("Please fill all required fields.");
+      return;
+    }
+
+    setModalLoading(true);
+
+    const visitingHours = user.visitingHours;
+    if (visitingHours) {
+      const startHour = visitingHours.start;
+      const endHour = visitingHours.end;
+
+      const selectedHour = selectedTime.format("HH:mm");
+      const selectedDateTime = moment(
+        `${selectedDate.format("YYYY-MM-DD")} ${selectedHour}`,
+        "YYYY-MM-DD HH:mm"
+      );
+
+      const currentDateTime = moment();
+
+      if (selectedDateTime.isBefore(currentDateTime)) {
+        message.error(
+          `Selected time (${selectedDateTime.format(
+            "HH:mm"
+          )}) is in the past. Please choose a future time.`
         );
-      })
-      // Sort appointments by time in ascending order
-      .sort((a, b) => {
-        const timeA = new Date(`${a.date} ${a.time}`);
-        const timeB = new Date(`${b.date} ${b.time}`);
-        return timeA - timeB; // Earliest time first
-      }),
-  }));
+        setModalLoading(false);
+        return;
+      }
 
-  const appointmentColumns = [
-    {
-      title: "Patient Name",
-      dataIndex: "patientId",
-      key: "patientId",
-      render: (patient) => (patient ? patient.name : "Deleted Patient"),
-    },
-    {
-      title: "Date",
-      dataIndex: "date",
-      key: "date",
-      render: (date) => new Date(date).toLocaleDateString("en-GB"),
-    },
-    { title: "Time", dataIndex: "time", key: "time" },
-    { title: "Status", dataIndex: "status", key: "status" },
-  ];
+      if (selectedHour < startHour || selectedHour > endHour) {
+        message.error(
+          `Selected time is outside your visiting hours. Please select a time between ${startHour} and ${endHour}.`
+        );
+        setModalLoading(false);
+        return;
+      }
+    }
+
+    const payload = {
+      patientId: selectedPatient,
+      doctorId: userID,
+      date: selectedDate.format("YYYY-MM-DD"),
+      time: selectedTime.format("HH:mm"),
+      status: selectedStatus,
+      remarks: remark,
+    };
+
+    try {
+      await axios.post("https://cams-qgq9.onrender.com/api/v1/appointment/createAppointment", payload);
+      message.success("Appointment created successfully");
+      setShowModal(false);
+      fetchAppointments();
+    } catch {
+      message.error("Failed to create appointment.");
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  const today = moment().format("YYYY-MM-DD");
+  const statusOrder = ["Pending", "Confirmed", "Completed", "Cancelled"];
+
+  const filteredAppointments = appointments
+    .filter((a) => (filterStatus !== "All" ? a.status === filterStatus : true))
+    .filter((a) => {
+      const isToday = showTodayOnly
+        ? moment(a.date).format("YYYY-MM-DD") === today
+        : true;
+      const patientName = a.patientId?.name?.toLowerCase() || "";
+      return isToday && patientName.includes(searchText.toLowerCase());
+    })
+    .sort((a, b) => {
+      const timeA = moment(`${a.date} ${a.time}`, "YYYY-MM-DD HH:mm");
+      const timeB = moment(`${b.date} ${b.time}`, "YYYY-MM-DD HH:mm");
+      return timeA - timeB;
+    });
+
+  const getCardColor = (status) => {
+    switch (status) {
+      case "Confirmed":
+        return "#ffff00"; // yellow
+      case "Pending":
+        return "#ab0a0a"; // red
+      case "Cancelled":
+        return "#6a6a6a"; // grey
+      case "Completed":
+        return "#008100"; // green
+      default:
+        return "#ffffff";
+    }
+  };
 
   return (
     <div>
       <h3>{showTodayOnly ? "Today's Appointments" : "All Appointments"}</h3>
+
       <div
         style={{
           position: "sticky",
           top: "20px",
-          zIndex: "2",
+          zIndex: 2,
           display: "flex",
           justifyContent: "space-between",
+          marginBottom: 16,
+          flexWrap: "wrap",
         }}
       >
         <Input
-          placeholder="Search by patient name"
+          placeholder="Search by Patient's Name"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          style={{ marginBottom: 16, width: "300px" }}
+          style={{ width: 300, marginBottom: 8 }}
         />
+
+        <div style={{ marginBottom: 16 }}>
+          <span style={{ marginRight: 8 }}>Filter by Status:</span>
+          <Radio.Group
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <Radio.Button value="All">All</Radio.Button>
+            {statusOrder.map((status) => (
+              <Radio.Button key={status} value={status}>
+                {status}
+              </Radio.Button>
+            ))}
+          </Radio.Group>
+        </div>
+
         <Button
-          style={{ background: "#4CAF50", color: "white" }}
           onClick={() => setShowTodayOnly(!showTodayOnly)}
+          style={{ backgroundColor: "#4CAF50", color: "white" }}
         >
-          {showTodayOnly ? "Show All Appointments" : "Show Today's Appointments"}
+          {showTodayOnly
+            ? "Show All Appointments"
+            : "Show Today's Appointments"}
+        </Button>
+        <Button type="primary" onClick={openAddModal}>
+          Add Appointment
         </Button>
       </div>
 
-      {groupedAppointments.map((group) => (
-        <div key={group.status} style={{ marginBottom: "40px" }}>
-          <h4>{group.status} Appointments</h4>
-          <Table
-            dataSource={group.appointments}
-            columns={appointmentColumns}
-            pagination={false}
-            rowKey={(record) => record._id}
-          />
-        </div>
-      ))}
+      {loading ? (
+        <Spin size="large" />
+      ) : (
+        <Row gutter={[16, 16]}>
+          {filteredAppointments.map((a) => (
+            <Col xs={24} sm={12} md={8} lg={6} key={a._id}>
+              <Card
+                hoverable
+                style={{
+                  background: `linear-gradient(135deg,#e3e1e1,${getCardColor(
+                    a.status
+                  )})`,
+                  display: "flex",
+                  placeContent: "center",
+                  textAlign: "center",
+                }}
+                onClick={() => {
+                  setSelectedAppointment(a);
+                  setShowDetailsModal(true);
+                }}
+              >
+                <div>{a.status}</div>
+                <div style={{ fontSize: "200%" }}>
+                  {moment(a.date).format("DD MMMM")}
+                </div>
+                <div>{moment(a.date).format("YYYY")}</div>
+                <div style={{ fontSize: "200%" }}>{a.time}</div>
+                <div>{a.patientId?.name || "Deleted Patient"}</div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      )}
+
+      <Modal
+        title="Add Appointment"
+        open={showModal}
+        onCancel={() => setShowModal(false)}
+        onOk={handleAddSubmit}
+        confirmLoading={modalLoading}
+        okText="Create"
+      >
+        <Select
+          placeholder="Select Patient"
+          value={selectedPatient}
+          onChange={setSelectedPatient}
+          style={{ width: "100%", marginBottom: 16 }}
+        >
+          {patients.map((patient) => (
+            <Option key={patient._id} value={patient._id}>
+              {patient.name}
+            </Option>
+          ))}
+        </Select>
+
+        <DatePicker
+          style={{ width: "100%", marginBottom: 16 }}
+          value={selectedDate}
+          onChange={setSelectedDate}
+          disabledDate={(current) =>
+            current && current < moment().startOf("day")
+          }
+          placeholder="Select Date"
+        />
+
+        <TimePicker
+          style={{ width: "100%", marginBottom: 16 }}
+          value={selectedTime}
+          onChange={setSelectedTime}
+          format="HH:mm"
+          placeholder="Select Time"
+        />
+
+        <Select
+          style={{ width: "100%" }}
+          value={selectedStatus}
+          onChange={setSelectedStatus}
+        >
+          {statusOrder.map((s) => (
+            <Option key={s} value={s}>
+              {s}
+            </Option>
+          ))}
+        </Select>
+        <TextArea
+          rows={4}
+          placeholder="Enter any remarks (optional)"
+          value={remark}
+          onChange={(e) => setRemark(e.target.value)}
+          style={{ marginBottom: 16 }}
+        />
+      </Modal>
+
+      <Modal
+        title="Appointment Details"
+        open={showDetailsModal}
+        onCancel={() => setShowDetailsModal(false)}
+        footer={null}
+        centered
+      >
+        <Card
+          style={{
+            height: "50vh",
+            fontSize: "medium",
+            background: "linear-gradient(#b7202e55,#b7202eff)",
+            color: "black",
+          }}
+        >
+          <p>
+            <b>Patient Name:</b>{" "}
+            {selectedAppointment?.patientId?.name || "Unknown"}
+          </p>
+          <p>
+            <b>Date:</b>{" "}
+            {moment(selectedAppointment?.date).format("DD/MM/YYYY")}
+          </p>
+          <p>
+            <b>Time:</b> {selectedAppointment?.time}
+          </p>
+          <p>
+            <b>Status:</b> {selectedAppointment?.status}
+          </p>
+          <p>
+            <b>Remarks:</b> {selectedAppointment?.remarks || "No Remarks"}
+          </p>
+        </Card>
+      </Modal>
     </div>
   );
 };

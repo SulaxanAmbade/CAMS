@@ -5,6 +5,7 @@ const {
   updateStatus,
   getDoctorAppointment,
   getPatientAppointment,
+  getAppointmentsByPatientId,
 } = require("../controllers/AppointmentController");
 const authMiddleware = require("../middlewares/authMiddleware");
 const router = express.Router();
@@ -15,5 +16,9 @@ router.put("/updateStatus/:appointmentId", updateStatus);
 
 router.post("/getDoctorAppointment", getDoctorAppointment);
 router.post("/getPatientAppointment", getPatientAppointment);
+router.get(
+  "/getAppointmentsByPatientId/:patientId",
+  getAppointmentsByPatientId
+);
 
 module.exports = router;

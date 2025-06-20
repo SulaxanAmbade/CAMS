@@ -1,53 +1,97 @@
-import { Card, Avatar } from "antd";
 import React from "react";
+import { Card, Avatar, Typography, Tag, Descriptions } from "antd";
 import { useSelector } from "react-redux";
 import { UserOutlined } from "@ant-design/icons";
+
+const { Title } = Typography;
+
+const getRoleTag = (role) => {
+  switch (role) {
+    case "Patient":
+      return <Tag color="blue">Patient</Tag>;
+    case "Doctor":
+      return <Tag color="green">Doctor</Tag>;
+    case "Staff":
+      return <Tag color="volcano">Staff</Tag>;
+    default:
+      return <Tag>Unknown</Tag>;
+  }
+};
+
 const PatientProfile = () => {
   const { user } = useSelector((state) => state.user);
-  const cardDetails = { color: "white" };
-  const dob = new Date(user?.dateOfBirth).toLocaleDateString("en-GB");
+  const dob =
+    user?.dateOfBirth && new Date(user.dateOfBirth).toLocaleDateString("en-GB");
+
   return (
-    <>
-      <Card style={{ background: "#b7202eee", height: "100%" }}>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div style={cardDetails}>
+    <Card
+      bordered={false}
+      style={{
+        background: "#fff",
+        boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
+        borderRadius: "12px",
+        padding: "24px",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+        }}
+      >
+        <div style={{ flex: 1 }}>
+          <Title level={3} style={{ marginBottom: 0 }}>
+            {user?.name} {getRoleTag(user?.role)}
+          </Title>
+          <p style={{ color: "#888", marginBottom: 24 }}>{user?.gender}</p>
+
+          <Descriptions
+            column={1}
+            layout="horizontal"
+            labelStyle={{ fontWeight: "bold" }}
+            contentStyle={{ marginBottom: "8px" }}
+          >
+            <Descriptions.Item label="Contact No">
+              {user?.contactNo}
+            </Descriptions.Item>
+
             {user?.role === "Patient" && (
               <>
-                <b>
-                  <h2>{user?.role}</h2>
-                </b>
-                <h3>Name : {user?.name}</h3> <h3>{user?.gender}</h3>
-                <h3>Contact Number : {user?.contactNo}</h3>
-                <h3>Date of Birth : {dob}</h3>
-                <h4>Medical History : {user?.medicalHistory}</h4>
+                <Descriptions.Item label="Date of Birth">
+                  {dob}
+                </Descriptions.Item>
+                <Descriptions.Item label="Medical History">
+                  {user?.medicalHistory || "N/A"}
+                </Descriptions.Item>
               </>
             )}
 
             {user?.role === "Doctor" && (
               <>
-                <b>
-                  <h2>{user?.role}</h2>
-                </b>
-                <h3>Name : {user?.name}</h3> <h3>{user?.gender}</h3>
-                <h3>Contact Number : {user?.contactNo}</h3>
-                <h4>Specialization : {user?.specialization}</h4>
+                <Descriptions.Item label="Specialization">
+                  {user?.specialization}
+                </Descriptions.Item>
+                <Descriptions.Item label="Visiting Hours">
+                  {user?.visitingHours?.start} - {user?.visitingHours?.end}
+                </Descriptions.Item>
               </>
             )}
-
-            {user?.role === "Staff" && (
-              <>
-                <b>
-                  <h2>{user?.role}</h2>
-                </b>
-                <h3>Name : {user?.name}</h3> <h3>{user?.gender}</h3>
-                <h3>Contact Number : {user?.contactNo}</h3>
-              </>
-            )}
-          </div>
-          <Avatar size={128} icon={<UserOutlined />} />
+          </Descriptions>
         </div>
-      </Card>
-    </>
+
+        <Avatar
+          size={128}
+          icon={<UserOutlined />}
+          style={{
+            backgroundColor: "#b7202e",
+            marginLeft: "auto",
+            marginTop: 8,
+          }}
+        />
+      </div>
+    </Card>
   );
 };
 
