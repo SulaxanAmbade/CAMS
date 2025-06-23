@@ -3,6 +3,7 @@ import axios from "axios";
 import { message, Input, Radio, Spin, Card, Row, Col, Tag } from "antd";
 import moment from "moment";
 import { useSelector } from "react-redux";
+import { getFcmToken } from "../../firebase"; // 🔸 Import FCM logic
 
 const PatientDashboard = () => {
   const { user } = useSelector((state) => state.user);
@@ -15,6 +16,29 @@ const PatientDashboard = () => {
 
   useEffect(() => {
     fetchAppointments();
+
+    // 🔹 Setup FCM and send token to backend
+    const setupFcm = async () => {
+      const token = await getFcmToken();
+      if (token) {
+        try {
+          await axios.post(
+            "https://cams-qgq9.onrender.com/api/v1/patient/save-token",
+            { token },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          console.log("✅ FCM Token sent to backend");
+        } catch (error) {
+          console.error("❌ Error saving FCM token:", error);
+        }
+      }
+    };
+
+    setupFcm();
   }, []);
 
   const fetchAppointments = async () => {

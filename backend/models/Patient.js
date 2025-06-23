@@ -16,7 +16,7 @@ const PatientSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      required:true,
+      required: true,
     },
     emergencyContact: {
       type: String,
@@ -25,6 +25,10 @@ const PatientSchema = new mongoose.Schema(
     medicalHistory: {
       type: String,
       default: "Not Mentioned",
+    },
+    fcmToken: {
+      type: String,
+      default: "",
     },
   },
   { timestamps: true }

@@ -10,6 +10,8 @@ dotenv.config();
 
 // MongoDB connection
 connectDB();
+// Appointment reminder scheduler
+require("./schedulers/reminderScheduler");
 
 // Initialize express
 const app = express();

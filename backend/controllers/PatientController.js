@@ -122,6 +122,38 @@ const patientLogin = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+// 🔐 Save FCM token for patient
+const saveFcmToken = async (req, res) => {
+  try {
+    const { token } = req.body;
+    const patientId = req.user.id;
+
+    if (!token) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Token is required" });
+    }
+
+    const updatedPatient = await newPatient.findByIdAndUpdate(
+      patientId,
+      { fcmToken: token },
+      { new: true }
+    );
+
+    if (!updatedPatient) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Patient not found" });
+    }
+
+    res
+      .status(200)
+      .json({ success: true, message: "FCM token saved successfully" });
+  } catch (error) {
+    console.error("FCM Token Save Error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
 
 module.exports = {
   getAllPatient,
@@ -130,4 +162,5 @@ module.exports = {
   updatePatient,
   deletePatient,
   patientLogin,
+  saveFcmToken,
 };

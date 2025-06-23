@@ -7,8 +7,9 @@ const {
   updatePatient,
   deletePatient,
   patientLogin,
+  saveFcmToken,
 } = require("../controllers/PatientController");
-
+const authMiddleware = require("../middlewares/authMiddleware");
 router.get("/getAllPatient", getAllPatient);
 
 // Add a new patient
@@ -24,5 +25,7 @@ router.put("/updatePatient/:id", updatePatient);
 router.delete("/deletePatient/:id", deletePatient);
 
 router.post("/login", patientLogin);
+
+router.post("/save-token", saveFcmToken, authMiddleware);
 
 module.exports = router;

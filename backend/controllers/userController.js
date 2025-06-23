@@ -42,7 +42,7 @@ const loginUser = async (req, res) => {
         .send({ message: "Invalid Credentials", success: false });
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1hr",
+      expiresIn: "1yr",
     });
     // Check the role and fetch corresponding profile data
     let profileCompleted = false;
