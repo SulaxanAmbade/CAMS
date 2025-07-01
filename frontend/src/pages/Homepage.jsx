@@ -19,13 +19,12 @@ import {
   ProfileOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-
 import StaffDashboard from "../components/dashboard/StaffDashboard";
 import DoctorDashboard from "../components/dashboard/DoctorDashboard";
 import PatientDashboard from "../components/dashboard/PatientDashboard";
 import { setUser } from "../redux/features/userSlice";
 import Profile from "../components/profile/Profile";
-
+import "../css/homepage.css";
 const { Header, Content } = Layout;
 const { Title } = Typography;
 
@@ -55,7 +54,9 @@ const HomePage = () => {
   ];
 
   if (user?.role === "Staff") {
-    menuItems.splice(1, 0,
+    menuItems.splice(
+      1,
+      0,
       {
         key: "patients",
         icon: <TeamOutlined />,
@@ -78,43 +79,30 @@ const HomePage = () => {
   };
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <Header
-        style={{
-          backgroundColor: "#b7202e",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0 20px",
-        }}
-      >
-        <Title level={3} style={{ color: "white", margin: 0 }}>
-          CAMS
-        </Title>
-
+    <Layout className="home-layout">
+      <Header className="home-header">
         <Menu
           theme="dark"
           mode="horizontal"
-          selectedKeys={[view]}
+          selectedKeys="none"
           onClick={(e) => {
             if (e.key === "patients") navigate("/manage-patients");
             else if (e.key === "doctors") navigate("/manage-doctors");
             else setView(e.key);
           }}
           items={menuItems}
-          style={{
-            backgroundColor: "#b7202e",
-            borderBottom: "none",
-            flex: 1,
-            justifyContent: "center",
-          }}
+          className="home-menu"
         />
 
         <Dropdown
           trigger={["click"]}
           overlay={
             <Menu>
-              <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+              <Menu.Item
+                key="logout"
+                icon={<LogoutOutlined />}
+                onClick={handleLogout}
+              >
                 Logout
               </Menu.Item>
             </Menu>
@@ -127,9 +115,7 @@ const HomePage = () => {
         </Dropdown>
       </Header>
 
-      <Content style={{ padding: 24 }}>
-        {renderDashboard()}
-      </Content>
+      <Content style={{ padding: 8 }}>{renderDashboard()}</Content>
     </Layout>
   );
 };

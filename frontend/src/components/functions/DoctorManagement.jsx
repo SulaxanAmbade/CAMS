@@ -61,7 +61,7 @@ export const DoctorManagement = () => {
 
   const fetchDoctors = async () => {
     try {
-      const response = await fetch("https://cams-qgq9.onrender.com/api/v1/doctor/getAllDoctors");
+      const response = await fetch("/api/v1/doctor/getAllDoctors");
       if (!response.ok) throw new Error("Failed to fetch doctors");
       const data = await response.json();
       setDoctorData(data.data);
@@ -101,7 +101,7 @@ export const DoctorManagement = () => {
 
       console.log("Doctor Data to be sent to DB:", doctorDataToSend);
 
-      const response = await fetch("https://cams-qgq9.onrender.com/api/v1/doctor/addNewDoctor", {
+      const response = await fetch("/api/v1/doctor/addNewDoctor", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(doctorDataToSend),
@@ -134,7 +134,7 @@ export const DoctorManagement = () => {
 
   const handleDeleteDoctor = async (doctorId) => {
     try {
-      const response = await fetch(`https://cams-qgq9.onrender.com/api/v1/doctor/deleteDoctor/${doctorId}`, {
+      const response = await fetch(`/api/v1/doctor/deleteDoctor/${doctorId}`, {
         method: "DELETE",
       });
 

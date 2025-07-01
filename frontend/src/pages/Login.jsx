@@ -17,7 +17,7 @@ const Login = () => {
   const [registerModal, setRegisterModal] = useState(false);
   const fetchStaff = async () => {
     try {
-      const response = await fetch("https://cams-qgq9.onrender.com/api/v1/staff/getAllStaff");
+      const response = await fetch("/api/v1/staff/getAllStaff");
       if (!response.ok) throw new Error("Failed to fetch staff");
       const data = await response.json();
       setStaffData(data.data || []);
@@ -34,7 +34,7 @@ const Login = () => {
   const onSubmitStaffLogin = async (values) => {
     try {
       dispatch(showLoading());
-      const response = await axios.post("https://cams-qgq9.onrender.com/api/v1/staff/login", values);
+      const response = await axios.post("/api/v1/staff/login", values);
       dispatch(hideLoading());
 
       if (response.data.success) {
@@ -53,7 +53,7 @@ const Login = () => {
   // Doctor Login Handler
   const onSubmitDoctorLogin = async (values) => {
     try {
-      const response = await axios.post("https://cams-qgq9.onrender.com/api/v1/doctor/login", values);
+      const response = await axios.post("/api/v1/doctor/login", values);
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
         message.success("Doctor login successful!");
@@ -69,7 +69,7 @@ const Login = () => {
   // Patient Login Handler
   const onSubmitPatientLogin = async (values) => {
     try {
-      const response = await axios.post("https://cams-qgq9.onrender.com/api/v1/patient/login", values);
+      const response = await axios.post("/api/v1/patient/login", values);
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
         message.success("Patient login successful!");
@@ -89,15 +89,7 @@ const Login = () => {
 
   return (
     <div className="formContainer">
-      <Card
-        style={{
-          background: "#fc840311",
-          backdropFilter: "blur(8px)",
-          width: "110vh",
-          textAlign: "center",
-          color: "#291806",
-        }}
-      >
+      <Card className="loginCard" style={{}}>
         <h4>Welcome to </h4>
         <h2 style={{ textAlign: "center", marginLeft: "10px" }}>
           <b style={{ color: "gold" }}>C</b>linical{" "}
@@ -107,15 +99,31 @@ const Login = () => {
         </h2>
         <hr />
         <h5>Login as</h5>
-        <Button className="LogButton" onClick={() => setDoctorCard(true)}>
-          DOCTOR
-        </Button>
-        <Button className="LogButton" onClick={() => setPatientCard(true)}>
-          PATIENT
-        </Button>
-        <Button className="LogButton" onClick={() => setStaffLoginShow(true)}>
-          STAFF
-        </Button>
+        <div className="logButtonDiv">
+          {" "}
+          <Button
+            type="text"
+            className="LogButton"
+            onClick={() => setDoctorCard(true)}
+          >
+            DOCTOR
+          </Button>
+          <Button
+            type="text"
+            className="LogButton"
+            onClick={() => setPatientCard(true)}
+          >
+            PATIENT
+          </Button>
+          <Button
+            type="text"
+            className="LogButton"
+            onClick={() => setStaffLoginShow(true)}
+          >
+            STAFF
+          </Button>
+        </div>
+
         <div>
           {" "}
           <Button

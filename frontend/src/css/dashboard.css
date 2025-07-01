@@ -1,0 +1,112 @@
+/* dashboard.css */
+
+.dashboard-header {
+  font-size: 24px;
+  color: #F8F1E5;
+  background-color: #2C1D13;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.dashboard-controls {
+  position: sticky;
+  top: 20px;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+  background-color: #2C1D13;
+  padding: 8px;
+  border-radius: 10px;
+}
+
+.dashboard-controls input {
+  width: 220px;
+  max-width: 100%;
+}
+
+.radio-group .ant-radio-button-wrapper {
+  background-color: #3E2B20 ;
+  color: #F8F1E5;
+  border: #3E2B20;
+  border-radius: 0;
+  transition: background-color 2s;
+}
+
+.ant-radio-button-wrapper-checked {
+  background-color: #805C37 !important;
+  color: #F4D186 !important;;
+}
+.ant-radio-button-wrapper-checked:active::after .ant-radio-button-wrapper-checked:before{
+  outline:none;
+  box-shadow: none;
+}
+
+.today-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+}
+
+.add-button {
+  background-color: #E6B35A;
+  color: #2C1D13;
+  border: none;
+}
+
+.add-button:hover {
+  background-color: #4c3526dc !important;
+  color: #E6B35A !important;
+}
+
+.card-style {
+  background: linear-gradient(135deg, #4a3623, #e6b35a);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-radius: 12px;
+  padding: 10px;
+  height: 100%;
+  transition: transform 0.3s;
+}
+
+.card-style:hover {
+  transform: scale(1.02);
+  border: 0;
+}
+
+.card-style .ant-select {
+  width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+
+  .dashboard-header {
+    font-size: 24px;
+  }
+
+  .dashboard-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dashboard-controls input {
+    width: 100%;
+  }
+
+  .radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .today-button,
+  .add-button {
+    width: 100%;
+  }
+}

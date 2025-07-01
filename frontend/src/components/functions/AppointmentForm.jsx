@@ -20,8 +20,8 @@ const AppointmentForm = () => {
     const fetchPatientsAndDoctors = async () => {
       try {
         const [patientsRes, doctorsRes] = await Promise.all([
-          fetch("https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient"), // Fetch patients
-          fetch("https://cams-qgq9.onrender.com/api/v1/doctor/getAllDoctors"), // Fetch doctors
+          fetch("/api/v1/patient/getAllPatient"), // Fetch patients
+          fetch("/api/v1/doctor/getAllDoctors"), // Fetch doctors
         ]);
 
         if (!patientsRes.ok || !doctorsRes.ok) {
@@ -67,7 +67,7 @@ const AppointmentForm = () => {
       }
 
       try {
-        const response = await fetch("https://cams-qgq9.onrender.com/api/v1/appointment/createAppointment", {
+        const response = await fetch("/api/v1/appointment/createAppointment", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

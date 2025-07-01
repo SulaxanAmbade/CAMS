@@ -8,7 +8,6 @@ import { getFcmToken } from "../../firebase"; // 🔸 Import FCM logic
 const PatientDashboard = () => {
   const { user } = useSelector((state) => state.user);
   const userID = user.ID;
-
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -23,7 +22,7 @@ const PatientDashboard = () => {
       if (token) {
         try {
           await axios.post(
-            "https://cams-qgq9.onrender.com/api/v1/patient/save-token",
+            "/api/v1/patient/save-token",
             { token },
             {
               headers: {
@@ -45,7 +44,7 @@ const PatientDashboard = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        "https://cams-qgq9.onrender.com/api/v1/appointment/getPatientAppointment",
+        "/api/v1/appointment/getPatientAppointment",
         { userID }
       );
       setAppointments(res.data.data || []);
@@ -95,40 +94,26 @@ const PatientDashboard = () => {
 
   return (
     <div>
-      <h3>All Appointments</h3>
+      <h3 className="dashboard-header">All Appointments</h3>
 
-      <div
-        style={{
-          position: "sticky",
-          top: "20px",
-          zIndex: 2,
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: 16,
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="dashboard-controls">
         <Input
           placeholder="Search by Doctor's Name"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          style={{ width: 300, marginBottom: 8 }}
         />
-
-        <div style={{ marginBottom: 16 }}>
-          <span style={{ marginRight: 8 }}>Filter by Status:</span>
-          <Radio.Group
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <Radio.Button value="All">All</Radio.Button>
-            {statusOrder.map((status) => (
-              <Radio.Button key={status} value={status}>
-                {status}
-              </Radio.Button>
-            ))}
-          </Radio.Group>
-        </div>
+        <Radio.Group
+          className="radio-group"
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+        >
+          <Radio.Button value="All">All</Radio.Button>
+          {statusOrder.map((status) => (
+            <Radio.Button key={status} value={status}>
+              {status}
+            </Radio.Button>
+          ))}
+        </Radio.Group>
       </div>
 
       {loading ? (
@@ -143,11 +128,9 @@ const PatientDashboard = () => {
                   background: `linear-gradient(135deg,#e3e1e1,${getCardColor(
                     a.status
                   )})`,
-                  display: "flex",
-                  placeContent: "center",
-                  textAlign: "center",
                   border: isTomorrowConfirmed(a) ? "2px solid #ff0000" : "none",
                 }}
+                className="card-style"
               >
                 {isTomorrowConfirmed(a) ? (
                   <Tag color="red" style={{ marginBottom: 8 }}>
@@ -162,7 +145,7 @@ const PatientDashboard = () => {
                 </div>
                 <div>{moment(a.date).format("YYYY")}</div>
                 <div style={{ fontSize: "200%" }}>{a.time}</div>
-                <div>{a.doctorId?.name || "Deleted Doctor"}</div>
+                <div>Dr.{a.doctorId?.name || "Deleted Doctor"}</div>
               </Card>
             </Col>
           ))}

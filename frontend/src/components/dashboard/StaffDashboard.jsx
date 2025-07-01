@@ -7,14 +7,13 @@ import {
   Select,
   Spin,
   Modal,
-  DatePicker,
-  TimePicker,
   Card,
   Radio,
   Row,
   Col,
 } from "antd";
 import moment from "moment";
+import "../../css/dashboard.css";
 import AppointmentForm from "../functions/AppointmentForm";
 const { Option } = Select;
 
@@ -37,7 +36,7 @@ const StaffDashboard = () => {
   const fetchAppointments = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://cams-qgq9.onrender.com/api/v1/appointment/getAllAppointments");
+      const res = await axios.get("/api/v1/appointment/getAllAppointments");
       setAppointments(res.data.data);
     } catch (err) {
       message.error("Failed to fetch appointments.");
@@ -48,7 +47,7 @@ const StaffDashboard = () => {
 
   const fetchPatients = async () => {
     try {
-      const res = await axios.get("https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient");
+      const res = await axios.get("/api/v1/patient/getAllPatient");
       setPatients(res.data.data);
     } catch {
       message.error("Failed to fetch patients.");
@@ -57,7 +56,7 @@ const StaffDashboard = () => {
 
   const fetchDoctors = async () => {
     try {
-      const res = await axios.get("https://cams-qgq9.onrender.com/api/v1/doctor/getAllDoctors");
+      const res = await axios.get("/api/v1/doctor/getAllDoctors");
       setDoctors(res.data.data);
     } catch {
       message.error("Failed to fetch doctors.");
@@ -66,7 +65,7 @@ const StaffDashboard = () => {
 
   const handleStatusChange = async (appointmentId, newStatus) => {
     try {
-      await axios.put(`https://cams-qgq9.onrender.com/api/v1/appointment/updateStatus/${appointmentId}`, {
+      await axios.put(`/api/v1/appointment/updateStatus/${appointmentId}`, {
         status: newStatus,
       });
       message.success("Status updated");
@@ -102,13 +101,13 @@ const StaffDashboard = () => {
   const getCardColor = (status) => {
     switch (status) {
       case "Confirmed":
-        return "#ffff00"; // yellow
+        return "#ffff00";
       case "Pending":
-        return "#ab0a0a"; // red
+        return "#ab0a0a";
       case "Cancelled":
-        return "#6a6a6a"; // grey
+        return "#6a6a6a";
       case "Completed":
-        return "#008100"; // green
+        return "#008100";
       default:
         return "#ffffff";
     }
@@ -116,27 +115,19 @@ const StaffDashboard = () => {
 
   return (
     <div>
-      <h3>{showTodayOnly ? "Today's Appointments" : "All Appointments"}</h3>
+      <h3 className="dashboard-header">
+        {showTodayOnly ? "Today's Appointments" : "All Appointments"}
+      </h3>
 
-      <div
-        style={{
-          position: "sticky",
-          top: "20px",
-          zIndex: 2,
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: 16,
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="dashboard-controls">
         <Input
-          placeholder="Search by patient or doctor name"
+          placeholder="Search by Patient or Doctor name"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          style={{ width: 300, marginBottom: 8 }}
         />
 
         <Radio.Group
+          className="radio-group"
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
         >
@@ -149,15 +140,17 @@ const StaffDashboard = () => {
         </Radio.Group>
 
         <Button
+          className="today-button"
           onClick={() => setShowTodayOnly(!showTodayOnly)}
-          style={{ backgroundColor: "#4CAF50", color: "white" }}
         >
           {showTodayOnly
             ? "Show All Appointments"
             : "Show Today's Appointments"}
         </Button>
 
-        <Button onClick={() => setShowModal(true)}>Add Appointment</Button>
+        <Button className="add-button" onClick={() => setShowModal(true)}>
+          Add Appointment
+        </Button>
       </div>
 
       {loading ? (
@@ -168,19 +161,16 @@ const StaffDashboard = () => {
             <Col xs={24} sm={12} md={8} lg={6} key={a._id}>
               <Card
                 hoverable
+                className="card-style"
                 style={{
-                  background: `linear-gradient(135deg,#e3e1e1,${getCardColor(
+                  background: `linear-gradient(135deg,#f5f0eb,${getCardColor(
                     a.status
                   )})`,
-                  display: "flex",
-                  placeContent: "center",
-                  textAlign: "center",
                 }}
               >
                 <Select
                   value={a.status}
                   onChange={(value) => handleStatusChange(a._id, value)}
-                  style={{ width: "100%" }}
                 >
                   {statusOrder.map((s) => (
                     <Option key={s} value={s}>
@@ -194,18 +184,20 @@ const StaffDashboard = () => {
                 </div>
                 <div style={{ fontSize: "150%" }}>{a.time}</div>
                 <div style={{ fontSize: "200%" }}>
-                  {a.patientId?.name || "Deleted Patient"}{" "}
-                  {a.doctorId?.name || "Deleted Doctor"}
+                  {a.patientId?.name || "Deleted Patient"} <br />
+                  Dr.{a.doctorId?.name || "Deleted Doctor"}
                 </div>
               </Card>
             </Col>
           ))}
         </Row>
       )}
+
       <Modal
         open={showModal}
         onCancel={() => setShowModal(false)}
         footer={null}
+        centered
       >
         <AppointmentForm />
       </Modal>

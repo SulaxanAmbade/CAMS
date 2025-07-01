@@ -31,7 +31,7 @@ export const PatientManagement = () => {
   const fetchAppointments = async (patientId) => {
     try {
       const response = await fetch(
-        `https://cams-qgq9.onrender.com/api/v1/appointment/getAppointmentsByPatientId/${patientId}`
+        `/api/v1/appointment/getAppointmentsByPatientId/${patientId}`
       );
       if (!response.ok) throw new Error("Failed to fetch appointments");
       const data = await response.json();
@@ -44,7 +44,7 @@ export const PatientManagement = () => {
 
   const fetchPatients = async () => {
     try {
-      const response = await fetch("https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient");
+      const response = await fetch("/api/v1/patient/getAllPatient");
       if (!response.ok) throw new Error("Failed to fetch patients");
       const data = await response.json();
       setPatientData(data.data || []);
@@ -59,7 +59,7 @@ export const PatientManagement = () => {
 
   const handleAddPatient = async (values) => {
     try {
-      const response = await fetch("https://cams-qgq9.onrender.com/api/v1/patient/addNewPatient", {
+      const response = await fetch("/api/v1/patient/addNewPatient", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
@@ -78,7 +78,7 @@ export const PatientManagement = () => {
   const handleDeletePatient = async (patientId) => {
     try {
       const response = await fetch(
-        `https://cams-qgq9.onrender.com/api/v1/patient/deletePatient/${patientId}`,
+        `/api/v1/patient/deletePatient/${patientId}`,
         { method: "DELETE" }
       );
       if (!response.ok) throw new Error("Failed to delete patient");

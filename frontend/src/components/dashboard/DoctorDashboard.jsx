@@ -16,7 +16,7 @@ import {
 } from "antd";
 import moment from "moment";
 import { useSelector } from "react-redux";
-
+import "../../css/dashboard.css";
 const { Option } = Select;
 const { TextArea } = Input;
 
@@ -48,7 +48,7 @@ const DoctorDashboard = () => {
 
   const fetchPatients = async () => {
     try {
-      const res = await axios.get("https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient");
+      const res = await axios.get("/api/v1/patient/getAllPatient");
       setPatients(res.data.data);
     } catch {
       message.error("Failed to fetch patients.");
@@ -58,7 +58,7 @@ const DoctorDashboard = () => {
   const fetchAppointments = async () => {
     setLoading(true);
     try {
-      const res = await axios.post("https://cams-qgq9.onrender.com/api/v1/appointment/getDoctorAppointment", {
+      const res = await axios.post("/api/v1/appointment/getDoctorAppointment", {
         userID,
       });
       setAppointments(res.data.data);
@@ -71,10 +71,11 @@ const DoctorDashboard = () => {
 
   const handleStatusChange = async (appointmentId, newStatus) => {
     try {
-      await axios.put(`https://cams-qgq9.onrender.com/api/v1/appointment/updateStatus/${appointmentId}`, {
+      await axios.put(`/api/v1/appointment/updateStatus/${appointmentId}`, {
         status: newStatus,
       });
       message.success("Status updated");
+      setShowDetailsModal(false);
       fetchAppointments();
     } catch {
       message.error("Failed to update status");
@@ -135,12 +136,12 @@ const DoctorDashboard = () => {
       doctorId: userID,
       date: selectedDate.format("YYYY-MM-DD"),
       time: selectedTime.format("HH:mm"),
-      status: selectedStatus,
+      status: "Confirmed",
       remarks: remark,
     };
 
     try {
-      await axios.post("https://cams-qgq9.onrender.com/api/v1/appointment/createAppointment", payload);
+      await axios.post("/api/v1/appointment/createAppointment", payload);
       message.success("Appointment created successfully");
       setShowModal(false);
       fetchAppointments();
@@ -186,42 +187,32 @@ const DoctorDashboard = () => {
 
   return (
     <div>
-      <h3>{showTodayOnly ? "Today's Appointments" : "All Appointments"}</h3>
+      <h3 className="dashboard-header">
+        {showTodayOnly ? "Today's Appointments" : "All Appointments"}
+      </h3>
 
-      <div
-        style={{
-          position: "sticky",
-          top: "20px",
-          zIndex: 2,
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: 16,
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="dashboard-controls">
         <Input
           placeholder="Search by Patient's Name"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          style={{ width: 300, marginBottom: 8 }}
         />
 
-        <div style={{ marginBottom: 16 }}>
-          <span style={{ marginRight: 8 }}>Filter by Status:</span>
-          <Radio.Group
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <Radio.Button value="All">All</Radio.Button>
-            {statusOrder.map((status) => (
-              <Radio.Button key={status} value={status}>
-                {status}
-              </Radio.Button>
-            ))}
-          </Radio.Group>
-        </div>
+        <Radio.Group
+          className="radio-group"
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+        >
+          <Radio.Button value="All">All</Radio.Button>
+          {statusOrder.map((status) => (
+            <Radio.Button key={status} value={status}>
+              {status}
+            </Radio.Button>
+          ))}
+        </Radio.Group>
 
         <Button
+          className="today-button"
           onClick={() => setShowTodayOnly(!showTodayOnly)}
           style={{ backgroundColor: "#4CAF50", color: "white" }}
         >
@@ -229,7 +220,7 @@ const DoctorDashboard = () => {
             ? "Show All Appointments"
             : "Show Today's Appointments"}
         </Button>
-        <Button type="primary" onClick={openAddModal}>
+        <Button className="add-button" type="primary" onClick={openAddModal}>
           Add Appointment
         </Button>
       </div>
@@ -242,13 +233,11 @@ const DoctorDashboard = () => {
             <Col xs={24} sm={12} md={8} lg={6} key={a._id}>
               <Card
                 hoverable
+                className="card-style"
                 style={{
                   background: `linear-gradient(135deg,#e3e1e1,${getCardColor(
                     a.status
                   )})`,
-                  display: "flex",
-                  placeContent: "center",
-                  textAlign: "center",
                 }}
                 onClick={() => {
                   setSelectedAppointment(a);
@@ -275,10 +264,12 @@ const DoctorDashboard = () => {
         onOk={handleAddSubmit}
         confirmLoading={modalLoading}
         okText="Create"
+        centered
       >
+        Patient:
         <Select
-          placeholder="Select Patient"
           value={selectedPatient}
+          placeholder="Select Patient"
           onChange={setSelectedPatient}
           style={{ width: "100%", marginBottom: 16 }}
         >
@@ -288,7 +279,7 @@ const DoctorDashboard = () => {
             </Option>
           ))}
         </Select>
-
+        Date:
         <DatePicker
           style={{ width: "100%", marginBottom: 16 }}
           value={selectedDate}
@@ -298,7 +289,7 @@ const DoctorDashboard = () => {
           }
           placeholder="Select Date"
         />
-
+        Time:
         <TimePicker
           style={{ width: "100%", marginBottom: 16 }}
           value={selectedTime}
@@ -306,18 +297,7 @@ const DoctorDashboard = () => {
           format="HH:mm"
           placeholder="Select Time"
         />
-
-        <Select
-          style={{ width: "100%" }}
-          value={selectedStatus}
-          onChange={setSelectedStatus}
-        >
-          {statusOrder.map((s) => (
-            <Option key={s} value={s}>
-              {s}
-            </Option>
-          ))}
-        </Select>
+        Status:Confirmed
         <TextArea
           rows={4}
           placeholder="Enter any remarks (optional)"
@@ -336,10 +316,9 @@ const DoctorDashboard = () => {
       >
         <Card
           style={{
-            height: "50vh",
-            fontSize: "medium",
-            background: "linear-gradient(#b7202e55,#b7202eff)",
-            color: "black",
+            background: `radial-gradient(circle,${getCardColor(
+              selectedAppointment?.status
+            )}99,#ffffff`,
           }}
         >
           <p>
@@ -353,11 +332,24 @@ const DoctorDashboard = () => {
           <p>
             <b>Time:</b> {selectedAppointment?.time}
           </p>
-          <p>
-            <b>Status:</b> {selectedAppointment?.status}
-          </p>
+
           <p>
             <b>Remarks:</b> {selectedAppointment?.remarks || "No Remarks"}
+          </p>
+          <p>
+            Status:
+            <Select
+              value={selectedAppointment?.status}
+              onChange={(value) =>
+                handleStatusChange(selectedAppointment?._id, value)
+              }
+            >
+              {statusOrder.map((s) => (
+                <Option key={s} value={s}>
+                  {s}
+                </Option>
+              ))}
+            </Select>
           </p>
         </Card>
       </Modal>

@@ -27,7 +27,7 @@ const PatientProfile = () => {
     <Card
       bordered={false}
       style={{
-        background: "#fff",
+        background: "#291806",
         boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
         borderRadius: "12px",
         padding: "24px",
@@ -36,22 +36,32 @@ const PatientProfile = () => {
       <div
         style={{
           display: "flex",
-          alignItems: "flex-start",
-          justifyContent: "space-between",
           flexWrap: "wrap",
+          flexDirection: "row",
+          gap: "24px",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          color: "white",
         }}
       >
-        <div style={{ flex: 1 }}>
-          <Title level={3} style={{ marginBottom: 0 }}>
+        {/* Profile Info */}
+        <div
+          style={{
+            flex: 1,
+            minWidth: "250px",
+            maxWidth: "100%",
+          }}
+        >
+          <Title level={3} style={{ marginBottom: 0, color: "white" }}>
             {user?.name} {getRoleTag(user?.role)}
           </Title>
-          <p style={{ color: "#888", marginBottom: 24 }}>{user?.gender}</p>
+          <p style={{ color: "#aaa", marginBottom: 24 }}>{user?.gender}</p>
 
           <Descriptions
             column={1}
             layout="horizontal"
-            labelStyle={{ fontWeight: "bold" }}
-            contentStyle={{ marginBottom: "8px" }}
+            labelStyle={{ fontWeight: "bold", color: "#ccc" }}
+            contentStyle={{ marginBottom: "8px", color: "white" }}
           >
             <Descriptions.Item label="Contact No">
               {user?.contactNo}
@@ -81,15 +91,17 @@ const PatientProfile = () => {
           </Descriptions>
         </div>
 
-        <Avatar
-          size={128}
-          icon={<UserOutlined />}
-          style={{
-            backgroundColor: "#b7202e",
-            marginLeft: "auto",
-            marginTop: 8,
-          }}
-        />
+        {/* Avatar */}
+        <div style={{ marginLeft: "auto", marginRight: "auto" }}>
+          <Avatar
+            size={128}
+            icon={<UserOutlined />}
+            style={{
+              backgroundColor: "#eb763f",
+              marginTop: 8,
+            }}
+          />
+        </div>
       </div>
     </Card>
   );
