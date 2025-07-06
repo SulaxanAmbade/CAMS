@@ -59,19 +59,22 @@ const AppointmentForm = ({
       }
 
       try {
-        const response = await fetch("https://cams-qgq9.onrender.com/api/v1/appointment/createAppointment", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            patientId: selectedPatient,
-            doctorId: selectedDoctor,
-            date: selectedDate.format("YYYY-MM-DD"),
-            time: selectedTime.format("HH:mm"),
-            remark: remark,
-          }),
-        });
+        const response = await fetch(
+          "https://cams-qgq9.onrender.com/api/v1/appointment/createAppointment",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              patientId: selectedPatient,
+              doctorId: selectedDoctor,
+              date: selectedDate.format("YYYY-MM-DD"),
+              time: selectedTime.format("HH:mm"),
+              remark: remark,
+            }),
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Failed to schedule appointment");
@@ -91,15 +94,22 @@ const AppointmentForm = ({
           fetchAppointments(); // refresh appointment list
           setShowModal(false); // close form
         } else {
-          notification.error({message:"Failed to schedule appointment. Please try again."});
+          notification.error({
+            message: "Failed to schedule appointment. Please try again.",
+          });
         }
       } catch (error) {
-        notification.error({message:"Failed to schedule appointment. Please try again."});
+        notification.error({
+          message: "Failed to schedule appointment. Please try again.",
+        });
       } finally {
         setLoading(false);
       }
     } else {
-      notification.warning({message:"Details not filled!",description:"Please select patient, doctor, date, and time."});
+      notification.warning({
+        message: "Details not filled!",
+        description: "Please select patient, doctor, date, and time.",
+      });
     }
   };
 
@@ -213,10 +223,12 @@ const StaffDashboard = () => {
   const fetchAppointments = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://cams-qgq9.onrender.com/api/v1/appointment/getAllAppointments");
+      const res = await axios.get(
+        "https://cams-qgq9.onrender.com/api/v1/appointment/getAllAppointments"
+      );
       setAppointments(res.data.data);
     } catch (err) {
-      notification.error({message:"Failed to fetch appointments."});
+      notification.error({ message: "Failed to fetch appointments." });
     } finally {
       setLoading(false);
     }
@@ -224,31 +236,41 @@ const StaffDashboard = () => {
 
   const fetchPatients = async () => {
     try {
-      const res = await axios.get("https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient");
+      const res = await axios.get(
+        "https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient"
+      );
       setPatients(res.data.data);
     } catch {
-      notification.error({message:"Failed to fetch patients."});
+      notification.error({ message: "Failed to fetch patients." });
     }
   };
 
   const fetchDoctors = async () => {
     try {
-      const res = await axios.get("https://cams-qgq9.onrender.com/api/v1/doctor/getAllDoctors");
+      const res = await axios.get(
+        "https://cams-qgq9.onrender.com/api/v1/doctor/getAllDoctors"
+      );
       setDoctors(res.data.data);
     } catch {
-      notification.error({message:"Failed to fetch doctors."});
+      notification.error({ message: "Failed to fetch doctors." });
     }
   };
 
   const handleStatusChange = async (appointmentId, newStatus) => {
     try {
-      await axios.put(`https://cams-qgq9.onrender.com/api/v1/appointment/updateStatus/${appointmentId}`, {
-        status: newStatus,
+      await axios.put(
+        `https://cams-qgq9.onrender.com/api/v1/appointment/updateStatus/${appointmentId}`,
+        {
+          status: newStatus,
+        }
+      );
+      notification.success({
+        message: `Status updated `,
+        description: `Status updated to ${newStatus}.`,
       });
-      notification.success({message:`Status updated `,description:`Status updated to ${newStatus}.`});
       fetchAppointments();
     } catch {
-      notification.error({message:"Failed to update status"});
+      notification.error({ message: "Failed to update status" });
     }
   };
 
@@ -289,7 +311,13 @@ const StaffDashboard = () => {
         return "#ffffff";
     }
   };
-
+  const isTomorrowConfirmed = (appointment) => {
+    const tomorrow = moment().add(1, "day");
+    return (
+      appointment.status === "Confirmed" &&
+      moment(appointment.date).isSame(tomorrow, "day")
+    );
+  };
   return (
     <div>
       <h3 className="dashboard-header">
@@ -343,18 +371,26 @@ const StaffDashboard = () => {
                   background: `linear-gradient(135deg,#f5f0eb,${getCardColor(
                     a.status
                   )})`,
+                  border: isTomorrowConfirmed(a) ? "2px solid #ff0000" : "none",
                 }}
               >
-                <Select
-                  value={a.status}
-                  onChange={(value) => handleStatusChange(a._id, value)}
-                >
-                  {statusOrder.map((s) => (
-                    <Option key={s} value={s}>
-                      {s}
-                    </Option>
-                  ))}
-                </Select>
+                {isTomorrowConfirmed(a) ? (
+                  <Tag color="red" style={{ marginBottom: 8 }}>
+                    Tomorrow's Confirmed Appointment
+                  </Tag>
+                ) : (
+                  <Select
+                    value={a.status}
+                    onChange={(value) => handleStatusChange(a._id, value)}
+                  >
+                    {statusOrder.map((s) => (
+                      <Option key={s} value={s}>
+                        {s}
+                      </Option>
+                    ))}
+                  </Select>
+                )}
+
                 <div className="appointment-date">
                   {moment(a.date).format("DD MMMM")}{" "}
                   {moment(a.date).format("YYYY")}

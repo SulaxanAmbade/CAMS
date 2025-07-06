@@ -196,7 +196,13 @@ const DoctorDashboard = () => {
         return "#ffffff";
     }
   };
-
+  const isTomorrowConfirmed = (appointment) => {
+    const tomorrow = moment().add(1, "day");
+    return (
+      appointment.status === "Confirmed" &&
+      moment(appointment.date).isSame(tomorrow, "day")
+    );
+  };
   return (
     <div>
       <h3 className="dashboard-header">
@@ -250,13 +256,20 @@ const DoctorDashboard = () => {
                   background: `linear-gradient(135deg,#e3e1e1,${getCardColor(
                     a.status
                   )})`,
+                  border: isTomorrowConfirmed(a) ? "2px solid #ff0000" : "none",
                 }}
                 onClick={() => {
                   setSelectedAppointment(a);
                   setShowDetailsModal(true);
                 }}
               >
-                <div>{a.status}</div>
+                {isTomorrowConfirmed(a) ? (
+                  <Tag color="red" style={{ marginBottom: 8 }}>
+                    Tomorrow's Confirmed Appointment
+                  </Tag>
+                ) : (
+                  <div>{a.status}</div>
+                )}{" "}
                 <div style={{ fontSize: "200%" }}>
                   {moment(a.date).format("DD MMMM")}
                 </div>
