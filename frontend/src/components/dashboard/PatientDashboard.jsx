@@ -4,6 +4,7 @@ import { message, Input, Radio, Spin, Card, Row, Col, Tag } from "antd";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import { getFcmToken } from "../../firebase"; // 🔸 Import FCM logic
+import Spinner from "../requirements/Spinner";
 
 const PatientDashboard = () => {
   const { user } = useSelector((state) => state.user);
@@ -118,7 +119,7 @@ const PatientDashboard = () => {
       </div>
 
       {loading ? (
-        <Spin size="large" />
+        <Spinner />
       ) : (
         <Row gutter={[16, 16]}>
           {filteredAppointments.map((a) => (

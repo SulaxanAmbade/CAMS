@@ -48,7 +48,9 @@ const DoctorDashboard = () => {
 
   const fetchPatients = async () => {
     try {
-      const res = await axios.get("https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient");
+      const res = await axios.get(
+        "https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient"
+      );
       setPatients(res.data.data);
     } catch {
       message.error("Failed to fetch patients.");
@@ -58,9 +60,12 @@ const DoctorDashboard = () => {
   const fetchAppointments = async () => {
     setLoading(true);
     try {
-      const res = await axios.post("https://cams-qgq9.onrender.com/api/v1/appointment/getDoctorAppointment", {
-        userID,
-      });
+      const res = await axios.post(
+        "https://cams-qgq9.onrender.com/api/v1/appointment/getDoctorAppointment",
+        {
+          userID,
+        }
+      );
       setAppointments(res.data.data);
     } catch {
       message.error("Error fetching appointments.");
@@ -71,9 +76,12 @@ const DoctorDashboard = () => {
 
   const handleStatusChange = async (appointmentId, newStatus) => {
     try {
-      await axios.put(`https://cams-qgq9.onrender.com/api/v1/appointment/updateStatus/${appointmentId}`, {
-        status: newStatus,
-      });
+      await axios.put(
+        `https://cams-qgq9.onrender.com/api/v1/appointment/updateStatus/${appointmentId}`,
+        {
+          status: newStatus,
+        }
+      );
       message.success("Status updated");
       setShowDetailsModal(false);
       fetchAppointments();
@@ -141,7 +149,10 @@ const DoctorDashboard = () => {
     };
 
     try {
-      await axios.post("https://cams-qgq9.onrender.com/api/v1/appointment/createAppointment", payload);
+      await axios.post(
+        "https://cams-qgq9.onrender.com/api/v1/appointment/createAppointment",
+        payload
+      );
       message.success("Appointment created successfully");
       setShowModal(false);
       fetchAppointments();
@@ -226,7 +237,7 @@ const DoctorDashboard = () => {
       </div>
 
       {loading ? (
-        <Spin size="large" />
+        <Spinner />
       ) : (
         <Row gutter={[16, 16]}>
           {filteredAppointments.map((a) => (
