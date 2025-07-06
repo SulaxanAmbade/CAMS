@@ -76,7 +76,7 @@ const HomePage = () => {
     if (user?.role === "staff") return <StaffDashboard />;
     if (user?.role === "doctor") return <DoctorDashboard />;
     if (user?.role === "patient") return <PatientDashboard />;
-    return user;
+    return null;
   };
 
   return (
