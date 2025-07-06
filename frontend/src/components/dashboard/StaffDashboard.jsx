@@ -374,9 +374,9 @@ const StaffDashboard = () => {
                   )})`,
                   border: isTomorrowConfirmed(a) ? "2px solid #ff0000" : "none",
                 }}
-              >
+              > 
                 {isTomorrowConfirmed(a) && (
-                  <Tag color="red" style={{ marginBottom: 8 }}>
+                  <Tag color="red" style={{ width:"100%", marginBottom: 8 }}>
                     Tomorrow's Confirmed Appointment
                   </Tag>
                 )}
