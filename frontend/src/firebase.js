@@ -1,3 +1,4 @@
+import { message } from "antd";
 import { initializeApp } from "firebase/app";
 import {
   getMessaging,
@@ -37,7 +38,7 @@ export const getFcmToken = async () => {
     });
     return token;
   } catch (error) {
-    console.error("Error getting FCM token", error);
+    message.error("Error getting FCM token", error);
     return null;
   }
 };
