@@ -4,7 +4,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { hideLoading, showLoading } from "../../redux/features/alertSlice";
 import { setUser } from "../../redux/features/userSlice";
-
+import jwtDecode from 'jwt-decode'
 export default function ProtectedRoutes({ children }) {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
@@ -14,7 +14,8 @@ export default function ProtectedRoutes({ children }) {
   const getUser = async () => {
     try {
       dispatch(showLoading());
-      const decodedToken = JSON.parse(atob(token.split(".")[1])); // Decode JWT
+      const decodedToken = jwtDecode(token);
+      // Decode JWT
       const role = decodedToken?.role?.toLowerCase();
 
       if (!role) throw new Error("Invalid token");
