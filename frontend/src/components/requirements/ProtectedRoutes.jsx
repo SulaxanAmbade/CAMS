@@ -4,7 +4,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { hideLoading, showLoading } from "../../redux/features/alertSlice";
 import { setUser } from "../../redux/features/userSlice";
-import jwtDecode from 'jwt-decode'
+import { jwtDecode } from "jwt-decode";
 export default function ProtectedRoutes({ children }) {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user);
