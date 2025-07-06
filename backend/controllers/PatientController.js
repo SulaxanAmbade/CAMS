@@ -5,7 +5,9 @@ const getAllPatient = async (req, res) => {
   try {
     const patients = await newPatient.find();
     if (patients.length === 0) {
-      return res.status(201).json({ success: true, message: "No patients found" });
+      return res
+        .status(201)
+        .json({ success: true, message: "No patients found" });
     }
     res.status(200).json({ success: true, data: patients });
   } catch (error) {
@@ -36,7 +38,9 @@ const getPatientById = async (req, res) => {
   try {
     const patient = await newPatient.findById(req.params.id);
     if (!patient) {
-      return res.status(404).json({ success: false, message: "Patient not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Patient not found" });
     }
     res.status(200).json({ success: true, data: patient });
   } catch (error) {
@@ -52,7 +56,9 @@ const updatePatient = async (req, res) => {
       { new: true, runValidators: true }
     );
     if (!updatedPatient) {
-      return res.status(404).json({ success: false, message: "Patient not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Patient not found" });
     }
     res.status(200).json({ success: true, data: updatedPatient });
   } catch (error) {
@@ -64,9 +70,13 @@ const deletePatient = async (req, res) => {
   try {
     const deletedPatient = await newPatient.findByIdAndDelete(req.params.id);
     if (!deletedPatient) {
-      return res.status(404).json({ success: false, message: "Patient not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Patient not found" });
     }
-    res.status(200).json({ success: true, message: "Patient deleted successfully" });
+    res
+      .status(200)
+      .json({ success: true, message: "Patient deleted successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -76,14 +86,18 @@ const patientLogin = async (req, res) => {
   const { phoneNumber } = req.body;
 
   if (!phoneNumber) {
-    return res.status(400).json({ success: false, message: "Phone number is required" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Phone number is required" });
   }
 
   try {
     const patient = await newPatient.findOne({ contactNo: phoneNumber });
 
     if (!patient) {
-      return res.status(404).json({ success: false, message: "Patient not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Patient not found" });
     }
 
     const token = jwt.sign(
@@ -139,6 +153,19 @@ const saveFcmToken = async (req, res) => {
     });
   }
 };
+const getUserData = async (req, res) => {
+  try {
+    const patient = await newPatient.findById(req.user.id);
+    if (!patient) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Patient not found" });
+    }
+    res.status(200).json({ success: true, data: patient });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 module.exports = {
   getAllPatient,
@@ -148,4 +175,5 @@ module.exports = {
   deletePatient,
   patientLogin,
   saveFcmToken,
+  getUserData,
 };

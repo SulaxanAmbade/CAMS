@@ -122,10 +122,24 @@ const doctorLogin = async (req, res) => {
       .json({ success: false, message: "Something Went Wrong" });
   }
 };
+const getUserData = async (req, res) => {
+  try {
+    const doctor = await Doctor.findById(req.user.id);
+    if (!doctor) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Doctor not found" });
+    }
+    res.status(200).json({ success: true, data: doctor });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 module.exports = {
   getAllDoctors,
   addDoctor,
   deleteDoctor,
   doctorLogin,
+  getUserData,
 };

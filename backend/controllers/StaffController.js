@@ -79,4 +79,19 @@ const registerStaff = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-module.exports = { getAllStaff, loginStaff };
+
+const getUserData = async (req, res) => {
+  try {
+    const staff = await Staff.findById(req.user.id);
+    if (!staff) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Staff not found" });
+    }
+    res.status(200).json({ success: true, data: staff });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+module.exports = { getAllStaff, loginStaff, getUserData };
