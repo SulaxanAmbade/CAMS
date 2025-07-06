@@ -13,6 +13,7 @@ const staffSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  role: { type: String, default: "staff" },
 });
 
 const Staff = mongoose.model("Staff", staffSchema);

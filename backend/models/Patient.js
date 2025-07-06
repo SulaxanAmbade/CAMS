@@ -10,6 +10,7 @@ const PatientSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    role: { type: String, default: "patient" },
     contactNo: {
       type: String,
       required: true,
