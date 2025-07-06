@@ -53,7 +53,9 @@ export const PatientManagement = () => {
 
   const fetchPatients = async () => {
     try {
-      const res = await axios.get("https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient");
+      const res = await axios.get(
+        "https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient"
+      );
       setPatientData(res.data.data);
     } catch {
       notification.error({ message: "Failed to fetch patients." });
@@ -83,7 +85,9 @@ export const PatientManagement = () => {
 
   const handleDeletePatient = async (patientId) => {
     try {
-      await axios.delete(`https://cams-qgq9.onrender.com/api/v1/patient/deletePatient/${patientId}`);
+      await axios.delete(
+        `https://cams-qgq9.onrender.com/api/v1/patient/deletePatient/${patientId}`
+      );
       setPatientData(
         patientData.filter((patient) => patient._id !== patientId)
       );
@@ -190,8 +194,7 @@ export const PatientManagement = () => {
                   },
                 ]}
               >
-                {" "}
-                <Input />{" "}
+                <Input />
               </Form.Item>
               <Form.Item
                 label="Date of Birth"
@@ -203,20 +206,18 @@ export const PatientManagement = () => {
                   },
                 ]}
               >
-                {" "}
-                <DatePicker style={{ width: "100%" }} />{" "}
+                <DatePicker style={{ width: "100%" }} />
               </Form.Item>
               <Form.Item
                 label="Gender"
                 name="gender"
                 rules={[{ required: true, message: "Please select gender!" }]}
               >
-                {" "}
                 <Select>
                   <Option value="Male">Male</Option>
                   <Option value="Female">Female</Option>
                   <Option value="Others">Others</Option>
-                </Select>{" "}
+                </Select>
               </Form.Item>
               <Form.Item
                 label="Contact No"
@@ -229,8 +230,7 @@ export const PatientManagement = () => {
                   },
                 ]}
               >
-                {" "}
-                <Input />{" "}
+                <Input />
               </Form.Item>
               <Form.Item
                 label="Emergency Contact"
@@ -243,12 +243,10 @@ export const PatientManagement = () => {
                   },
                 ]}
               >
-                {" "}
-                <Input />{" "}
+                <Input />
               </Form.Item>
               <Form.Item label="Medical History" name="medicalHistory">
-                {" "}
-                <Input.TextArea rows={4} />{" "}
+                <Input.TextArea rows={4} />
               </Form.Item>
               <Form.Item>
                 <Button type="primary" htmlType="submit">
