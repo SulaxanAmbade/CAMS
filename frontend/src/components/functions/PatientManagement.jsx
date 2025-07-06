@@ -141,7 +141,7 @@ export const PatientManagement = () => {
 
   return (
     <>
-      {user?.role === "Staff" ? (
+      {user?.role === "staff" ? (
         <>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <Button

@@ -7,11 +7,11 @@ const { Title } = Typography;
 
 const getRoleTag = (role) => {
   switch (role) {
-    case "Patient":
+    case "patient":
       return <Tag color="blue">Patient</Tag>;
-    case "Doctor":
+    case "doctor":
       return <Tag color="green">Doctor</Tag>;
-    case "Staff":
+    case "staff":
       return <Tag color="volcano">Staff</Tag>;
     default:
       return <Tag>Unknown</Tag>;
