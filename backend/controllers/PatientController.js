@@ -126,7 +126,7 @@ const patientLogin = async (req, res) => {
 const saveFcmToken = async (req, res) => {
   try {
     const { token } = req.body;
-    const patientId = req.user.id;
+    const patientId = req.body.userId;
 
     if (!token) {
       return res

@@ -111,7 +111,6 @@ const Login = () => {
         <hr />
         <h5>Login as</h5>
         <div className="logButtonDiv">
-          {" "}
           <Button
             type="text"
             className="LogButton"
@@ -136,7 +135,6 @@ const Login = () => {
         </div>
 
         <div>
-          {" "}
           <Button
             type="text"
             onClick={handleRegister}
