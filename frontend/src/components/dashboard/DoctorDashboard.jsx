@@ -13,7 +13,7 @@ import {
   Radio,
   Row,
   Col,
-  Tag
+  Tag,
 } from "antd";
 import moment from "moment";
 import { useSelector } from "react-redux";
@@ -24,7 +24,7 @@ const { TextArea } = Input;
 
 const DoctorDashboard = () => {
   const { user } = useSelector((state) => state.user);
-  const userID = user.ID;
+  const userID = user._id;
 
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);

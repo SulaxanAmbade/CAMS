@@ -8,7 +8,7 @@ import Spinner from "../requirements/Spinner";
 
 const PatientDashboard = () => {
   const { user } = useSelector((state) => state.user);
-  const userID = user.ID;
+  const userID = user._id;
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -115,7 +115,6 @@ const PatientDashboard = () => {
             </Radio.Button>
           ))}
         </Radio.Group>
-        
       </div>
 
       {loading ? (
