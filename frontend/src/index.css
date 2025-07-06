@@ -1,16 +1,16 @@
-*{
+* {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    
+
 }
-.spinner{
+
+.spinner {
     height: 100vh;
-    min-width: 80vw;
     width: 100vw;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: #1C120D;
-    color:#C49B59
+    color: #C49B59
 }
