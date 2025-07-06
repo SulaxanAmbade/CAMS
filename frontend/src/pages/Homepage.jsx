@@ -54,7 +54,7 @@ const HomePage = () => {
     },
   ];
 
-  if (user?.role === "Staff") {
+  if (user?.role === "staff") {
     menuItems.splice(
       1,
       0,
@@ -73,16 +73,18 @@ const HomePage = () => {
 
   const renderDashboard = () => {
     if (view === "profile") return <Profile />;
-    if (user?.role === "Staff") return <StaffDashboard />;
-    if (user?.role === "Doctor") return <DoctorDashboard />;
-    if (user?.role === "Patient") return <PatientDashboard />;
+    if (user?.role === "staff") return <StaffDashboard />;
+    if (user?.role === "doctor") return <DoctorDashboard />;
+    if (user?.role === "patient") return <PatientDashboard />;
     return null;
   };
 
   return (
     <Layout className="home-layout">
       <Header className="home-header">
-        <div><img src={logo} className="logo"></img></div>
+        <div>
+          <img src={logo} className="logo"></img>
+        </div>
         <Menu
           theme="dark"
           mode="horizontal"
