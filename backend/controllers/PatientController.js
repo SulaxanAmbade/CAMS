@@ -101,7 +101,7 @@ const patientLogin = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: patient._id, contactNo: patient.contactNo },
+      { id: patient._id, contactNo: patient.contactNo, role: "staff" },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );

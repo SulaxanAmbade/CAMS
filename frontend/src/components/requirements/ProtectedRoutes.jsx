@@ -15,6 +15,8 @@ export default function ProtectedRoutes({ children }) {
     try {
       dispatch(showLoading());
       const decodedToken = jwtDecode(token);
+      console.log("Decoded Token: ", jwt_decode(token));
+
       // Decode JWT
       const role = decodedToken?.role?.toLowerCase();
 

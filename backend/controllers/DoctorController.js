@@ -105,9 +105,13 @@ const doctorLogin = async (req, res) => {
         .send({ message: "Invalid Credentials", success: false });
     }
 
-    const token = jwt.sign({ id: doctor._id }, process.env.JWT_SECRET, {
-      expiresIn: "1hr",
-    });
+    const token = jwt.sign(
+      { id: doctor._id, role: "doctor" },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1yr",
+      }
+    );
     // Login successful
     return res.status(200).json({
       success: true,

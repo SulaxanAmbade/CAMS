@@ -36,9 +36,13 @@ const loginStaff = async (req, res) => {
         .send({ message: "Invalid Credentials", success: false });
     }
 
-    const token = jwt.sign({ id: staff._id }, process.env.JWT_SECRET, {
-      expiresIn: "1hr",
-    });
+    const token = jwt.sign(
+      { id: staff._id, role: "staff" },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1hr",
+      }
+    );
 
     res.status(200).send({
       message: "Logged In Successfully",
