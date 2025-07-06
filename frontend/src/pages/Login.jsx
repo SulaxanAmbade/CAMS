@@ -102,7 +102,7 @@ const Login = () => {
     <div className="formContainer">
       <Card className="loginCard" style={{}}>
         <h4>Welcome to </h4>
-        <h2 style={{ textAlign: "center", marginLeft: "10px" }}>
+        <h2 style={{ textAlign: "center", color: "white", marginLeft: "10px" }}>
           <b style={{ color: "gold" }}>C</b>linical{" "}
           <b style={{ color: "gold" }}>A</b>ppointment{" "}
           <b style={{ color: "gold" }}>M</b>anagement{" "}
