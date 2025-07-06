@@ -17,7 +17,9 @@ const Login = () => {
   const [registerModal, setRegisterModal] = useState(false);
   const fetchStaff = async () => {
     try {
-      const response = await fetch("https://cams-qgq9.onrender.com/api/v1/staff/getAllStaff");
+      const response = await fetch(
+        "https://cams-qgq9.onrender.com/api/v1/staff/getAllStaff"
+      );
       if (!response.ok) throw new Error("Failed to fetch staff");
       const data = await response.json();
       setStaffData(data.data || []);
@@ -34,7 +36,10 @@ const Login = () => {
   const onSubmitStaffLogin = async (values) => {
     try {
       dispatch(showLoading());
-      const response = await axios.post("https://cams-qgq9.onrender.com/api/v1/staff/login", values);
+      const response = await axios.post(
+        "https://cams-qgq9.onrender.com/api/v1/staff/login",
+        values
+      );
       dispatch(hideLoading());
 
       if (response.data.success) {
@@ -53,7 +58,10 @@ const Login = () => {
   // Doctor Login Handler
   const onSubmitDoctorLogin = async (values) => {
     try {
-      const response = await axios.post("https://cams-qgq9.onrender.com/api/v1/doctor/login", values);
+      const response = await axios.post(
+        "https://cams-qgq9.onrender.com/api/v1/doctor/login",
+        values
+      );
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
         message.success("Doctor login successful!");
@@ -69,7 +77,10 @@ const Login = () => {
   // Patient Login Handler
   const onSubmitPatientLogin = async (values) => {
     try {
-      const response = await axios.post("https://cams-qgq9.onrender.com/api/v1/patient/login", values);
+      const response = await axios.post(
+        "https://cams-qgq9.onrender.com/api/v1/patient/login",
+        values
+      );
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
         message.success("Patient login successful!");
@@ -131,7 +142,7 @@ const Login = () => {
             onClick={handleRegister}
             style={{ color: "#291806" }}
           >
-            Registeration details
+            Registration details
           </Button>
         </div>
       </Card>

@@ -23,7 +23,7 @@
 
 .home-menu {
   background-color: #2C1D13 !important;
-  color: white;
+  color: white !important;
   border-bottom: none;
   flex: 1;
   justify-content: flex-start;
@@ -33,5 +33,6 @@
 .ant-menu-vertical,
 .ant-menu-item {
   margin: 0;
-  background: #2c1d13 !important;
+  background: #362317 !important;
+  color: white !important;
 }
