@@ -22,7 +22,7 @@ const PatientDashboard = () => {
       if (token) {
         try {
           await axios.post(
-            "/api/v1/patient/save-token",
+            "https://cams-qgq9.onrender.com/api/v1/patient/save-token",
             { token },
             {
               headers: {
@@ -44,7 +44,7 @@ const PatientDashboard = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        "/api/v1/appointment/getPatientAppointment",
+        "https://cams-qgq9.onrender.com/api/v1/appointment/getPatientAppointment",
         { userID }
       );
       setAppointments(res.data.data || []);
@@ -114,6 +114,7 @@ const PatientDashboard = () => {
             </Radio.Button>
           ))}
         </Radio.Group>
+        
       </div>
 
       {loading ? (

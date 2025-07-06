@@ -1,22 +1,199 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {
-  message,
+  notification,
   Input,
   Button,
   Select,
   Spin,
-  Modal,
   Card,
   Radio,
   Row,
   Col,
+  DatePicker,
+  TimePicker,
+  Modal,
 } from "antd";
 import moment from "moment";
+import TextArea from "antd/es/input/TextArea";
 import "../../css/dashboard.css";
-import AppointmentForm from "../functions/AppointmentForm";
+import Spinner from "../requirements/Spinner";
+
 const { Option } = Select;
 
+/* =======================
+   Embedded AppointmentForm
+   ======================= */
+const AppointmentForm = ({
+  patients,
+  doctors,
+  fetchAppointments,
+  setShowModal,
+}) => {
+  const [selectedPatient, setSelectedPatient] = useState("");
+  const [selectedDoctor, setSelectedDoctor] = useState("");
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [remark, setRemark] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleScheduleAppointment = async () => {
+    if (selectedPatient && selectedDoctor && selectedDate && selectedTime) {
+      setLoading(true);
+      const doctor = doctors.find((doc) => doc._id === selectedDoctor);
+
+      if (doctor) {
+        const { visitingHours } = doctor;
+        const startHour = visitingHours.start;
+        const endHour = visitingHours.end;
+        const selectedHour = selectedTime.format("HH:mm");
+
+        if (selectedHour < startHour || selectedHour > endHour) {
+          notification.error({
+            message: "Invalid Time Slot",
+            description: `Selected time is outside the doctor's visiting hours. Please select a time between ${startHour} and ${endHour}.`,
+          });
+          setLoading(false);
+          return;
+        }
+      }
+
+      try {
+        const response = await fetch("https://cams-qgq9.onrender.com/api/v1/appointment/createAppointment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            patientId: selectedPatient,
+            doctorId: selectedDoctor,
+            date: selectedDate.format("YYYY-MM-DD"),
+            time: selectedTime.format("HH:mm"),
+            remark: remark,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to schedule appointment");
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+          notification.success({
+            message: "Appointment scheduled successfully",
+          });
+          setSelectedPatient("");
+          setSelectedDoctor("");
+          setSelectedDate("");
+          setSelectedTime(null);
+          setRemark("");
+          fetchAppointments(); // refresh appointment list
+          setShowModal(false); // close form
+        } else {
+          notification.error({message:"Failed to schedule appointment. Please try again."});
+        }
+      } catch (error) {
+        notification.error({message:"Failed to schedule appointment. Please try again."});
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      notification.warning({message:"Details not filled!",description:"Please select patient, doctor, date, and time."});
+    }
+  };
+
+  return (
+    <div
+      style={{
+        marginTop: "2rem",
+        padding: "1rem",
+        background: "#f4f4f4",
+        borderRadius: 10,
+      }}
+    >
+      <h2>Schedule Appointment</h2>
+      <p>Patient</p>
+      <Select
+        placeholder="Select Patient"
+        value={selectedPatient}
+        onChange={setSelectedPatient}
+        style={{ width: "100%", marginBottom: "1rem" }}
+      >
+        {patients.map((patient) => (
+          <Option key={patient._id} value={patient._id}>
+            {patient.name}
+          </Option>
+        ))}
+      </Select>
+      <p>Doctor</p>
+      <Select
+        placeholder="Select Doctor"
+        value={selectedDoctor}
+        onChange={(value) => {
+          setSelectedDoctor(value);
+          setSelectedDate(null);
+          setSelectedTime(null);
+        }}
+        style={{ width: "100%", marginBottom: "1rem" }}
+      >
+        {doctors.map((doctor) => (
+          <Option key={doctor._id} value={doctor._id}>
+            {doctor.name}
+          </Option>
+        ))}
+      </Select>
+
+      <DatePicker
+        placeholder="Select Date"
+        onChange={(date) => {
+          setSelectedDate(date);
+          setSelectedTime(null);
+        }}
+        disabled={!selectedDoctor}
+        style={{ width: "100%", marginBottom: "1rem" }}
+        disabledDate={(current) => current && current < moment().startOf("day")}
+      />
+
+      <TimePicker
+        placeholder="Select Time"
+        value={selectedTime}
+        onChange={setSelectedTime}
+        disabled={!selectedDoctor || !selectedDate}
+        format="HH:mm"
+        style={{ width: "100%", marginBottom: "1rem" }}
+      />
+
+      <TextArea
+        rows={4}
+        placeholder="Enter any remarks (optional)"
+        value={remark}
+        onChange={(e) => setRemark(e.target.value)}
+        style={{ marginBottom: 16 }}
+      />
+
+      <Button
+        type="primary"
+        onClick={handleScheduleAppointment}
+        loading={loading}
+      >
+        Schedule Appointment
+      </Button>
+
+      <Button
+        style={{ marginLeft: "1rem" }}
+        danger
+        onClick={() => setShowModal(false)}
+      >
+        Cancel
+      </Button>
+    </div>
+  );
+};
+
+/* =====================
+   Main StaffDashboard
+   ===================== */
 const StaffDashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [patients, setPatients] = useState([]);
@@ -36,10 +213,10 @@ const StaffDashboard = () => {
   const fetchAppointments = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("/api/v1/appointment/getAllAppointments");
+      const res = await axios.get("https://cams-qgq9.onrender.com/api/v1/appointment/getAllAppointments");
       setAppointments(res.data.data);
     } catch (err) {
-      message.error("Failed to fetch appointments.");
+      notification.error({message:"Failed to fetch appointments."});
     } finally {
       setLoading(false);
     }
@@ -47,31 +224,31 @@ const StaffDashboard = () => {
 
   const fetchPatients = async () => {
     try {
-      const res = await axios.get("/api/v1/patient/getAllPatient");
+      const res = await axios.get("https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient");
       setPatients(res.data.data);
     } catch {
-      message.error("Failed to fetch patients.");
+      notification.error({message:"Failed to fetch patients."});
     }
   };
 
   const fetchDoctors = async () => {
     try {
-      const res = await axios.get("/api/v1/doctor/getAllDoctors");
+      const res = await axios.get("https://cams-qgq9.onrender.com/api/v1/doctor/getAllDoctors");
       setDoctors(res.data.data);
     } catch {
-      message.error("Failed to fetch doctors.");
+      notification.error({message:"Failed to fetch doctors."});
     }
   };
 
   const handleStatusChange = async (appointmentId, newStatus) => {
     try {
-      await axios.put(`/api/v1/appointment/updateStatus/${appointmentId}`, {
+      await axios.put(`https://cams-qgq9.onrender.com/api/v1/appointment/updateStatus/${appointmentId}`, {
         status: newStatus,
       });
-      message.success("Status updated");
+      notification.success({message:`Status updated `,description:`Status updated to ${newStatus}.`});
       fetchAppointments();
     } catch {
-      message.error("Failed to update status");
+      notification.error({message:"Failed to update status"});
     }
   };
 
@@ -154,7 +331,7 @@ const StaffDashboard = () => {
       </div>
 
       {loading ? (
-        <Spin size="large" />
+        <Spinner />
       ) : (
         <Row gutter={[16, 16]}>
           {filteredAppointments.map((a) => (
@@ -178,12 +355,14 @@ const StaffDashboard = () => {
                     </Option>
                   ))}
                 </Select>
-                <div style={{ fontSize: "150%" }}>
+                <div className="appointment-date">
                   {moment(a.date).format("DD MMMM")}{" "}
                   {moment(a.date).format("YYYY")}
                 </div>
-                <div style={{ fontSize: "150%" }}>{a.time}</div>
-                <div style={{ fontSize: "200%" }}>
+
+                <div className="appointment-time">{a.time}</div>
+
+                <div className="appointment-info">
                   {a.patientId?.name || "Deleted Patient"} <br />
                   Dr.{a.doctorId?.name || "Deleted Doctor"}
                 </div>
@@ -198,8 +377,14 @@ const StaffDashboard = () => {
         onCancel={() => setShowModal(false)}
         footer={null}
         centered
+        destroyOnClose
       >
-        <AppointmentForm />
+        <AppointmentForm
+          patients={patients}
+          doctors={doctors}
+          fetchAppointments={fetchAppointments}
+          setShowModal={setShowModal}
+        />
       </Modal>
     </div>
   );

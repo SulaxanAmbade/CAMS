@@ -5,7 +5,7 @@ import {
   Button,
   Modal,
   Select,
-  notification as message,
+  notification,
   DatePicker,
   Card,
   Row,
@@ -16,6 +16,8 @@ import moment from "moment";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import axios from "axios";
+import Spinner from "../requirements/Spinner";
 
 export const PatientManagement = () => {
   const { user } = useSelector((state) => state.user);
@@ -25,31 +27,36 @@ export const PatientManagement = () => {
   const [isAppointmentModalVisible, setIsAppointmentModalVisible] =
     useState(false);
   const [appointments, setAppointments] = useState([]);
-
+  const [loading, setLoading] = useState(false);
   const [patientForm] = Form.useForm();
   const { Option } = Select;
+  const navigate = useNavigate();
+
   const fetchAppointments = async (patientId) => {
+    setLoading(true);
     try {
-      const response = await fetch(
-        `/api/v1/appointment/getAppointmentsByPatientId/${patientId}`
+      const res = await axios.get(
+        `https://cams-qgq9.onrender.com/api/v1/appointment/getAppointmentsByPatientId/${patientId}`
       );
-      if (!response.ok) throw new Error("Failed to fetch appointments");
-      const data = await response.json();
-      setAppointments(data.data || []);
+      setAppointments(res.data.data);
       setIsAppointmentModalVisible(true);
-    } catch (error) {
-      message.error({ message: error.message });
+    } catch (err) {
+      notification.error({
+        message: "No Appointments Found",
+        description:
+          "There are currently no appointments scheduled for this patient. Once appointments are made, they will appear here.",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchPatients = async () => {
     try {
-      const response = await fetch("/api/v1/patient/getAllPatient");
-      if (!response.ok) throw new Error("Failed to fetch patients");
-      const data = await response.json();
-      setPatientData(data.data || []);
-    } catch (error) {
-      message.error({ message: error.message });
+      const res = await axios.get("https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient");
+      setPatientData(res.data.data);
+    } catch {
+      notification.error({ message: "Failed to fetch patients." });
     }
   };
 
@@ -59,45 +66,42 @@ export const PatientManagement = () => {
 
   const handleAddPatient = async (values) => {
     try {
-      const response = await fetch("/api/v1/patient/addNewPatient", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-      if (!response.ok) throw new Error("Failed to add patient");
-      const newPatient = await response.json();
-      setPatientData([...patientData, newPatient.data]);
+      const response = await axios.post(
+        "https://cams-qgq9.onrender.com/api/v1/patient/addNewPatient",
+        values
+      );
+      setPatientData([...patientData, response.data.data]);
       setIsPatientModalVisible(false);
       patientForm.resetFields();
-      message.success({ message: "Patient added successfully!" });
+      notification.success({ message: "Patient added successfully!" });
     } catch (error) {
-      message.error({ message: error.message });
+      notification.error({
+        message: error.response?.data?.message || error.message,
+      });
     }
   };
 
   const handleDeletePatient = async (patientId) => {
     try {
-      const response = await fetch(
-        `/api/v1/patient/deletePatient/${patientId}`,
-        { method: "DELETE" }
-      );
-      if (!response.ok) throw new Error("Failed to delete patient");
+      await axios.delete(`https://cams-qgq9.onrender.com/api/v1/patient/deletePatient/${patientId}`);
       setPatientData(
         patientData.filter((patient) => patient._id !== patientId)
       );
-      message.success({ message: "Patient deleted successfully!" });
+      notification.success({ message: "Patient deleted successfully!" });
     } catch (error) {
-      message.error({ message: error.message });
+      notification.error({
+        message: error.response?.data?.message || error.message,
+      });
     }
   };
+
   const confirmDeletePatient = (patientId) => {
     Modal.confirm({
-      title: "Are you sure you want to delete this doctor?",
+      title: "Are you sure you want to delete this patient?",
       content: "This action cannot be undone.",
       onOk() {
         handleDeletePatient(patientId);
       },
-      onCancel() {},
     });
   };
 
@@ -130,50 +134,52 @@ export const PatientManagement = () => {
       ),
     },
   ];
-  const navigate = useNavigate();
 
   return (
     <>
       {user?.role === "Staff" ? (
         <>
-          {" "}
           <div style={{ display: "flex", justifyContent: "space-between" }}>
-            {" "}
             <Button
-              style={{ background: "#b7202eee", color: "white" }}
+              style={{ background: "#3E2B20", color: "white" }}
               size="large"
               onClick={() => navigate("/")}
             >
               <ArrowLeftOutlined />
             </Button>
             <Button
-              style={{ background: "#b7202eee", color: "white" }}
+              style={{ background: "#3E2B20", color: "white" }}
               onClick={() => setIsPatientModalVisible(true)}
             >
               Add New Patient
             </Button>
           </div>
+
           <Table
             dataSource={patientData}
             columns={columns}
             pagination={false}
             rowKey="_id"
-            onRow={(record) => {
-              return {
-                onClick: () => {
-                  setSelectedPatient(record);
-                  fetchAppointments(record._id);
-                },
-              };
-            }}
+            onRow={(record) => ({
+              onClick: () => {
+                setSelectedPatient(record);
+                fetchAppointments(record._id);
+              },
+            })}
           />
+
           <Modal
             title="Add New Patient"
             open={isPatientModalVisible}
             onCancel={() => setIsPatientModalVisible(false)}
             footer={null}
+            centered
           >
-            <Form form={patientForm} onFinish={handleAddPatient}>
+            <Form
+              form={patientForm}
+              onFinish={handleAddPatient}
+              layout="vertical"
+            >
               <Form.Item
                 label="Name"
                 name="name"
@@ -184,7 +190,8 @@ export const PatientManagement = () => {
                   },
                 ]}
               >
-                <Input />
+                {" "}
+                <Input />{" "}
               </Form.Item>
               <Form.Item
                 label="Date of Birth"
@@ -192,35 +199,24 @@ export const PatientManagement = () => {
                 rules={[
                   {
                     required: true,
-                    message: "Please input the patient's date of birth!",
+                    message: "Please input the date of birth!",
                   },
                 ]}
               >
-                <DatePicker
-                  onChange={(date) => {
-                    if (date) {
-                      patientForm.setFieldsValue({ dateOfBirth: date });
-                    } else {
-                      patientForm.setFieldsValue({ dateOfBirth: null });
-                    }
-                  }}
-                />
+                {" "}
+                <DatePicker style={{ width: "100%" }} />{" "}
               </Form.Item>
               <Form.Item
                 label="Gender"
                 name="gender"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input the gender!",
-                  },
-                ]}
+                rules={[{ required: true, message: "Please select gender!" }]}
               >
-                <Select placeholder="Select your gender">
+                {" "}
+                <Select>
                   <Option value="Male">Male</Option>
                   <Option value="Female">Female</Option>
                   <Option value="Others">Others</Option>
-                </Select>
+                </Select>{" "}
               </Form.Item>
               <Form.Item
                 label="Contact No"
@@ -229,11 +225,12 @@ export const PatientManagement = () => {
                   {
                     pattern: /^\+91\d{10}$/,
                     required: true,
-                    message: "Please input the patient's contact number!",
+                    message: "Please input valid contact number!",
                   },
                 ]}
               >
-                <Input />
+                {" "}
+                <Input />{" "}
               </Form.Item>
               <Form.Item
                 label="Emergency Contact"
@@ -242,14 +239,16 @@ export const PatientManagement = () => {
                   {
                     pattern: /^\+91\d{10}$/,
                     required: true,
-                    message: "Please input the emergency contact!",
+                    message: "Please input valid emergency contact!",
                   },
                 ]}
               >
-                <Input />
+                {" "}
+                <Input />{" "}
               </Form.Item>
               <Form.Item label="Medical History" name="medicalHistory">
-                <Input.TextArea rows={4} />
+                {" "}
+                <Input.TextArea rows={4} />{" "}
               </Form.Item>
               <Form.Item>
                 <Button type="primary" htmlType="submit">
@@ -258,27 +257,29 @@ export const PatientManagement = () => {
               </Form.Item>
             </Form>
           </Modal>
+
           <Modal
             title={`Appointment History: ${selectedPatient?.name}`}
             open={isAppointmentModalVisible}
             onCancel={() => setIsAppointmentModalVisible(false)}
             footer={null}
             centered
-            width="50vw"
           >
-            {appointments.length === 0 ? (
+            {loading ? (
+              <Spinner />
+            ) : appointments.length === 0 ? (
               <p>No appointments found for this patient.</p>
             ) : (
               <Row gutter={[8, 8]}>
                 {appointments.map((appt) => (
-                  <Col xs={48} sm={24} md={16} lg={12} key={appt._id}>
-                    <Card key={appt._id}>
+                  <Col xs={24} sm={12} md={8} lg={8} key={appt._id}>
+                    <Card>
                       <strong>Date:</strong>{" "}
                       {moment(appt.date).format("DD MMMM YYYY")}
                       <br />
                       <strong>Time:</strong> {appt.time}
                       <br />
-                      <strong>Doctor:</strong> {appt.doctorId.name}
+                      <strong>Doctor:</strong> {appt.doctorId?.name || "N/A"}
                       <br />
                       <strong>Remark:</strong> {appt.remarks || "N/A"}
                     </Card>

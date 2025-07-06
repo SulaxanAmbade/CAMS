@@ -25,6 +25,7 @@ import PatientDashboard from "../components/dashboard/PatientDashboard";
 import { setUser } from "../redux/features/userSlice";
 import Profile from "../components/profile/Profile";
 import "../css/homepage.css";
+import logo from "../assets/logo192.png";
 const { Header, Content } = Layout;
 const { Title } = Typography;
 
@@ -81,6 +82,7 @@ const HomePage = () => {
   return (
     <Layout className="home-layout">
       <Header className="home-header">
+        <div><img src={logo} className="logo"></img></div>
         <Menu
           theme="dark"
           mode="horizontal"
@@ -93,7 +95,6 @@ const HomePage = () => {
           items={menuItems}
           className="home-menu"
         />
-
         <Dropdown
           trigger={["click"]}
           overlay={

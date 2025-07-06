@@ -10,7 +10,6 @@ import PublicRoutes from "./components/requirements/PublicRoutes";
 import ProtectedLayout from "./components/requirements/ProtectedLayout";
 import DoctorManagement from "./components/functions/DoctorManagement";
 import PatientManagement from "./components/functions/PatientManagement";
-import DoctorSchedule from "./components/functions/DoctorSchedule";
 import Profile from "./components/profile/Profile";
 
 function App() {
@@ -82,16 +81,6 @@ function App() {
               }
             />
             {/* Route to view doctor schedule */}
-            <Route
-              path="/schedule/:doctorId" // Dynamic route for doctor schedule
-              element={
-                <ProtectedRoutes>
-                  <ProtectedLayout>
-                    <DoctorSchedule />
-                  </ProtectedLayout>
-                </ProtectedRoutes>
-              }
-            />
           </Routes>
         )}
       </BrowserRouter>

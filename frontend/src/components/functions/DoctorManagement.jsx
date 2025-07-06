@@ -5,16 +5,15 @@ import {
   Button,
   Modal,
   Card,
-  notification as message,
+  notification,
   Select,
   TimePicker,
   InputNumber,
 } from "antd";
 import React, { useEffect, useState } from "react";
-import moment from "moment";
 import { useNavigate } from "react-router-dom";
-import DoctorSchedule from "./DoctorSchedule";
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import axios from "axios";
 
 export const DoctorManagement = () => {
   const [doctorData, setDoctorData] = useState([]);
@@ -22,13 +21,12 @@ export const DoctorManagement = () => {
   const [doctorForm] = Form.useForm();
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [showDoctorDetailsModal, setShowDoctorDetailsModal] = useState(false);
-
   const [visitingTimeStrings, setVisitingTimeStrings] = useState({
     start: "",
     end: "",
   });
-
   const navigate = useNavigate();
+  const { Option } = Select;
 
   const columns = [
     { title: "Name", dataIndex: "name", key: "name" },
@@ -43,7 +41,6 @@ export const DoctorManagement = () => {
       key: "visitingHours.end",
     },
     { title: "Contact", dataIndex: "contact", key: "contact" },
-
     {
       title: "Action",
       key: "action",
@@ -61,12 +58,13 @@ export const DoctorManagement = () => {
 
   const fetchDoctors = async () => {
     try {
-      const response = await fetch("/api/v1/doctor/getAllDoctors");
-      if (!response.ok) throw new Error("Failed to fetch doctors");
-      const data = await response.json();
-      setDoctorData(data.data);
+      const res = await axios.get("https://cams-qgq9.onrender.com/api/v1/doctor/getAllDoctors");
+      setDoctorData(res.data.data);
     } catch (error) {
-      message.error({ message: error.message });
+      notification.error({
+        message: "Failed to fetch doctors",
+        description: error.response?.data?.message || error.message,
+      });
     }
   };
 
@@ -76,10 +74,10 @@ export const DoctorManagement = () => {
 
   const handleAddDoctor = async (values) => {
     try {
-      console.log("Form values:", values);
-
       if (!visitingTimeStrings.start || !visitingTimeStrings.end) {
-        message.error({ message: "Please select both start and end times!" });
+        notification.error({
+          message: "Please select both start and end times!",
+        });
         return;
       }
 
@@ -89,35 +87,41 @@ export const DoctorManagement = () => {
         slot: values.slotsDuration,
       };
 
-      console.log("Visiting Hours:", visitingHours);
-
       const doctorDataToSend = {
         name: values.name,
         password: values.password,
         specialization: values.specialization,
-        contact: values.contact || "",
-        visitingHours, // Use the formatted visiting hours
+        contact: values.contact,
+        visitingHours,
       };
 
-      console.log("Doctor Data to be sent to DB:", doctorDataToSend);
-
-      const response = await fetch("/api/v1/doctor/addNewDoctor", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(doctorDataToSend),
-      });
-
-      if (!response.ok) throw new Error("Failed to add doctor");
-
-      const newDoctor = await response.json();
-      setDoctorData([...doctorData, newDoctor.data]);
+      const res = await axios.post(
+        "https://cams-qgq9.onrender.com/api/v1/doctor/addNewDoctor",
+        doctorDataToSend
+      );
+      setDoctorData([...doctorData, res.data.data]);
       setIsDoctorModalVisible(false);
       doctorForm.resetFields();
-      setVisitingTimeStrings({ start: "", end: "" }); // Reset the time strings
-      fetchDoctors();
-      message.success({ message: "Doctor added successfully!" });
+      setVisitingTimeStrings({ start: "", end: "" });
+      notification.success({ message: "Doctor added successfully!" });
     } catch (error) {
-      message.error({ message: error.message });
+      notification.error({
+        message: "Failed to add doctor",
+        description: error.response?.data?.message || error.message,
+      });
+    }
+  };
+
+  const handleDeleteDoctor = async (doctorId) => {
+    try {
+      await axios.delete(`https://cams-qgq9.onrender.com/api/v1/doctor/deleteDoctor/${doctorId}`);
+      setDoctorData(doctorData.filter((doc) => doc._id !== doctorId));
+      notification.success({ message: "Doctor deleted successfully!" });
+    } catch (error) {
+      notification.error({
+        message: "Failed to delete doctor",
+        description: error.response?.data?.message || error.message,
+      });
     }
   };
 
@@ -128,43 +132,27 @@ export const DoctorManagement = () => {
       onOk() {
         handleDeleteDoctor(doctorId);
       },
-      onCancel() {},
     });
-  };
-
-  const handleDeleteDoctor = async (doctorId) => {
-    try {
-      const response = await fetch(`/api/v1/doctor/deleteDoctor/${doctorId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) throw new Error("Failed to delete doctor");
-
-      // Remove the deleted doctor from the state
-      setDoctorData(doctorData.filter((doctor) => doctor._id !== doctorId));
-      message.success({ message: "Doctor deleted successfully!" });
-    } catch (error) {
-      message.error({ message: error.message });
-    }
   };
 
   return (
     <>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <Button
-          style={{ background: "#b7202eee", color: "white" }}
+          style={{ background: "#3E2B20", color: "white" }}
           size="large"
           onClick={() => navigate("/")}
         >
           <ArrowLeftOutlined />
         </Button>
         <Button
-          style={{ background: "#b7202eee", color: "white" }}
+          style={{ background: "#3E2B20", color: "white" }}
           onClick={() => setIsDoctorModalVisible(true)}
         >
           Add New Doctor
         </Button>
       </div>
+
       <Table
         dataSource={doctorData}
         columns={columns}
@@ -177,13 +165,14 @@ export const DoctorManagement = () => {
           },
         })}
       />
+
       <Modal
         title="Add New Doctor"
         open={isDoctorModalVisible}
         onCancel={() => setIsDoctorModalVisible(false)}
         footer={null}
       >
-        <Form form={doctorForm} onFinish={handleAddDoctor}>
+        <Form form={doctorForm} onFinish={handleAddDoctor} layout="vertical">
           <Form.Item
             label="Name"
             name="name"
@@ -199,7 +188,7 @@ export const DoctorManagement = () => {
             rules={[
               {
                 required: true,
-                message: "Please input the doctor's Password!",
+                message: "Please input the doctor's password!",
               },
             ]}
           >
@@ -209,10 +198,7 @@ export const DoctorManagement = () => {
             label="Specialization"
             name="specialization"
             rules={[
-              {
-                required: true,
-                message: "Please input the doctor's specialization!",
-              },
+              { required: true, message: "Please input specialization!" },
             ]}
           >
             <Input />
@@ -221,7 +207,7 @@ export const DoctorManagement = () => {
             label="Contact"
             name="contact"
             rules={[
-              { required: true, message: "Please input your phone number!" },
+              { required: true, message: "Please input contact!" },
               {
                 pattern: /^\+91\d{10}$/,
                 message: "Invalid phone number format!",
@@ -245,19 +231,15 @@ export const DoctorManagement = () => {
                   end: timeString[1],
                 });
                 doctorForm.setFieldsValue({ visitingHours: time });
-                console.log(timeString[0], timeString[1]);
               }}
             />
           </Form.Item>
-
           <Form.Item
-            label="Slot Duration"
+            label="Slot Duration (minutes)"
             name="slotsDuration"
-            rules={[
-              { required: true, message: "Please enter duration in Minutes!" },
-            ]}
+            rules={[{ required: true, message: "Please enter slot duration!" }]}
           >
-            <InputNumber maxLength={3} />
+            <InputNumber min={1} max={180} style={{ width: "100%" }} />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
@@ -266,6 +248,7 @@ export const DoctorManagement = () => {
           </Form.Item>
         </Form>
       </Modal>
+
       <Modal
         title="Doctor Details"
         open={showDoctorDetailsModal}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { DatePicker, Button, Select, message, TimePicker } from "antd";
+import { notification } from "antd";
 import moment from "moment";
 import TextArea from "antd/es/input/TextArea";
 
@@ -20,8 +21,8 @@ const AppointmentForm = () => {
     const fetchPatientsAndDoctors = async () => {
       try {
         const [patientsRes, doctorsRes] = await Promise.all([
-          fetch("/api/v1/patient/getAllPatient"), // Fetch patients
-          fetch("/api/v1/doctor/getAllDoctors"), // Fetch doctors
+          fetch("https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient"), // Fetch patients
+          fetch("https://cams-qgq9.onrender.com/api/v1/doctor/getAllDoctors"), // Fetch doctors
         ]);
 
         if (!patientsRes.ok || !doctorsRes.ok) {
@@ -57,9 +58,10 @@ const AppointmentForm = () => {
 
         // Check if the selected time is within visiting hours
         if (selectedHour < startHour || selectedHour > endHour) {
-          message.error(
-            `Selected time is outside the doctor's visiting hours. Please select a time between ${startHour} and ${endHour} ${selectedHour} .`
-          );
+          notification.error({
+            message: "Invalid Time Slot",
+            description: `Selected time is outside the doctor's visiting hours. Please select a time between ${startHour} and ${endHour}.`,
+          });
 
           setLoading(false);
           return;
@@ -67,7 +69,7 @@ const AppointmentForm = () => {
       }
 
       try {
-        const response = await fetch("/api/v1/appointment/createAppointment", {
+        const response = await fetch("https://cams-qgq9.onrender.com/api/v1/appointment/createAppointment", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -90,11 +92,13 @@ const AppointmentForm = () => {
         const result = await response.json();
 
         if (result.success) {
-          message.success("Appointment scheduled successfully");
+          notification.success({
+            message: "Appointment scheduled successfully",description:`${selectedDoctor}`
+          });
           // Reset form after success
           setSelectedPatient("");
           setSelectedDoctor("");
-          setSelectedDate(null);
+          setSelectedDate("");
           setSelectedTime(null);
           setRemark("");
         } else {

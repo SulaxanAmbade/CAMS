@@ -13,26 +13,45 @@ cron.schedule("*/15 * * * *", async () => {
 
   try {
     // Find confirmed appointments between now+24h and now+24h+15min
-    const appointments = await Appointment.find({
-      status: "Confirmed",
-      $expr: {
-        $lte: [
-          {
-            $subtract: [
-              {
-                $dateFromString: {
-                  dateString: {
-                    $concat: ["$date", "T", "$time"],
+    const appointments = await Appointment.aggregate([
+      {
+        $match: {
+          status: "Confirmed",
+        },
+      },
+      {
+        $addFields: {
+          appointmentDateTime: {
+            $dateFromString: {
+              dateString: {
+                $concat: [
+                  {
+                    $dateToString: {
+                      format: "%Y-%m-%d",
+                      date: "$date",
+                    },
                   },
-                },
+                  "T",
+                  "$time",
+                ],
               },
-              new Date(),
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          $expr: {
+            $lte: [
+              {
+                $subtract: ["$appointmentDateTime", new Date()],
+              },
+              1000 * 60 * 15, // within next 15 mins
             ],
           },
-          1000 * 60 * 15, // 15 minutes in ms
-        ],
+        },
       },
-    }).populate("patientId");
+    ]);
 
     for (const appointment of appointments) {
       const patient = appointment.patientId;
