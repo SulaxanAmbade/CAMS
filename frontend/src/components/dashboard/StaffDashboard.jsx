@@ -13,7 +13,7 @@ import {
   DatePicker,
   TimePicker,
   Modal,
-  Tag
+  Tag,
 } from "antd";
 import moment from "moment";
 import TextArea from "antd/es/input/TextArea";
@@ -375,22 +375,23 @@ const StaffDashboard = () => {
                   border: isTomorrowConfirmed(a) ? "2px solid #ff0000" : "none",
                 }}
               >
-                {isTomorrowConfirmed(a) ? (
+                {isTomorrowConfirmed(a) && (
                   <Tag color="red" style={{ marginBottom: 8 }}>
                     Tomorrow's Confirmed Appointment
                   </Tag>
-                ) : (
-                  <Select
-                    value={a.status}
-                    onChange={(value) => handleStatusChange(a._id, value)}
-                  >
-                    {statusOrder.map((s) => (
-                      <Option key={s} value={s}>
-                        {s}
-                      </Option>
-                    ))}
-                  </Select>
                 )}
+
+                <Select
+                  value={a.status}
+                  onChange={(value) => handleStatusChange(a._id, value)}
+                  style={{ width: "100%", marginBottom: 8 }}
+                >
+                  {statusOrder.map((s) => (
+                    <Select.Option key={s} value={s}>
+                      {s}
+                    </Select.Option>
+                  ))}
+                </Select>
 
                 <div className="appointment-date">
                   {moment(a.date).format("DD MMMM")}{" "}
