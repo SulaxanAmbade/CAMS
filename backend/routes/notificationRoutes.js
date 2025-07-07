@@ -2,16 +2,15 @@ const express = require("express");
 const router = express.Router();
 const Appointment = require("../models/Appointment");
 const Patient = require("../models/Patient");
-const admin = require("../config/firebaseAdmin");
-const sendFast2Sms = require("../utils/sendFast2SMS");
+const admin = require("../config/firebaseAdmin"); // Firebase Admin SDK
 
+// POST /api/v1/notification/send-custom-reminder
 router.post("/send-custom-reminder", async (req, res) => {
   const { appointmentId, title, message } = req.body;
 
   try {
-    const appointment = await Appointment.findById(appointmentId).populate(
-      "patientId"
-    );
+    // Fetch appointment and patient
+    const appointment = await Appointment.findById(appointmentId).populate("patientId");
 
     if (!appointment || !appointment.patientId) {
       return res.status(404).json({
@@ -20,45 +19,38 @@ router.post("/send-custom-reminder", async (req, res) => {
       });
     }
 
-    const { name, fcmToken, contactNo } = appointment.patientId;
-    const appointmentDate = appointment.date.toDateString();
-    const appointmentTime = appointment.time;
+    const { fcmToken, name } = appointment.patientId;
 
-    const finalMessage =
-      message ||
-      `Hi ${name}, this is a reminder for your appointment on ${appointmentDate} at ${appointmentTime}.`;
-
-    // ---- 🔔 Push Notification via FCM ----
-    if (fcmToken) {
-      const notification = {
-        notification: {
-          title: title || "📢 Appointment Reminder",
-          body: finalMessage,
-        },
-        token: fcmToken,
-      };
-
-      await admin.messaging().send(notification);
+    if (!fcmToken) {
+      return res.status(400).json({
+        success: false,
+        message: "Patient does not have an FCM token",
+      });
     }
 
-    // ---- 📱 SMS Notification via Fast2SMS ----
-    if (contactNo) {
-      const smsResponse = await sendFast2Sms(`${contactNo}`, finalMessage); // Assumes Indian numbers
+    // Compose notification
+    const notification = {
+      notification: {
+        title: title || "📢 Appointment Reminder",
+        body:
+          message ||
+          `Hi ${name}, this is a reminder for your appointment on ${appointment.date.toDateString()} at ${appointment.time}.`,
+      },
+      token: fcmToken,
+    };
 
-      if (!smsResponse.success) {
-        console.error("❌ SMS failed:", smsResponse.error);
-      }
-    }
+    // Send FCM push notification
+    await admin.messaging().send(notification);
 
     return res.status(200).json({
       success: true,
-      message: "Push and SMS reminder sent successfully",
+      message: "Push notification sent successfully",
     });
   } catch (error) {
-    console.error("❌ Reminder error:", error);
+    console.error("Error sending reminder notification:", error);
     return res.status(500).json({
       success: false,
-      message: "Failed to send reminder",
+      message: "Failed to send push notification",
       error: error.message,
     });
   }
