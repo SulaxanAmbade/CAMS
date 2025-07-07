@@ -16,8 +16,6 @@ const PatientDashboard = () => {
 
   useEffect(() => {
     fetchAppointments();
-
-    // 🔹 Setup FCM and send token to backend
     const setupFcm = async () => {
       const token = await getFcmToken();
       if (token) {
