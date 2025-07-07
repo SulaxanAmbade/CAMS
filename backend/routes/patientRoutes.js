@@ -27,6 +27,6 @@ router.delete("/deletePatient/:id", deletePatient);
 
 router.post("/login", patientLogin);
 
-router.post("/save-token", saveFcmToken, authMiddleware);
+router.post("/save-token", authMiddleware, saveFcmToken);
 router.post("/getUserData", authMiddleware, getUserData);
 module.exports = router;
