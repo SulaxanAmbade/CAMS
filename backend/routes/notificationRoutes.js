@@ -9,7 +9,9 @@ router.post("/send-custom-reminder", async (req, res) => {
   const { appointmentId, title, message } = req.body;
 
   try {
-    const appointment = await Appointment.findById(appointmentId).populate("patientId");
+    const appointment = await Appointment.findById(appointmentId).populate(
+      "patientId"
+    );
 
     if (!appointment || !appointment.patientId) {
       return res.status(404).json({
@@ -41,7 +43,7 @@ router.post("/send-custom-reminder", async (req, res) => {
 
     // ---- 📱 SMS Notification via Fast2SMS ----
     if (contactNo) {
-      const smsResponse = await sendFast2Sms(`91${contactNo}`, finalMessage); // Assumes Indian numbers
+      const smsResponse = await sendFast2Sms(`${contactNo}`, finalMessage); // Assumes Indian numbers
 
       if (!smsResponse.success) {
         console.error("❌ SMS failed:", smsResponse.error);
