@@ -125,7 +125,7 @@ const saveFcmToken = async (req, res) => {
     console.log("➡️ req.body:", req.body);
 
     const { token } = req.body;
-    const contactNo = req.user?.contactNo;
+    const userId = req.user?.id;
 
     if (!token) {
       console.warn("⚠️ Token missing");
@@ -134,16 +134,16 @@ const saveFcmToken = async (req, res) => {
         message: "Token  missing",
       });
     }
-    if (!contactNo) {
-      console.warn("⚠️ contactNo missing");
+    if (!userId) {
+      console.warn("⚠️ userId missing");
       return res.status(400).json({
         success: false,
-        message: " contact number missing",
+        message: "userId missing",
       });
     }
 
-    const updatedPatient = await newPatient.findOneAndUpdate(
-      { contactNo },
+    const updatedPatient = await newPatient.findByIdAndUpdate(
+      { userId },
       { $set: { fcmToken: token } },
       { new: true }
     );
