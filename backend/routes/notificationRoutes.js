@@ -48,7 +48,7 @@ router.post("/send-custom-reminder", async (req, res) => {
       await twilioClient.messages.create({
         body: smsBody,
         from: process.env.TWILIO_PHONE_NUMBER,
-        to: `+91${contactNo}`, // Assuming Indian numbers
+        to: `${contactNo}`, // Assuming Indian numbers
       });
     }
 
