@@ -3,15 +3,13 @@ const router = express.Router();
 const Appointment = require("../models/Appointment");
 const Patient = require("../models/Patient");
 const admin = require("../config/firebaseAdmin");
-const twilioClient = require("../config/twilioClient");
+const sendFast2Sms = require("../utils/sendFast2SMS");
 
 router.post("/send-custom-reminder", async (req, res) => {
   const { appointmentId, title, message } = req.body;
 
   try {
-    const appointment = await Appointment.findById(appointmentId).populate(
-      "patientId"
-    );
+    const appointment = await Appointment.findById(appointmentId).populate("patientId");
 
     if (!appointment || !appointment.patientId) {
       return res.status(404).json({
@@ -24,14 +22,16 @@ router.post("/send-custom-reminder", async (req, res) => {
     const appointmentDate = appointment.date.toDateString();
     const appointmentTime = appointment.time;
 
-    // ----- 🔔 Push Notification -----
+    const finalMessage =
+      message ||
+      `Hi ${name}, this is a reminder for your appointment on ${appointmentDate} at ${appointmentTime}.`;
+
+    // ---- 🔔 Push Notification via FCM ----
     if (fcmToken) {
       const notification = {
         notification: {
           title: title || "📢 Appointment Reminder",
-          body:
-            message ||
-            `Hi ${name}, your appointment is on ${appointmentDate} at ${appointmentTime}.`,
+          body: finalMessage,
         },
         token: fcmToken,
       };
@@ -39,28 +39,24 @@ router.post("/send-custom-reminder", async (req, res) => {
       await admin.messaging().send(notification);
     }
 
-    // ----- 📱 SMS Notification -----
+    // ---- 📱 SMS Notification via Fast2SMS ----
     if (contactNo) {
-      const smsBody =
-        message ||
-        `Hi ${name}, this is a reminder for your appointment on ${appointmentDate} at ${appointmentTime}.`;
+      const smsResponse = await sendFast2Sms(`91${contactNo}`, finalMessage); // Assumes Indian numbers
 
-      await twilioClient.messages.create({
-        body: smsBody,
-        from: process.env.TWILIO_PHONE_NUMBER,
-        to: `${contactNo}`, // Assuming Indian numbers
-      });
+      if (!smsResponse.success) {
+        console.error("❌ SMS failed:", smsResponse.error);
+      }
     }
 
     return res.status(200).json({
       success: true,
-      message: "Notification and SMS sent successfully",
+      message: "Push and SMS reminder sent successfully",
     });
   } catch (error) {
-    console.error("Error sending reminder:", error);
+    console.error("❌ Reminder error:", error);
     return res.status(500).json({
       success: false,
-      message: "Failed to send notification or SMS",
+      message: "Failed to send reminder",
       error: error.message,
     });
   }
