@@ -120,39 +120,51 @@ const patientLogin = async (req, res) => {
 
 const saveFcmToken = async (req, res) => {
   try {
+    console.log("🔐 Incoming FCM token request");
+    console.log("➡️ req.user:", req.user);
+    console.log("➡️ req.body:", req.body);
+
     const { token } = req.body;
-    const contactNo = req.user.contactNo;
+    const contactNo = req.user?.contactNo;
 
     if (!token || !contactNo) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Token or contact number missing" });
+      console.warn("⚠️ Token or contactNo missing");
+      return res.status(400).json({
+        success: false,
+        message: "Token or contact number missing",
+      });
     }
 
     const updatedPatient = await newPatient.findOneAndUpdate(
       { contactNo },
-      { fcmToken: token },
+      { $set: { fcmToken: token } },
       { new: true }
     );
 
     if (!updatedPatient) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Patient not found" });
+      console.warn("⚠️ Patient not found");
+      return res.status(404).json({
+        success: false,
+        message: "Patient not found",
+      });
     }
 
-    res.status(200).json({
+    console.log("✅ Token saved successfully for:", contactNo);
+
+    return res.status(200).json({
       success: true,
       message: "✅ FCM token saved successfully",
     });
   } catch (error) {
-    console.error("FCM Token Save Error:", error);
-    res.status(500).json({
+    console.error("❌ FCM Token Save Error:", error);
+    return res.status(500).json({
       success: false,
       message: "Internal server error",
+      error: error.message, // Optional: expose error in dev
     });
   }
 };
+
 const getUserData = async (req, res) => {
   try {
     const patient = await newPatient.findById(req.user.id);
