@@ -21,6 +21,10 @@ const appointmentSchema = new mongoose.Schema({
     required: true,
   },
   remarks: { type: String, required: false },
+  remindersSent: {
+    type: [Number],
+    default: [],
+  },
 });
 
 module.exports = mongoose.model("Appointment", appointmentSchema);

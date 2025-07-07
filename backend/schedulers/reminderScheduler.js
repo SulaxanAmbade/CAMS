@@ -1,23 +1,23 @@
 const cron = require("node-cron");
-const moment = require("moment");
+const moment = require("moment-timezone"); // ✅ Use moment-timezone
 const admin = require("../config/firebaseAdmin");
 const Appointment = require("../models/Appointment");
 const Patient = require("../models/Patient");
 
-// Runs every 15 minutes
-cron.schedule("*/15 * * * *", async () => {
-  console.log("⏰ Running 24-hour prior appointment reminder...");
+// Set your timezone
+const TIMEZONE = "Asia/Kolkata"; // IST
 
-  const now = moment();
-  const in24Hours = moment().add(24, "hours");
+// Run every 15 minutes
+cron.schedule("*/15 * * * *", async () => {
+  console.log("⏰ Running multi-hour reminder scheduler...");
+
+  const now = moment().tz(TIMEZONE);
 
   try {
-    // Find confirmed appointments between now+24h and now+24h+15min
+    // Fetch all confirmed future appointments
     const appointments = await Appointment.aggregate([
       {
-        $match: {
-          status: "Confirmed",
-        },
+        $match: { status: "Confirmed" }
       },
       {
         $addFields: {
@@ -25,66 +25,62 @@ cron.schedule("*/15 * * * *", async () => {
             $dateFromString: {
               dateString: {
                 $concat: [
-                  {
-                    $dateToString: {
-                      format: "%Y-%m-%d",
-                      date: "$date",
-                    },
-                  },
+                  { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
                   "T",
-                  "$time",
-                ],
-              },
-            },
-          },
-        },
+                  "$time"
+                ]
+              }
+            }
+          }
+        }
       },
       {
         $match: {
-          $expr: {
-            $lte: [
-              {
-                $subtract: ["$appointmentDateTime", new Date()],
-              },
-              1000 * 60 * 15, // within next 15 mins
-            ],
-          },
-        },
-      },
+          appointmentDateTime: { $gte: new Date() }
+        }
+      }
     ]);
 
     for (const appointment of appointments) {
-      const patient = appointment.patientId;
-      const fcmToken = patient.fcmToken;
+      const appointmentTime = moment(`${appointment.date} ${appointment.time}`, "YYYY-MM-DD HH:mm").tz(TIMEZONE);
+      const diffInHours = appointmentTime.diff(now, "hours");
 
-      if (!fcmToken) continue;
+      // Allowed intervals: 24, 22, 20, ..., 2
+      if (diffInHours % 2 === 0 && diffInHours >= 2 && diffInHours <= 24) {
+        // Get the full appointment document to access remindersSent and patient info
+        const fullAppointment = await Appointment.findById(appointment._id).populate("patientId");
 
-      const appointmentTime = moment(
-        `${appointment.date} ${appointment.time}`,
-        "YYYY-MM-DD HH:mm"
-      );
+        if (!fullAppointment) continue;
 
-      // Only send if it's exactly 24 hours before
-      const timeDiff = appointmentTime.diff(now, "minutes");
+        const patient = fullAppointment.patientId;
+        const fcmToken = patient?.fcmToken;
 
-      if (timeDiff >= 1439 && timeDiff <= 1441) {
+        if (!fcmToken) continue;
+
+        // Check if this reminder was already sent
+        if (fullAppointment.remindersSent?.includes(diffInHours)) continue;
+
         const message = {
           notification: {
             title: "⏰ Appointment Reminder",
-            body: `You have an appointment in 24 hours at ${appointment.time}.`,
+            body: `You have an appointment in ${diffInHours} hours at ${appointment.time}.`,
           },
           token: fcmToken,
         };
 
         try {
           await admin.messaging().send(message);
-          console.log(`✅ Reminder sent to: ${patient.name}`);
+          console.log(`✅ Sent ${diffInHours}h reminder to ${patient.name}`);
+
+          // Save this hour to prevent duplicate reminders
+          fullAppointment.remindersSent.push(diffInHours);
+          await fullAppointment.save();
         } catch (error) {
           console.error(`❌ Failed to send to ${patient.name}:`, error);
         }
       }
     }
   } catch (err) {
-    console.error("Error in reminder scheduler:", err);
+    console.error("Error in multi-hour reminder scheduler:", err);
   }
 });
