@@ -376,17 +376,55 @@ const StaffDashboard = () => {
                 }}
               >
                 {isTomorrowConfirmed(a) && (
-                  <Tag
-                    color="red"
-                    style={{
-                      textAlign: "center",
-                      overflow: "hidden",
-                      width: "100%",
-                      marginBottom: 8,
-                    }}
-                  >
-                    Tomorrow's Confirmed Appointment
-                  </Tag>
+                  <>
+                    <Tag
+                      color="red"
+                      style={{
+                        textAlign: "center",
+                        overflow: "hidden",
+                        width: "100%",
+                        marginBottom: 8,
+                      }}
+                    >
+                      Tomorrow's Confirmed Appointment
+                    </Tag>
+
+                    <Button
+                      type="primary"
+                      size="small"
+                      block
+                      style={{ marginBottom: 8 }}
+                      onClick={async () => {
+                        try {
+                          const res = await axios.post(
+                            "https://cams-qgq9.onrender.com/api/v1/notification/send-custom-reminder",
+                            {
+                              appointmentId: a._id,
+                              title: "⏰ Appointment Reminder",
+                              message: `You have an appointment tomorrow at ${a.time}`,
+                            }
+                          );
+
+                          if (res.data.success) {
+                            notification.success({
+                              message: "Reminder sent successfully!",
+                            });
+                          } else {
+                            notification.error({
+                              message:
+                                res.data.message || "Failed to send reminder.",
+                            });
+                          }
+                        } catch (error) {
+                          notification.error({
+                            message: "Error sending reminder.",
+                          });
+                        }
+                      }}
+                    >
+                      Send Reminder
+                    </Button>
+                  </>
                 )}
 
                 <Select

@@ -30,6 +30,7 @@ app.use("/api/v1/patient", require("./routes/patientRoutes.js"));
 app.use("/api/v1/doctor", require("./routes/doctorRoutes.js"));
 app.use("/api/v1/staff", require("./routes/staffRoutes.js"));
 app.use("/api/v1/appointment", require("./routes/appointmentRoutes.js"));
+app.use("/api/v1/notification", require("./routes/notificationRoutes.js"));
 // Health Check route
 app.get("/", (req, res) => {
   res.status(200).send({
