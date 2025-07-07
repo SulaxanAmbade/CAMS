@@ -127,11 +127,18 @@ const saveFcmToken = async (req, res) => {
     const { token } = req.body;
     const contactNo = req.body.contactNo;
 
-    if (!token || !contactNo) {
-      console.warn("⚠️ Token or contactNo missing");
+    if (!token) {
+      console.warn("⚠️ Token missing");
       return res.status(400).json({
         success: false,
-        message: "Token or contact number missing",
+        message: "Token  missing",
+      });
+    }
+    if (!contactNo) {
+      console.warn("⚠️ contactNo missing");
+      return res.status(400).json({
+        success: false,
+        message: " contact number missing",
       });
     }
 
