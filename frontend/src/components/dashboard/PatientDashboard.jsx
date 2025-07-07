@@ -25,7 +25,6 @@ const PatientDashboard = () => {
           await axios.post(
             "https://cams-qgq9.onrender.com/api/v1/patient/save-token",
             { token },
-            { userID },
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
