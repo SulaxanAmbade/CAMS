@@ -125,7 +125,7 @@ const saveFcmToken = async (req, res) => {
     console.log("➡️ req.body:", req.body);
 
     const { token } = req.body;
-    const contactNo = req.user?.contactNo;
+    const contactNo = req.body.contactNo;
 
     if (!token || !contactNo) {
       console.warn("⚠️ Token or contactNo missing");
