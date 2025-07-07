@@ -143,7 +143,7 @@ const saveFcmToken = async (req, res) => {
     }
 
     const updatedPatient = await newPatient.findByIdAndUpdate(
-      { userId },
+      userId,
       { $set: { fcmToken: token } },
       { new: true }
     );
