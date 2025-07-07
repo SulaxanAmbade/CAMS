@@ -156,7 +156,7 @@ const saveFcmToken = async (req, res) => {
       });
     }
 
-    console.log("✅ Token saved successfully for:", contactNo);
+    console.log("✅ Token saved successfully for:", userId);
 
     return res.status(200).json({
       success: true,
