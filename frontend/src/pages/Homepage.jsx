@@ -38,6 +38,7 @@ const HomePage = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    sessionStorage.removeItem("splashSeen");
     dispatch(setUser(null));
     navigate("/login");
   };
