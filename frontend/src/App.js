@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Homepage from "./pages/Homepage";
@@ -11,80 +12,86 @@ import ProtectedLayout from "./components/requirements/ProtectedLayout";
 import DoctorManagement from "./components/functions/DoctorManagement";
 import PatientManagement from "./components/functions/PatientManagement";
 import Profile from "./components/profile/Profile";
+import SplashScreen from "./pages/SplashScreen";
 
 function App() {
   const { loading } = useSelector((state) => state.alerts);
-  const { user } = useSelector((state) => state.user); // Access user data
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 4000); // show splash for 4 seconds
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (showSplash) {
+    return <SplashScreen />;
+  }
 
   return (
-    <>
-      <BrowserRouter>
-        {loading ? (
-          <Spinner />
-        ) : (
-          <Routes>
-            {/* // Public routes like login and register are not shown in the sidebar */}
-            <Route
-              path="/login"
-              element={
-                <PublicRoutes>
-                  <Login />
-                </PublicRoutes>
-              }
-            />
-            <Route
-              path="/register"
-              element={
-                <PublicRoutes>
-                  <Register />
-                </PublicRoutes>
-              }
-            />
-            <Route
-              path="/*"
-              element={
-                <ProtectedRoutes>
-                  <ProtectedLayout>
-                    <Homepage />
-                  </ProtectedLayout>
-                </ProtectedRoutes>
-              }
-            />
-            <Route
-              path="/manage-patients"
-              element={
-                <ProtectedRoutes>
-                  <ProtectedLayout>
-                    <PatientManagement />
-                  </ProtectedLayout>
-                </ProtectedRoutes>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoutes>
-                  <ProtectedLayout>
-                    <Profile />
-                  </ProtectedLayout>
-                </ProtectedRoutes>
-              }
-            />
-            <Route
-              path="/manage-doctors"
-              element={
-                <ProtectedRoutes>
-                  <ProtectedLayout>
-                    <DoctorManagement />
-                  </ProtectedLayout>
-                </ProtectedRoutes>
-              }
-            />
-            {/* Route to view doctor schedule */}
-          </Routes>
-        )}
-      </BrowserRouter>
-    </>
+    <BrowserRouter>
+      {loading ? (
+        <Spinner />
+      ) : (
+        <Routes>
+          <Route
+            path="/login"
+            element={
+              <PublicRoutes>
+                <Login />
+              </PublicRoutes>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <PublicRoutes>
+                <Register />
+              </PublicRoutes>
+            }
+          />
+          <Route
+            path="/*"
+            element={
+              <ProtectedRoutes>
+                <ProtectedLayout>
+                  <Homepage />
+                </ProtectedLayout>
+              </ProtectedRoutes>
+            }
+          />
+          <Route
+            path="/manage-patients"
+            element={
+              <ProtectedRoutes>
+                <ProtectedLayout>
+                  <PatientManagement />
+                </ProtectedLayout>
+              </ProtectedRoutes>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoutes>
+                <ProtectedLayout>
+                  <Profile />
+                </ProtectedLayout>
+              </ProtectedRoutes>
+            }
+          />
+          <Route
+            path="/manage-doctors"
+            element={
+              <ProtectedRoutes>
+                <ProtectedLayout>
+                  <DoctorManagement />
+                </ProtectedLayout>
+              </ProtectedRoutes>
+            }
+          />
+        </Routes>
+      )}
+    </BrowserRouter>
   );
 }
 
