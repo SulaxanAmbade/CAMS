@@ -1,35 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import "./App.css";
-import Homepage from "./pages/Homepage";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
 import { useSelector } from "react-redux";
 import Spinner from "./components/requirements/Spinner";
 import ProtectedRoutes from "./components/requirements/ProtectedRoutes";
 import PublicRoutes from "./components/requirements/PublicRoutes";
 import ProtectedLayout from "./components/requirements/ProtectedLayout";
+import Homepage from "./pages/Homepage";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import DoctorManagement from "./components/functions/DoctorManagement";
 import PatientManagement from "./components/functions/PatientManagement";
 import Profile from "./components/profile/Profile";
-import SplashScreen from "./pages/SplashScreen";
+import SplashScreen from "./components/SplashScreen";
 
 function App() {
   const { loading } = useSelector((state) => state.alerts);
   const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 4000); // show splash for 4 seconds
+    const timer = setTimeout(() => setShowSplash(false), 4000);
     return () => clearTimeout(timer);
   }, []);
 
-  if (showSplash) {
-    return <SplashScreen />;
-  }
-
   return (
     <BrowserRouter>
-      {loading ? (
+      {showSplash ? (
+        <SplashScreen />
+      ) : loading ? (
         <Spinner />
       ) : (
         <Routes>
