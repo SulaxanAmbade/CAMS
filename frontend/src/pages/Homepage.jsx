@@ -78,8 +78,16 @@ const HomePage = () => {
     if (user?.role === "patient") return <PatientDashboard />;
     return null;
   };
+  const [showSplash, setShowSplash] = useState(true);
 
-  return (
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 4000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return showSplash ? (
+    <SplashScreen />
+  ) : (
     <Layout className="home-layout">
       <Header className="home-header">
         <div>

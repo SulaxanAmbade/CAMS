@@ -15,74 +15,70 @@ import SplashScreen from "./pages/SplashScreen";
 
 function App() {
   const { loading } = useSelector((state) => state.alerts);
-  const [showSplash, setShowSplash] = useState(true);
 
   return (
     <BrowserRouter>
-      {showSplash ? (
-        <SplashScreen />
-      ) : loading ? (
-        <Spinner />
-      ) : (
-        <Routes>
-          <Route
-            path="/login"
-            element={
-              <PublicRoutes>
-                <Login />
-              </PublicRoutes>
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              <PublicRoutes>
-                <Register />
-              </PublicRoutes>
-            }
-          />
-          <Route
-            path="/*"
-            element={
-              <ProtectedRoutes>
-                <ProtectedLayout>
-                  <Homepage />
-                </ProtectedLayout>
-              </ProtectedRoutes>
-            }
-          />
-          <Route
-            path="/manage-patients"
-            element={
-              <ProtectedRoutes>
-                <ProtectedLayout>
-                  <PatientManagement />
-                </ProtectedLayout>
-              </ProtectedRoutes>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoutes>
-                <ProtectedLayout>
-                  <Profile />
-                </ProtectedLayout>
-              </ProtectedRoutes>
-            }
-          />
-          <Route
-            path="/manage-doctors"
-            element={
-              <ProtectedRoutes>
-                <ProtectedLayout>
-                  <DoctorManagement />
-                </ProtectedLayout>
-              </ProtectedRoutes>
-            }
-          />
-        </Routes>
-      )}
+      : loading ? (
+      <Spinner />) : (
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <PublicRoutes>
+              <Login />
+            </PublicRoutes>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <PublicRoutes>
+              <Register />
+            </PublicRoutes>
+          }
+        />
+        <Route
+          path="/*"
+          element={
+            <ProtectedRoutes>
+              <ProtectedLayout>
+                <Homepage />
+              </ProtectedLayout>
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="/manage-patients"
+          element={
+            <ProtectedRoutes>
+              <ProtectedLayout>
+                <PatientManagement />
+              </ProtectedLayout>
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoutes>
+              <ProtectedLayout>
+                <Profile />
+              </ProtectedLayout>
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="/manage-doctors"
+          element={
+            <ProtectedRoutes>
+              <ProtectedLayout>
+                <DoctorManagement />
+              </ProtectedLayout>
+            </ProtectedRoutes>
+          }
+        />
+      </Routes>
+      )
     </BrowserRouter>
   );
 }
