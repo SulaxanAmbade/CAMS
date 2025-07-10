@@ -89,7 +89,7 @@ const HomePage = () => {
       const timer = setTimeout(() => {
         setShowSplash(false);
         sessionStorage.setItem("splashSeen", "true");
-      }, 4000);
+      }, 7000);
       return () => clearTimeout(timer);
     }
   }, [showSplash]);
