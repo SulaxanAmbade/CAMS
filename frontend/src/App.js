@@ -17,11 +17,6 @@ function App() {
   const { loading } = useSelector((state) => state.alerts);
   const [showSplash, setShowSplash] = useState(true);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 4000);
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <BrowserRouter>
       {showSplash ? (
