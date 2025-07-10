@@ -79,12 +79,19 @@ const HomePage = () => {
     if (user?.role === "patient") return <PatientDashboard />;
     return null;
   };
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(() => {
+    return sessionStorage.getItem("splashSeen") !== "true";
+  });
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 4000);
-    return () => clearTimeout(timer);
-  }, []);
+    if (showSplash) {
+      const timer = setTimeout(() => {
+        setShowSplash(false);
+        sessionStorage.setItem("splashSeen", "true");
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSplash]);
 
   return showSplash ? (
     <SplashScreen />

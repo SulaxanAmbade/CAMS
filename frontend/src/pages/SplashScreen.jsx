@@ -1,16 +1,12 @@
 import React from "react";
 import "../css/SplashScreen.css";
+import { ReactComponent as Logo } from "../assets/logo.svg";
 
 const SplashScreen = () => {
   return (
     <div className="splash-container">
       <div className="svg-wrapper">
-        <object
-          type="image/svg+xml"
-          data="/logo.svg"
-          className="animated-logo"
-          aria-label="Ayurveda Logo"
-        />
+        <Logo className="animated-logo" />
       </div>
     </div>
   );
