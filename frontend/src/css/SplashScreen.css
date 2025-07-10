@@ -1,36 +1,35 @@
 .splash-container {
-    background-image: url("/background.jpg");
+    background-image: url("../../public/backgroundImage.jpeg");
     background-size: cover;
     background-position: center;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-  
-  .svg-wrapper {
+}
+
+.svg-wrapper {
     width: 60%;
     max-width: 500px;
-  }
-  
-  .animated-logo {
+}
+
+.animated-logo {
     width: 100%;
     height: auto;
     stroke-dasharray: 1000;
     stroke-dashoffset: 1000;
     fill-opacity: 0;
     animation: draw 3s ease forwards, fillIn 1s ease forwards 3s;
-  }
-  
-  @keyframes draw {
+}
+
+@keyframes draw {
     to {
-      stroke-dashoffset: 0;
+        stroke-dashoffset: 0;
     }
-  }
-  
-  @keyframes fillIn {
+}
+
+@keyframes fillIn {
     to {
-      fill-opacity: 1;
+        fill-opacity: 1;
     }
-  }
-  
+}
