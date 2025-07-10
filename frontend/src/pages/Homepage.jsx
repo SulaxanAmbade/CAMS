@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useEffect } from "react-router-dom";
 import {
   Layout,
   Menu,
@@ -24,6 +24,7 @@ import DoctorDashboard from "../components/dashboard/DoctorDashboard";
 import PatientDashboard from "../components/dashboard/PatientDashboard";
 import { setUser } from "../redux/features/userSlice";
 import Profile from "../components/profile/Profile";
+import SplashScreen from "./SplashScreen";
 import "../css/homepage.css";
 import logo from "../assets/logo192.png";
 const { Header, Content } = Layout;
