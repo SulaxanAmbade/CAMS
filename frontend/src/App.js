@@ -11,7 +11,7 @@ import Register from "./pages/Register";
 import DoctorManagement from "./components/functions/DoctorManagement";
 import PatientManagement from "./components/functions/PatientManagement";
 import Profile from "./components/profile/Profile";
-import SplashScreen from "./components/SplashScreen";
+import SplashScreen from "./pages/SplashScreen";
 
 function App() {
   const { loading } = useSelector((state) => state.alerts);
