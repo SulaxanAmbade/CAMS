@@ -36,7 +36,7 @@ export const PatientManagement = () => {
     setLoading(true);
     try {
       const res = await axios.get(
-        `https://cams-qgq9.onrender.com/api/v1/appointment/getAppointmentsByPatientId/${patientId}`
+        `${process.env.REACT_APP_BACKEND}/api/v1/appointment/getAppointmentsByPatientId/${patientId}`
       );
       setAppointments(res.data.data);
       setIsAppointmentModalVisible(true);
@@ -54,7 +54,7 @@ export const PatientManagement = () => {
   const fetchPatients = async () => {
     try {
       const res = await axios.get(
-        "https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient"
+        `${process.env.REACT_APP_BACKEND}/api/v1/patient/getAllPatient`
       );
       setPatientData(res.data.data);
     } catch {
@@ -69,7 +69,7 @@ export const PatientManagement = () => {
   const handleAddPatient = async (values) => {
     try {
       const response = await axios.post(
-        "https://cams-qgq9.onrender.com/api/v1/patient/addNewPatient",
+        `${process.env.REACT_APP_BACKEND}/api/v1/patient/addNewPatient`,
         values
       );
       setPatientData([...patientData, response.data.data]);
@@ -86,7 +86,7 @@ export const PatientManagement = () => {
   const handleDeletePatient = async (patientId) => {
     try {
       await axios.delete(
-        `https://cams-qgq9.onrender.com/api/v1/patient/deletePatient/${patientId}`
+        `${process.env.REACT_APP_BACKEND}/api/v1/patient/deletePatient/${patientId}`
       );
       setPatientData(
         patientData.filter((patient) => patient._id !== patientId)
@@ -173,12 +173,12 @@ export const PatientManagement = () => {
           />
 
           <Modal
-            title="Add New Patient"
             open={isPatientModalVisible}
             onCancel={() => setIsPatientModalVisible(false)}
             footer={null}
             centered
           >
+            <h4>Add New Patient</h4>
             <Form
               form={patientForm}
               onFinish={handleAddPatient}

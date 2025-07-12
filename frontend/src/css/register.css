@@ -1,34 +1,53 @@
-.formContainer{
+.formContainer {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100vh;
-    background: url('../assets/bg.jpg') top center ;
+    background: url('../assets/bgLog.jpeg') top center;
     background-size: cover;
     background-repeat: no-repeat;
+    text-shadow:
+        2px 2px 0 #ffffff20,
+        -2px -2px 4px #00000070;
 }
-.registerForm{
+
+.registerForm {
     width: 30vw;
     min-width: 250px;
     padding: 20px;
-    background:#29180611;
+    background: #29180611;
     color: bisque;
-    box-shadow: -20px 20px 20px -20px  pink
-}
-.LogButton {
-    color: #291806 !important;
-    margin: 10px;
-    font-size: large;
-}
-.LogButton:hover{
-    background-color: #29180677 !important;
-    color:white !important;
-}
-.loginCard{
-    background: none;
-    backdrop-filter: blur(8px);
-    width: 110vh;
-    text-align: center;
-    color: #291806;
+    box-shadow: -20px 20px 20px -20px pink
 }
 
+.LogButton {
+    font-size: large;
+    width: 120px;
+    margin: px;
+    color: #423328;
+    text-shadow:
+        2px 2px 0 #ffffff20,
+        -2px -2px 4px #00000070;
+}
+
+.LogButton:hover {
+    font-size: large;
+    width: 120px;
+    color: #085042 !important;
+    background-color: #5132114a !important;
+}
+
+.loginCard {
+    background: none;
+    border: none;
+    display: flex;
+    color: #085042;
+    text-align: center;
+    padding: 2%;
+}
+
+@media screen and (max-width: 524px) {
+    .LogButton {
+        width: auto;
+    }
+}

@@ -23,7 +23,7 @@ export default function ProtectedRoutes({ children }) {
       if (!role) throw new Error("Invalid token");
 
       const res = await axios.post(
-        `https://cams-qgq9.onrender.com/api/v1/${role}/getUserData`,
+        `${process.env.REACT_APP_BACKEND}/api/v1/${role}/getUserData`,
         {},
         {
           headers: {

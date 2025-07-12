@@ -61,7 +61,7 @@ const AppointmentForm = ({
 
       try {
         const response = await fetch(
-          "https://cams-qgq9.onrender.com/api/v1/appointment/createAppointment",
+          `${process.env.REACT_APP_BACKEND}/api/v1/appointment/createAppointment`,
           {
             method: "POST",
             headers: {
@@ -119,7 +119,6 @@ const AppointmentForm = ({
       style={{
         marginTop: "2rem",
         padding: "1rem",
-        background: "#f4f4f4",
         borderRadius: 10,
       }}
     >
@@ -127,7 +126,7 @@ const AppointmentForm = ({
       <p>Patient</p>
       <Select
         placeholder="Select Patient"
-        value={selectedPatient}
+        value={selectedPatient || "Select Patient"}
         onChange={setSelectedPatient}
         style={{ width: "100%", marginBottom: "1rem" }}
       >
@@ -140,7 +139,7 @@ const AppointmentForm = ({
       <p>Doctor</p>
       <Select
         placeholder="Select Doctor"
-        value={selectedDoctor}
+        value={selectedDoctor || "Select Doctor"}
         onChange={(value) => {
           setSelectedDoctor(value);
           setSelectedDate(null);
@@ -225,7 +224,7 @@ const StaffDashboard = () => {
     setLoading(true);
     try {
       const res = await axios.get(
-        "https://cams-qgq9.onrender.com/api/v1/appointment/getAllAppointments"
+        `${process.env.REACT_APP_BACKEND}/api/v1/appointment/getAllAppointments`
       );
       setAppointments(res.data.data);
     } catch (err) {
@@ -238,7 +237,7 @@ const StaffDashboard = () => {
   const fetchPatients = async () => {
     try {
       const res = await axios.get(
-        "https://cams-qgq9.onrender.com/api/v1/patient/getAllPatient"
+        `${process.env.REACT_APP_BACKEND}/api/v1/patient/getAllPatient`
       );
       setPatients(res.data.data);
     } catch {
@@ -249,7 +248,7 @@ const StaffDashboard = () => {
   const fetchDoctors = async () => {
     try {
       const res = await axios.get(
-        "https://cams-qgq9.onrender.com/api/v1/doctor/getAllDoctors"
+        `${process.env.REACT_APP_BACKEND}/api/v1/doctor/getAllDoctors`
       );
       setDoctors(res.data.data);
     } catch {
@@ -260,7 +259,7 @@ const StaffDashboard = () => {
   const handleStatusChange = async (appointmentId, newStatus) => {
     try {
       await axios.put(
-        `https://cams-qgq9.onrender.com/api/v1/appointment/updateStatus/${appointmentId}`,
+        `${process.env.REACT_APP_BACKEND}/api/v1/appointment/updateStatus/${appointmentId}`,
         {
           status: newStatus,
         }
@@ -397,7 +396,7 @@ const StaffDashboard = () => {
                       onClick={async () => {
                         try {
                           const res = await axios.post(
-                            "https://cams-qgq9.onrender.com/api/v1/notification/send-custom-reminder",
+                            `${process.env.REACT_APP_BACKEND}/api/v1/notification/send-custom-reminder`,
                             {
                               appointmentId: a._id,
                               title: "⏰ Appointment Reminder",

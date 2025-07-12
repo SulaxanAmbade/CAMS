@@ -18,7 +18,7 @@ const Login = () => {
   const fetchStaff = async () => {
     try {
       const response = await fetch(
-        "https://cams-qgq9.onrender.com/api/v1/staff/getAllStaff"
+        `${process.env.REACT_APP_BACKEND}/api/v1/staff/getAllStaff`
       );
       if (!response.ok) throw new Error("Failed to fetch staff");
       const data = await response.json();
@@ -37,7 +37,7 @@ const Login = () => {
     try {
       dispatch(showLoading());
       const response = await axios.post(
-        "https://cams-qgq9.onrender.com/api/v1/staff/login",
+        `${process.env.REACT_APP_BACKEND}/api/v1/staff/login`,
         values
       );
       dispatch(hideLoading());
@@ -45,7 +45,7 @@ const Login = () => {
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
         message.success(response.data.message);
-        navigate("/");
+        navigate("/splash");
       } else {
         message.error(response.data.message);
       }
@@ -59,13 +59,13 @@ const Login = () => {
   const onSubmitDoctorLogin = async (values) => {
     try {
       const response = await axios.post(
-        "https://cams-qgq9.onrender.com/api/v1/doctor/login",
+        `${process.env.REACT_APP_BACKEND}/api/v1/doctor/login`,
         values
       );
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
         message.success("Doctor login successful!");
-        navigate("/");
+        navigate("/splash");
       } else {
         message.error(response.data.message || "Invalid phone number.");
       }
@@ -78,13 +78,13 @@ const Login = () => {
   const onSubmitPatientLogin = async (values) => {
     try {
       const response = await axios.post(
-        "https://cams-qgq9.onrender.com/api/v1/patient/login",
+        `${process.env.REACT_APP_BACKEND}/api/v1/patient/login`,
         values
       );
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
         message.success("Patient login successful!");
-        navigate("/");
+        navigate("/splash");
       } else {
         message.error(response.data.message || "Invalid phone number.");
       }
@@ -97,17 +97,20 @@ const Login = () => {
     { title: "Name", dataIndex: "name", key: "name" },
     { title: "Contact No", dataIndex: "contactNo", key: "contactNo" },
   ];
+  useEffect(() => {
+    console.log("Backend URL:", process.env.REACT_APP_BACKEND);
+  }, []);
 
   return (
     <div className="formContainer">
       <Card className="loginCard" style={{}}>
         <h4>Welcome to </h4>
-        <h2 style={{ textAlign: "center", color: "white", marginLeft: "10px" }}>
-          <b style={{ color: "gold" }}>C</b>linical{" "}
-          <b style={{ color: "gold" }}>A</b>ppointment{" "}
-          <b style={{ color: "gold" }}>M</b>anagement{" "}
-          <b style={{ color: "gold" }}>S</b>ystem
-        </h2>
+        <h1 style={{ color: "#423328", fontWeight: "bold" }}>
+          Dhanvantari Ayurveda's
+        </h1>
+        <h4 style={{ textAlign: "center", marginLeft: "10px" }}>
+          <b>C</b>linical <b>A</b>ppointment <b>M</b>anagement <b>S</b>ystem
+        </h4>
         <hr />
         <h5>Login as</h5>
         <div className="logButtonDiv">
@@ -138,7 +141,10 @@ const Login = () => {
           <Button
             type="text"
             onClick={handleRegister}
-            style={{ color: "#291806" }}
+            style={{
+              color: "#085042",
+              textShadow: "1px 1px 0 #ffffff20,-1px -1px 2px #00000070",
+            }}
           >
             Registration details
           </Button>
@@ -153,7 +159,7 @@ const Login = () => {
         centered
       >
         <Form layout="vertical" onFinish={onSubmitStaffLogin}>
-          <h3 style={{ textAlign: "center", color: "#291806" }}>Staff Login</h3>
+          <h3 style={{ textAlign: "center" }}>Staff Login</h3>
           <Form.Item
             label="Phone Number"
             name="contactNo"
@@ -195,9 +201,7 @@ const Login = () => {
         centered
       >
         <Form layout="vertical" onFinish={onSubmitDoctorLogin}>
-          <h3 style={{ textAlign: "center", color: "#291806" }}>
-            Doctor Login
-          </h3>
+          <h3 style={{ textAlign: "center" }}>Doctor Login</h3>
           <Form.Item
             label="Phone Number"
             name="phoneNumber"
@@ -239,9 +243,7 @@ const Login = () => {
         centered
       >
         <Form layout="vertical" onFinish={onSubmitPatientLogin}>
-          <h3 style={{ textAlign: "center", color: "#291806" }}>
-            Patient Login
-          </h3>
+          <h3 style={{ textAlign: "center" }}>Patient Login</h3>
           <Form.Item
             label="Phone Number"
             name="phoneNumber"

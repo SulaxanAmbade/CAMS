@@ -58,7 +58,7 @@ export const DoctorManagement = () => {
 
   const fetchDoctors = async () => {
     try {
-      const res = await axios.get("https://cams-qgq9.onrender.com/api/v1/doctor/getAllDoctors");
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND}/api/v1/doctor/getAllDoctors`);
       setDoctorData(res.data.data);
     } catch (error) {
       notification.error({
@@ -96,7 +96,7 @@ export const DoctorManagement = () => {
       };
 
       const res = await axios.post(
-        "https://cams-qgq9.onrender.com/api/v1/doctor/addNewDoctor",
+        `${process.env.REACT_APP_BACKEND}/api/v1/doctor/addNewDoctor`,
         doctorDataToSend
       );
       setDoctorData([...doctorData, res.data.data]);
@@ -114,7 +114,7 @@ export const DoctorManagement = () => {
 
   const handleDeleteDoctor = async (doctorId) => {
     try {
-      await axios.delete(`https://cams-qgq9.onrender.com/api/v1/doctor/deleteDoctor/${doctorId}`);
+      await axios.delete(`${process.env.REACT_APP_BACKEND}/api/v1/doctor/deleteDoctor/${doctorId}`);
       setDoctorData(doctorData.filter((doc) => doc._id !== doctorId));
       notification.success({ message: "Doctor deleted successfully!" });
     } catch (error) {

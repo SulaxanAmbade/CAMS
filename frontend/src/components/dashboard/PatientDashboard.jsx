@@ -21,7 +21,7 @@ const PatientDashboard = () => {
       if (token) {
         try {
           await axios.post(
-            "https://cams-qgq9.onrender.com/api/v1/patient/save-token",
+            `${process.env.REACT_APP_BACKEND}/api/v1/patient/save-token`,
             { token },
             {
               headers: {
@@ -43,7 +43,7 @@ const PatientDashboard = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        "https://cams-qgq9.onrender.com/api/v1/appointment/getPatientAppointment",
+        `${process.env.REACT_APP_BACKEND}/api/v1/appointment/getPatientAppointment`,
         { userID }
       );
       setAppointments(res.data.data || []);

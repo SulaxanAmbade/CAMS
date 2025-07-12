@@ -1,8 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "../css/SplashScreen.css";
 import { ReactComponent as Logo } from "../assets/logo.svg";
+import { useNavigate } from "react-router-dom";
 
 const SplashScreen = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      navigate("/"); // Navigate to homepage after 2s
+    }, 7000);
+
+    return () => clearTimeout(timeout);
+  }, [navigate]);
   return (
     <div className="splash-container">
       <div className="svg-wrapper">

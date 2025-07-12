@@ -11,6 +11,7 @@ import Register from "./pages/Register";
 import DoctorManagement from "./components/functions/DoctorManagement";
 import PatientManagement from "./components/functions/PatientManagement";
 import Profile from "./components/profile/Profile";
+import SplashScreen from "./pages/SplashScreen";
 
 function App() {
   const { loading } = useSelector((state) => state.alerts);
@@ -35,6 +36,16 @@ function App() {
               <PublicRoutes>
                 <Register />
               </PublicRoutes>
+            }
+          />
+          <Route
+            path="/splash"
+            element={
+              <ProtectedRoutes>
+                <ProtectedLayout>
+                  <SplashScreen />
+                </ProtectedLayout>
+              </ProtectedRoutes>
             }
           />
           <Route
