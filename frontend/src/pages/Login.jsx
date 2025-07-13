@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Button, Card, Form, Input, Modal, Table, message } from "antd";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { showLoading, hideLoading } from "../redux/features/alertSlice";
 import "../css/register.css";
-
+//https://cams-qgq9.onrender.com
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -15,10 +15,6 @@ const Login = () => {
   const [doctorCard, setDoctorCard] = useState(false);
   const [patientCard, setPatientCard] = useState(false);
   const [registerModal, setRegisterModal] = useState(false);
-
-  // NEW STATE FOR MOBILE TOGGLE
-  const [showLoginOptions, setShowLoginOptions] = useState(false);
-
   const fetchStaff = async () => {
     try {
       const response = await fetch(
@@ -36,7 +32,7 @@ const Login = () => {
     setRegisterModal(true);
     fetchStaff();
   };
-
+  // Staff Login Handler
   const onSubmitStaffLogin = async (values) => {
     try {
       dispatch(showLoading());
@@ -59,6 +55,7 @@ const Login = () => {
     }
   };
 
+  // Doctor Login Handler
   const onSubmitDoctorLogin = async (values) => {
     try {
       const response = await axios.post(
@@ -77,6 +74,7 @@ const Login = () => {
     }
   };
 
+  // Patient Login Handler
   const onSubmitPatientLogin = async (values) => {
     try {
       const response = await axios.post(
@@ -99,87 +97,60 @@ const Login = () => {
     { title: "Name", dataIndex: "name", key: "name" },
     { title: "Contact No", dataIndex: "contactNo", key: "contactNo" },
   ];
-
   useEffect(() => {
     console.log("Backend URL:", process.env.REACT_APP_BACKEND);
   }, []);
 
   return (
     <div className="formContainer">
-      <Card className="loginCard">
-        {/* Welcome Text - Hidden on mobile when login toggled */}
-        {!showLoginOptions && (
-          <div className="welcome-text">
-            <h1 style={{ color: "#423328", fontWeight: "bold" }}>
-              Dhanvantari Ayurveda's
-            </h1>
-            <h4 style={{ textAlign: "center", marginLeft: "10px" }}>
-              <b>C</b>linical <b>A</b>ppointment <b>M</b>anagement <b>S</b>ystem
-            </h4>
-            <hr />
-          </div>
-        )}
+      <Card className="loginCard" style={{}}>
+        <h1 style={{ color: "#423328", fontWeight: "bold" }}>
+          Dhanvantari Ayurveda's
+        </h1>
+        <h4 style={{ textAlign: "center", marginLeft: "10px" }}>
+          <b>C</b>linical <b>A</b>ppointment <b>M</b>anagement <b>S</b>ystem
+        </h4>
+        <hr />
+        <h6>Login as</h6>
+        <div className="logButtonDiv">
+          <Button
+            type="text"
+            className="LogButton"
+            onClick={() => setDoctorCard(true)}
+          >
+            DOCTOR
+          </Button>
+          <Button
+            type="text"
+            className="LogButton"
+            onClick={() => setPatientCard(true)}
+          >
+            PATIENT
+          </Button>
+          <Button
+            type="text"
+            className="LogButton"
+            onClick={() => setStaffLoginShow(true)}
+          >
+            STAFF
+          </Button>
+        </div>
 
-        {/* Mobile: Show "Login as" button initially */}
-        {!showLoginOptions && (
-          <>
-            <Button
-              size="large"
-              type="text"
-              block
-              centered
-              style={{ color: "#085042" }}
-              onClick={() => setShowLoginOptions(true)}
-            >
-              Login
-            </Button>
-
-            <div>
-              <Button
-                type="text"
-                onClick={handleRegister}
-                style={{
-                  color: "#085042",
-                  textShadow: "1px 1px 0 #ffffff20,-1px -1px 2px #00000070",
-                }}
-              >
-                Registration details
-              </Button>
-            </div>
-          </>
-        )}
-        {/* Mobile: Show login options after click */}
-        {showLoginOptions && (
-          <>
-            <h5 onClick={() => setShowLoginOptions(true)}>Login as</h5>
-            <div className="logButtonDiv">
-              <Button
-                type="text"
-                className="LogButton"
-                onClick={() => setDoctorCard(true)}
-              >
-                DOCTOR
-              </Button>
-              <Button
-                type="text"
-                className="LogButton"
-                onClick={() => setPatientCard(true)}
-              >
-                PATIENT
-              </Button>
-              <Button
-                type="text"
-                className="LogButton"
-                onClick={() => setStaffLoginShow(true)}
-              >
-                STAFF
-              </Button>
-            </div>
-          </>
-        )}
+        <div>
+          <Button
+            type="text"
+            onClick={handleRegister}
+            style={{
+              color: "#085042",
+              textShadow: "1px 1px 0 #ffffff20,-1px -1px 2px #00000070",
+            }}
+          >
+            Registration details
+          </Button>
+        </div>
       </Card>
 
-      {/* Modals remain unchanged */}
+      {/* Staff Login Modal */}
       <Modal
         open={staffloginshow}
         onCancel={() => setStaffLoginShow(false)}
@@ -221,6 +192,7 @@ const Login = () => {
         </Form>
       </Modal>
 
+      {/* Doctor Login Modal */}
       <Modal
         open={doctorCard}
         onCancel={() => setDoctorCard(false)}
@@ -262,6 +234,7 @@ const Login = () => {
         </Form>
       </Modal>
 
+      {/* Patient Login Modal */}
       <Modal
         open={patientCard}
         onCancel={() => setPatientCard(false)}
@@ -295,10 +268,11 @@ const Login = () => {
           </Form.Item>
         </Form>
       </Modal>
-
       <Modal
         open={registerModal}
-        onCancel={() => setRegisterModal(false)}
+        onCancel={() => {
+          setRegisterModal(false);
+        }}
         footer={null}
         centered
       >

@@ -19,13 +19,11 @@
     color: bisque;
     box-shadow: -20px 20px 20px -20px pink
 }
-.logButtonDiv{
-    display: flex;
-}
+
 .LogButton {
     font-size: large;
     width: 120px;
-    margin: 2px;
+    margin: px;
     color: #423328;
     text-shadow:
         2px 2px 0 #ffffff20,
