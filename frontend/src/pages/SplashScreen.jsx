@@ -8,8 +8,8 @@ const SplashScreen = () => {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      navigate("/"); // Navigate to homepage after 2s
-    }, 7000);
+      navigate("/", { replace: true }); // Navigate to homepage after 2s
+    }, 5000);
 
     return () => clearTimeout(timeout);
   }, [navigate]);

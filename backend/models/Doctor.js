@@ -5,7 +5,10 @@ const DoctorSchema = new mongoose.Schema({
   password: { type: String, required: true },
   specialization: { type: String, required: true },
   role: { type: String, default: "doctor" },
-  contact: String,
+  contactNo: {
+    type: String,
+    required: true,
+  },
   visitingHours: {
     start: { type: String, required: true },
     end: { type: String, required: true },

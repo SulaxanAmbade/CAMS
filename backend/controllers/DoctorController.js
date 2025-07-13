@@ -18,10 +18,10 @@ const getAllDoctors = async (req, res) => {
 
 const addDoctor = async (req, res) => {
   try {
-    const { contact, password, ...rest } = req.body;
+    const {contactNo, password, ...rest } = req.body;
 
     // Input validation
-    if (!contact || !password) {
+    if (!contactNo || !password) {
       return res.status(400).json({
         success: false,
         message: "Contact and password are required.",
@@ -29,7 +29,7 @@ const addDoctor = async (req, res) => {
     }
 
     // Check if a doctor with the same contact already exists
-    const existingDoctor = await Doctor.findOne({ contact });
+    const existingDoctor = await Doctor.findOne({ contactNo });
     if (existingDoctor) {
       return res.status(400).json({
         success: false,
@@ -43,7 +43,7 @@ const addDoctor = async (req, res) => {
 
     // Create new doctor with hashed password
     const newDoctor = new Doctor({
-      contact,
+      contactNo,
       password: hashedPassword,
       ...rest,
     });
@@ -91,7 +91,7 @@ const doctorLogin = async (req, res) => {
 
   try {
     // Check if a doctor exists with the given phone number
-    const doctor = await Doctor.findOne({ contact: phoneNumber });
+    const doctor = await Doctor.findOne({ contactNo: phoneNumber });
 
     if (!doctor) {
       return res

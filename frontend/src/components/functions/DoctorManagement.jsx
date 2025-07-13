@@ -40,7 +40,7 @@ export const DoctorManagement = () => {
       dataIndex: ["visitingHours", "end"],
       key: "visitingHours.end",
     },
-    { title: "Contact", dataIndex: "contact", key: "contact" },
+    { title: "Contact", dataIndex: "contactNo", key: "contactNo" },
     {
       title: "Action",
       key: "action",
@@ -58,7 +58,9 @@ export const DoctorManagement = () => {
 
   const fetchDoctors = async () => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_BACKEND}/api/v1/doctor/getAllDoctors`);
+      const res = await axios.get(
+        `${process.env.REACT_APP_BACKEND}/api/v1/doctor/getAllDoctors`
+      );
       setDoctorData(res.data.data);
     } catch (error) {
       notification.error({
@@ -91,7 +93,7 @@ export const DoctorManagement = () => {
         name: values.name,
         password: values.password,
         specialization: values.specialization,
-        contact: values.contact,
+        contactNo: values.contactNo,
         visitingHours,
       };
 
@@ -114,7 +116,9 @@ export const DoctorManagement = () => {
 
   const handleDeleteDoctor = async (doctorId) => {
     try {
-      await axios.delete(`${process.env.REACT_APP_BACKEND}/api/v1/doctor/deleteDoctor/${doctorId}`);
+      await axios.delete(
+        `${process.env.REACT_APP_BACKEND}/api/v1/doctor/deleteDoctor/${doctorId}`
+      );
       setDoctorData(doctorData.filter((doc) => doc._id !== doctorId));
       notification.success({ message: "Doctor deleted successfully!" });
     } catch (error) {
@@ -167,11 +171,12 @@ export const DoctorManagement = () => {
       />
 
       <Modal
-        title="Add New Doctor"
         open={isDoctorModalVisible}
         onCancel={() => setIsDoctorModalVisible(false)}
         footer={null}
+        centered
       >
+        <h3>Add New Doctor</h3>
         <Form form={doctorForm} onFinish={handleAddDoctor} layout="vertical">
           <Form.Item
             label="Name"
@@ -205,7 +210,7 @@ export const DoctorManagement = () => {
           </Form.Item>
           <Form.Item
             label="Contact"
-            name="contact"
+            name="contactNo"
             rules={[
               { required: true, message: "Please input contact!" },
               {
@@ -250,12 +255,14 @@ export const DoctorManagement = () => {
       </Modal>
 
       <Modal
-        title="Doctor Details"
         open={showDoctorDetailsModal}
         onCancel={() => setShowDoctorDetailsModal(false)}
         footer={null}
       >
-        <Card>
+        <h3>Doctor's Details</h3>
+        <Card
+          style={{ background: "#0000007e", color: "white", fontSize: "18px" }}
+        >
           <p>
             <b>Name:</b> {selectedDoctor?.name}
           </p>
@@ -263,7 +270,7 @@ export const DoctorManagement = () => {
             <b>Specialization:</b> {selectedDoctor?.specialization}
           </p>
           <p>
-            <b>Contact:</b> {selectedDoctor?.contact}
+            <b>Contact:</b> {selectedDoctor?.contactNo}
           </p>
           <p>
             <b>Visiting Hours:</b>{" "}

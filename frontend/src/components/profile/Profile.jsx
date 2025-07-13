@@ -67,7 +67,7 @@ const PatientProfile = () => {
               {user?.contactNo}
             </Descriptions.Item>
 
-            {user?.role === "Patient" && (
+            {user?.role === "patient" && (
               <>
                 <Descriptions.Item label="Date of Birth">
                   {dob}
@@ -78,7 +78,7 @@ const PatientProfile = () => {
               </>
             )}
 
-            {user?.role === "Doctor" && (
+            {user?.role === "doctor" && (
               <>
                 <Descriptions.Item label="Specialization">
                   {user?.specialization}

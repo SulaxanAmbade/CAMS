@@ -284,7 +284,6 @@ const DoctorDashboard = () => {
       )}
 
       <Modal
-        title="Add Appointment"
         open={showModal}
         onCancel={() => setShowModal(false)}
         onOk={handleAddSubmit}
@@ -292,9 +291,10 @@ const DoctorDashboard = () => {
         okText="Create"
         centered
       >
+        <h3>Add Appointment</h3>
         Patient:
         <Select
-          value={selectedPatient}
+          value={selectedPatient || "Select Patient"}
           placeholder="Select Patient"
           onChange={setSelectedPatient}
           style={{ width: "100%", marginBottom: 16 }}
@@ -334,17 +334,20 @@ const DoctorDashboard = () => {
       </Modal>
 
       <Modal
-        title="Appointment Details"
         open={showDetailsModal}
         onCancel={() => setShowDetailsModal(false)}
         footer={null}
         centered
       >
+        <h3>Appointment Details</h3>
         <Card
           style={{
             background: `radial-gradient(circle,${getCardColor(
               selectedAppointment?.status
-            )}99,#ffffff`,
+            )}99,#00000033`,
+            color: "white",
+            fontSize: "18px",
+            border: "1px solid #00000077",
           }}
         >
           <p>

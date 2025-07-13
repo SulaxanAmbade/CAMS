@@ -257,12 +257,15 @@ export const PatientManagement = () => {
           </Modal>
 
           <Modal
-            title={`Appointment History: ${selectedPatient?.name}`}
             open={isAppointmentModalVisible}
             onCancel={() => setIsAppointmentModalVisible(false)}
             footer={null}
             centered
           >
+            <h3>
+              Appointment History: <br />
+            </h3>
+            <h4>{selectedPatient?.name}</h4>
             {loading ? (
               <Spinner />
             ) : appointments.length === 0 ? (
@@ -271,15 +274,14 @@ export const PatientManagement = () => {
               <Row gutter={[8, 8]}>
                 {appointments.map((appt) => (
                   <Col xs={24} sm={12} md={8} lg={8} key={appt._id}>
-                    <Card>
-                      <strong>Date:</strong>{" "}
+                    <Card style={{ background: "#0000007e", color: "white" }}>
                       {moment(appt.date).format("DD MMMM YYYY")}
                       <br />
-                      <strong>Time:</strong> {appt.time}
+                      {appt.time}
                       <br />
-                      <strong>Doctor:</strong> {appt.doctorId?.name || "N/A"}
+                      Dr. {appt.doctorId?.name || "N/A"}
                       <br />
-                      <strong>Remark:</strong> {appt.remarks || "N/A"}
+                      {appt.remarks || "N/A"}
                     </Card>
                   </Col>
                 ))}

@@ -26,7 +26,7 @@ import { setUser } from "../redux/features/userSlice";
 import Profile from "../components/profile/Profile";
 import SplashScreen from "./SplashScreen";
 import "../css/homepage.css";
-import logo from "../assets/logo192.png";
+import logo from "../assets/logoRs.svg";
 const { Header, Content } = Layout;
 const { Title } = Typography;
 
