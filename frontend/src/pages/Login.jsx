@@ -35,12 +35,11 @@ const Login = () => {
   // Staff Login Handler
   const onSubmitStaffLogin = async (values) => {
     try {
-      dispatch(showLoading());
+      values.contactNo = `+91${values.contactNo}`;
       const response = await axios.post(
         `${process.env.REACT_APP_BACKEND}/api/v1/staff/login`,
         values
       );
-      dispatch(hideLoading());
 
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
@@ -58,6 +57,7 @@ const Login = () => {
   // Doctor Login Handler
   const onSubmitDoctorLogin = async (values) => {
     try {
+      values.contactNo = `+91${values.contactNo}`;
       const response = await axios.post(
         `${process.env.REACT_APP_BACKEND}/api/v1/doctor/login`,
         values
@@ -77,6 +77,7 @@ const Login = () => {
   // Patient Login Handler
   const onSubmitPatientLogin = async (values) => {
     try {
+      values.contactNo = `+91${values.contactNo}`;
       const response = await axios.post(
         `${process.env.REACT_APP_BACKEND}/api/v1/patient/login`,
         values
@@ -165,12 +166,12 @@ const Login = () => {
             rules={[
               { required: true, message: "Please input your phone number!" },
               {
-                pattern: /^\+91\d{10}$/,
+                pattern: /\d{10}$/,
                 message: "Invalid phone number format!",
               },
             ]}
           >
-            <Input placeholder="XXXXXXXXXX" />
+            <Input addonBefore="+91" maxLength={10} placeholder="XXXXXXXXXX" />
           </Form.Item>
           <Form.Item
             label="Password"
@@ -207,12 +208,12 @@ const Login = () => {
             rules={[
               { required: true, message: "Please input your phone number!" },
               {
-                pattern: /^\+91\d{10}$/,
+                pattern: /^\d{10}$/,
                 message: "Invalid phone number format!",
               },
             ]}
           >
-            <Input placeholder="XXXXXXXXXX" />
+            <Input addonBefore="+91" maxLength={10} placeholder="XXXXXXXXXX" />
           </Form.Item>
           <Form.Item
             label="Password"
@@ -249,12 +250,12 @@ const Login = () => {
             rules={[
               { required: true, message: "Please input your phone number!" },
               {
-                pattern: /^\+91\d{10}$/,
+                pattern: /^\d{10}$/,
                 message: "Invalid phone number format!",
               },
             ]}
           >
-            <Input placeholder="XXXXXXXXXX" />
+            <Input addonBefore="+91" maxLength={10} placeholder="XXXXXXXXXX" />
           </Form.Item>
           <Form.Item>
             <Button
