@@ -23,7 +23,6 @@
 .LogButton {
     font-size: large;
     width: 120px;
-    margin: px;
     color: #423328;
     text-shadow:
         2px 2px 0 #ffffff20,
@@ -31,8 +30,6 @@
 }
 
 .LogButton:hover {
-    font-size: large;
-    width: 120px;
     color: #085042 !important;
     background-color: #5132114a !important;
 }
