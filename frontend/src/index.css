@@ -50,3 +50,9 @@
 .ant-table-cell {
     background: none !important;
 }
+
+@media screen and (max-width: 524px) {
+    .ant-modal {
+        width: 75vw !important;
+    }
+}
