@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Layout,
   Menu,
-  Button,
   Avatar,
   Dropdown,
   Space,
   Typography,
-  Divider,
 } from "antd";
 import {
   UserOutlined,
@@ -16,19 +14,17 @@ import {
   ScheduleOutlined,
   TeamOutlined,
   UsergroupAddOutlined,
-  ProfileOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import StaffDashboard from "../components/dashboard/StaffDashboard";
 import DoctorDashboard from "../components/dashboard/DoctorDashboard";
 import PatientDashboard from "../components/dashboard/PatientDashboard";
-import { setUser } from "../redux/features/userSlice";
 import Profile from "../components/profile/Profile";
-import SplashScreen from "./SplashScreen";
+import { setUser } from "../redux/features/userSlice";
 import "../css/homepage.css";
 import logo from "../assets/logoRs.svg";
+
 const { Header, Content } = Layout;
-const { Title } = Typography;
 
 const HomePage = () => {
   const dispatch = useDispatch();
@@ -36,23 +32,11 @@ const HomePage = () => {
   const { user } = useSelector((state) => state.user);
   const [view, setView] = useState("appointments");
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("splashSeen");
-    dispatch(setUser(null));
-    navigate("/login");
-  };
-
   const menuItems = [
     {
       key: "appointments",
       icon: <ScheduleOutlined />,
       label: "Appointments",
-    },
-    {
-      key: "profile",
-      icon: <ProfileOutlined />,
-      label: "My Profile",
     },
   ];
 
@@ -85,7 +69,7 @@ const HomePage = () => {
     <Layout className="home-layout">
       <Header className="home-header">
         <div>
-          <img src={logo} className="logo"></img>
+          <img src={logo} className="logo" alt="logo" />
         </div>
         <Menu
           theme="dark"
@@ -99,25 +83,13 @@ const HomePage = () => {
           items={menuItems}
           className="home-menu"
         />
-        <Dropdown
-          trigger={["click"]}
-          overlay={
-            <Menu>
-              <Menu.Item
-                key="logout"
-                icon={<LogoutOutlined />}
-                onClick={handleLogout}
-              >
-                Logout
-              </Menu.Item>
-            </Menu>
-          }
+        <Space
+          style={{ cursor: "pointer" }}
+          onClick={() => setView("profile")}
         >
-          <Space style={{ cursor: "pointer" }}>
-            <Avatar icon={<UserOutlined />} />
-            <span style={{ color: "white" }}>{user?.name}</span>
-          </Space>
-        </Dropdown>
+          <Avatar icon={<UserOutlined />} />
+          <span style={{ color: "white" }}>{user?.name}</span>
+        </Space>
       </Header>
 
       <Content style={{ padding: 8 }}>{renderDashboard()}</Content>

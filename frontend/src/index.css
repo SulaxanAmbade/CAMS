@@ -30,6 +30,7 @@
     .ant-form,
     .ant-form-item-required,
     .ant-notification-notice-message,
+    .ant-input-group-addon,
     .ant-notification-notice-description {
         color: white !important;
     }
@@ -44,6 +45,19 @@
         color: white !important;
     }
 
+}
+
+/* Override Ant Design radio button checked background on hover, active, and default states */
+:where(.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled))::before,
+:where(.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover)::before,
+:where(.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):active)::before {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+:where(.css-dev-only-do-not-override-qnu6hi).ant-radio-button-wrapper:not(:first-child)::before {
+    background-color: transparent !important;
+    box-shadow: none !important;
 }
 
 .ant-table,

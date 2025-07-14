@@ -1,7 +1,9 @@
 import React from "react";
-import { Card, Avatar, Typography, Tag, Descriptions } from "antd";
-import { useSelector } from "react-redux";
-import { UserOutlined } from "@ant-design/icons";
+import { Card, Avatar, Typography, Tag, Descriptions, Button } from "antd";
+import { useSelector, useDispatch } from "react-redux";
+import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
+import { setUser } from "../../redux/features/userSlice";
+import { useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
 
@@ -18,10 +20,19 @@ const getRoleTag = (role) => {
   }
 };
 
-const PatientProfile = () => {
+const Profile = () => {
   const { user } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const dob =
     user?.dateOfBirth && new Date(user.dateOfBirth).toLocaleDateString("en-GB");
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("splashSeen");
+    dispatch(setUser(null));
+    navigate("/login");
+  };
 
   return (
     <Card
@@ -31,6 +42,7 @@ const PatientProfile = () => {
         boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
         borderRadius: "12px",
         padding: "24px",
+        color: "white",
       }}
     >
       <div
@@ -41,10 +53,8 @@ const PatientProfile = () => {
           gap: "24px",
           justifyContent: "space-between",
           alignItems: "flex-start",
-          color: "white",
         }}
       >
-        {/* Profile Info */}
         <div
           style={{
             flex: 1,
@@ -89,9 +99,23 @@ const PatientProfile = () => {
               </>
             )}
           </Descriptions>
+
+          <Button
+            danger
+            icon={<LogoutOutlined />}
+            onClick={handleLogout}
+            style={{
+              marginTop: "24px",
+              background: "#ff4d4f",
+              border: "none",
+              color: "#fff",
+              fontWeight: "bold",
+            }}
+          >
+            Logout
+          </Button>
         </div>
 
-        {/* Avatar */}
         <div style={{ marginLeft: "auto", marginRight: "auto" }}>
           <Avatar
             size={128}
@@ -107,4 +131,4 @@ const PatientProfile = () => {
   );
 };
 
-export default PatientProfile;
+export default Profile;

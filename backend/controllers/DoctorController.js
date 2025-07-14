@@ -81,9 +81,9 @@ const deleteDoctor = async (req, res) => {
 };
 
 const doctorLogin = async (req, res) => {
-  const { phoneNumber } = req.body;
+  const { contactNo } = req.body;
 
-  if (!phoneNumber) {
+  if (!contactNo) {
     return res
       .status(400)
       .json({ success: false, message: "Phone number is required" });
@@ -91,7 +91,7 @@ const doctorLogin = async (req, res) => {
 
   try {
     // Check if a doctor exists with the given phone number
-    const doctor = await Doctor.findOne({ contactNo: phoneNumber });
+    const doctor = await Doctor.findOne({ contactNo });
 
     if (!doctor) {
       return res
