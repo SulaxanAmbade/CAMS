@@ -246,7 +246,7 @@ const Login = () => {
           <h3 style={{ textAlign: "center" }}>Patient Login</h3>
           <Form.Item
             label="Phone Number"
-            name="phoneNumber"
+            name="contactNo"
             rules={[
               { required: true, message: "Please input your phone number!" },
               {
