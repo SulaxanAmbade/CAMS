@@ -48,6 +48,9 @@
 }
 
 /* Override Ant Design radio button checked background on hover, active, and default states */
+:where(.ant-radio-button-wrapper:not(.ant-radio-button-wrapper-disabled))::before,
+:where(.ant-radio-button-wrapper:not(.ant-radio-button-wrapper-disabled):hover)::before,
+:where(.ant-radio-button-wrapper:not(.ant-radio-button-wrapper-disabled):active)::before,
 :where(.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled))::before,
 :where(.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover)::before,
 :where(.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):active)::before {
