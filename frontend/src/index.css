@@ -30,9 +30,12 @@
     .ant-form,
     .ant-form-item-required,
     .ant-notification-notice-message,
-    .ant-input-group-addon,
     .ant-notification-notice-description {
         color: white !important;
+    }
+
+    .ant-input-group-addon {
+        background-color: white !important;
     }
 
     label {
