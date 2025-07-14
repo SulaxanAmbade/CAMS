@@ -83,16 +83,16 @@ const deletePatient = async (req, res) => {
 };
 
 const patientLogin = async (req, res) => {
-  const { phoneNumber } = req.body;
+  const { contactNo } = req.body;
 
-  if (!phoneNumber) {
+  if (!contactNo) {
     return res
       .status(400)
       .json({ success: false, message: "Phone number is required" });
   }
 
   try {
-    const patient = await newPatient.findOne({ contactNo: phoneNumber });
+    const patient = await newPatient.findOne({ contactNo });
 
     if (!patient) {
       return res
