@@ -1,13 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Layout,
-  Menu,
-  Avatar,
-  Dropdown,
-  Space,
-  Typography,
-} from "antd";
+import { Layout, Menu, Avatar, Dropdown, Space, Typography } from "antd";
 import {
   UserOutlined,
   LogoutOutlined,
@@ -74,7 +67,7 @@ const HomePage = () => {
         <Menu
           theme="dark"
           mode="horizontal"
-          selectedKeys="none"
+          selectedKeys="appointments"
           onClick={(e) => {
             if (e.key === "patients") navigate("/manage-patients");
             else if (e.key === "doctors") navigate("/manage-doctors");
@@ -83,10 +76,7 @@ const HomePage = () => {
           items={menuItems}
           className="home-menu"
         />
-        <Space
-          style={{ cursor: "pointer" }}
-          onClick={() => setView("profile")}
-        >
+        <Space style={{ cursor: "pointer" }} onClick={() => setView("profile")}>
           <Avatar icon={<UserOutlined />} />
           <span style={{ color: "white" }}>{user?.name}</span>
         </Space>
