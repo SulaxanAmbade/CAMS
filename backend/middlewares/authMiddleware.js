@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
 const Doctor = require("../models/Doctor");
 const Patient = require("../models/Patient");
 const Staff = require("../models/Staff");
@@ -14,12 +13,6 @@ module.exports = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    let user = await User.findById(decoded.id);
-    if (user) {
-      req.user = { id: user._id, role: "user" };
-      return next();
-    }
 
     let doctor = await Doctor.findById(decoded.id);
     if (doctor) {

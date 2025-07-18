@@ -14,10 +14,13 @@ import {
   Row,
   Col,
   Tag,
+  notification,
+  Flex,
 } from "antd";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import "../../css/dashboard.css";
+import { TableOutlined, CreditCardOutlined } from "@ant-design/icons";
 import Spinner from "../requirements/Spinner";
 const { Option } = Select;
 const { TextArea } = Input;
@@ -34,7 +37,7 @@ const DoctorDashboard = () => {
   const [remark, setRemark] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
-
+  const [viewMode, setViewMode] = useState("card"); // "card" or "table"
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
@@ -42,6 +45,7 @@ const DoctorDashboard = () => {
   const [selectedStatus, setSelectedStatus] = useState("Pending");
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [dateRange, setDateRange] = useState(null);
 
   useEffect(() => {
     fetchAppointments();
@@ -55,7 +59,7 @@ const DoctorDashboard = () => {
       );
       setPatients(res.data.data);
     } catch {
-      message.error("Failed to fetch patients.");
+      notification.error({ message: "Failed to fetch patients." });
     }
   };
 
@@ -70,7 +74,10 @@ const DoctorDashboard = () => {
       );
       setAppointments(res.data.data);
     } catch {
-      message.error("Error fetching appointments.");
+      notification.error({
+        message: "Failed to fetch Appointments",
+        description: "No Apointments",
+      });
     } finally {
       setLoading(false);
     }
@@ -91,7 +98,21 @@ const DoctorDashboard = () => {
       message.error("Failed to update status");
     }
   };
+  const handleDelete = async (appointmentId) => {
+    try {
+      await axios.delete(
+        `${process.env.REACT_APP_BACKEND}/api/v1/appointment/deleteAppointment/${appointmentId}`
+      );
 
+      notification.success({ message: "Appointment deleted successfully!" });
+      setShowDetailsModal(false);
+      fetchAppointments();
+    } catch (error) {
+      notification.error({
+        message: error.response?.data?.message || error.message,
+      });
+    }
+  };
   const openAddModal = () => {
     setSelectedPatient("");
     setSelectedDate(null);
@@ -103,49 +124,20 @@ const DoctorDashboard = () => {
 
   const handleAddSubmit = async () => {
     if (!selectedPatient || !selectedDate || !selectedTime) {
-      message.info("Please fill all required fields.");
+      notification.warning({
+        message: "Incomplete Details",
+        description: "Please fill all the Details",
+      });
       return;
     }
 
     setModalLoading(true);
 
-    const visitingHours = user.visitingHours;
-    if (visitingHours) {
-      const startHour = visitingHours.start;
-      const endHour = visitingHours.end;
-
-      const selectedHour = selectedTime.format("HH:mm");
-      const selectedDateTime = moment(
-        `${selectedDate.format("YYYY-MM-DD")} ${selectedHour}`,
-        "YYYY-MM-DD HH:mm"
-      );
-
-      const currentDateTime = moment();
-
-      if (selectedDateTime.isBefore(currentDateTime)) {
-        message.error(
-          `Selected time (${selectedDateTime.format(
-            "HH:mm"
-          )}) is in the past. Please choose a future time.`
-        );
-        setModalLoading(false);
-        return;
-      }
-
-      if (selectedHour < startHour || selectedHour > endHour) {
-        message.error(
-          `Selected time is outside your visiting hours. Please select a time between ${startHour} and ${endHour}.`
-        );
-        setModalLoading(false);
-        return;
-      }
-    }
-
     const payload = {
       patientId: selectedPatient,
       doctorId: userID,
       date: selectedDate.format("YYYY-MM-DD"),
-      time: selectedTime.format("HH:mm"),
+      slotTime: selectedTime, // selectedTime now holds "09:00–10:00"
       status: "Confirmed",
       remarks: remark,
     };
@@ -155,11 +147,12 @@ const DoctorDashboard = () => {
         `${process.env.REACT_APP_BACKEND}/api/v1/appointment/createAppointment`,
         payload
       );
-      message.success("Appointment created successfully");
+      notification.success({ message: "Appointment created successfully" });
       setShowModal(false);
       fetchAppointments();
-    } catch {
-      message.error("Failed to create appointment.");
+    } catch (err) {
+      const error = err.response?.data?.message || "Something went wrong.";
+      notification.error({ message: error });
     } finally {
       setModalLoading(false);
     }
@@ -174,8 +167,17 @@ const DoctorDashboard = () => {
       const isToday = showTodayOnly
         ? moment(a.date).format("YYYY-MM-DD") === today
         : true;
+      const inDateRange = dateRange
+        ? moment(a.date).format("YYYY-MM-DD") >=
+            dateRange[0].format("YYYY-MM-DD") &&
+          moment(a.date).format("YYYY-MM-DD") <=
+            dateRange[1].format("YYYY-MM-DD")
+        : true;
+
       const patientName = a.patientId?.name?.toLowerCase() || "";
-      return isToday && patientName.includes(searchText.toLowerCase());
+      return (
+        isToday && inDateRange && patientName.includes(searchText.toLowerCase())
+      );
     })
     .sort((a, b) => {
       const timeA = moment(`${a.date} ${a.time}`, "YYYY-MM-DD HH:mm");
@@ -216,7 +218,10 @@ const DoctorDashboard = () => {
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
         />
-
+        <DatePicker.RangePicker
+          onChange={(dates) => setDateRange(dates)}
+          allowClear
+        />
         <Radio.Group
           className="radio-group"
           value={filterStatus}
@@ -235,18 +240,44 @@ const DoctorDashboard = () => {
           onClick={() => setShowTodayOnly(!showTodayOnly)}
           style={{ backgroundColor: "#4CAF50", color: "white" }}
         >
-          {showTodayOnly
-            ? "Show All Appointments"
-            : "Show Today's Appointments"}
+          {showTodayOnly ? "All" : "Today's"}
         </Button>
         <Button className="add-button" type="primary" onClick={openAddModal}>
           Add Appointment
         </Button>
       </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          margin: "10px 0",
+        }}
+      >
+        <p style={{ margin: "5px 0", fontWeight: "bold" }}>
+          Showing {filteredAppointments.length} Appointments
+        </p>
+        <Button
+          onClick={() => setViewMode(viewMode === "card" ? "table" : "card")}
+          className="add-button"
+        >
+          {viewMode === "card" ? (
+            <>
+              <TableOutlined style={{ marginRight: "2px" }} />
+              Table
+            </>
+          ) : (
+            <>
+              <CreditCardOutlined style={{ marginRight: "2px" }} />
+              Card
+            </>
+          )}
+        </Button>
+      </div>
 
       {loading ? (
         <Spinner />
-      ) : (
+      ) : viewMode === "card" ? (
         <Row gutter={[16, 16]}>
           {filteredAppointments.map((a) => (
             <Col xs={24} sm={12} md={8} lg={6} key={a._id}>
@@ -254,7 +285,7 @@ const DoctorDashboard = () => {
                 hoverable
                 className="card-style"
                 style={{
-                  background: `linear-gradient(135deg,#e3e1e1,${getCardColor(
+                  background: `linear-gradient(0deg,#000000,${getCardColor(
                     a.status
                   )})`,
                   border: isTomorrowConfirmed(a) ? "2px solid #ff0000" : "none",
@@ -275,12 +306,81 @@ const DoctorDashboard = () => {
                   {moment(a.date).format("DD MMMM")}
                 </div>
                 <div>{moment(a.date).format("YYYY")}</div>
-                <div style={{ fontSize: "200%" }}>{a.time}</div>
+                <div style={{ fontSize: "200%" }}>{a.slotTime}</div>
                 <div>{a.patientId?.name || "Deleted Patient"}</div>
               </Card>
             </Col>
           ))}
         </Row>
+      ) : (
+        <table
+          className="appointment-table"
+          style={{ width: "100%", borderCollapse: "collapse" }}
+        >
+          <thead>
+            <tr>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Date</th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Time</th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Patient
+              </th>
+              <th
+                style={{
+                  border: "1px solid #ddd",
+                  padding: "8px",
+                }}
+              >
+                Status
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredAppointments.map((a) => (
+              <tr
+                key={a._id}
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setSelectedAppointment(a);
+                  setShowDetailsModal(true);
+                }}
+              >
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  {moment(a.date).format("DD MMM YYYY")}
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  {a.slotTime}
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  {a.patientId?.name || "Unknown"}
+                </td>
+                <td
+                  style={{
+                    border: "1px solid #ddd",
+                    padding: "8px",
+                    backgroundColor: `${getCardColor(a.status)}`,
+                  }}
+                >
+                  {a.status}
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  <Button
+                    type="link"
+                    danger
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(a._id);
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
 
       <Modal
@@ -294,7 +394,7 @@ const DoctorDashboard = () => {
         <h3>Add Appointment</h3>
         Patient:
         <Select
-          value={selectedPatient || "Select Patient"}
+          value={selectedPatient}
           placeholder="Select Patient"
           onChange={setSelectedPatient}
           style={{ width: "100%", marginBottom: 16 }}
@@ -316,13 +416,26 @@ const DoctorDashboard = () => {
           placeholder="Select Date"
         />
         Time:
-        <TimePicker
-          style={{ width: "100%", marginBottom: 16 }}
+        <Select
+          placeholder="Select Time Slot"
           value={selectedTime}
           onChange={setSelectedTime}
-          format="HH:mm"
-          placeholder="Select Time"
-        />
+          style={{ width: "100%", marginBottom: 16 }}
+        >
+          {[
+            "09:00 – 10:00",
+            "10:00 – 11:00",
+            "11:00 – 12:00",
+            "12:00 – 13:00",
+            "14:00 – 15:00",
+            "15:00 – 16:00",
+            "16:00 – 17:00",
+          ].map((slot) => (
+            <Option key={slot} value={slot}>
+              {slot}
+            </Option>
+          ))}
+        </Select>
         Status:Confirmed
         <TextArea
           rows={4}
@@ -359,11 +472,18 @@ const DoctorDashboard = () => {
             {moment(selectedAppointment?.date).format("DD/MM/YYYY")}
           </p>
           <p>
-            <b>Time:</b> {selectedAppointment?.time}
+            <b>Time Slot:</b> {selectedAppointment?.slotTime}
           </p>
 
           <p>
             <b>Remarks:</b> {selectedAppointment?.remarks || "No Remarks"}
+            {/* <TextArea
+              rows={4}
+              placeholder="Enter any remarks (optional)"
+              value={selectedAppointment?.remarks}
+              onChange={(e) => setRemark(e.target.value)}
+              style={{ marginBottom: 16 }}
+            /> */}
           </p>
           <p>
             Status:
@@ -380,6 +500,15 @@ const DoctorDashboard = () => {
               ))}
             </Select>
           </p>
+          <Button
+            style={{ background: "none" }}
+            block
+            type="link"
+            danger
+            onClick={() => handleDelete(selectedAppointment._id)}
+          >
+            Delete
+          </Button>
         </Card>
       </Modal>
     </div>

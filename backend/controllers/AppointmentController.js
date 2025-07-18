@@ -8,63 +8,55 @@ const moment = require("moment"); // Make sure to import moment
 
 const createAppointment = async (req, res) => {
   try {
-    const { patientId, doctorId, date, time, status, remarks } = req.body;
-
-    // Check if the patient and doctor IDs are valid
+    const { patientId, doctorId, date, slotTime, status, remarks } = req.body;
     const patient = await Patient.findById(patientId);
     const doctor = await Doctor.findById(doctorId);
+
     if (!patient || !doctor) {
       return res
         .status(404)
         .json({ success: false, message: "Invalid patient or doctor ID." });
     }
 
-    // Get the doctor's time slot duration in minutes
-    const slotDuration = doctor.visitingHours.slot;
-
-    // Convert requested time to a moment object for easier manipulation
-    const appointmentStartTime = moment(time, "HH:mm");
-
-    // Fetch all appointments for the doctor on the specified date
-    const appointments = await Appointment.find({
+    // Prevent double booking by the same patient for same doctor, date & slot
+    const existingAppointment = await Appointment.findOne({
+      patientId,
       doctorId,
-      date: new Date(date).toISOString().split("T")[0], // Match appointments on the same day
+      date,
+      slotTime,
     });
 
-    // Check for overlaps with each existing appointment
-    for (const existingAppointment of appointments) {
-      const existingAppointmentStart = moment(
-        existingAppointment.time,
-        "HH:mm"
-      );
-      const existingAppointmentEnd = existingAppointmentStart
-        .clone()
-        .add(slotDuration, "minutes");
-
-      // Check if the new appointment start time is within the existing appointment range
-      if (
-        appointmentStartTime.isBetween(
-          existingAppointmentStart,
-          existingAppointmentEnd,
-          null,
-          "[)"
-        )
-      ) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Time slot already booked." });
-      }
+    if (existingAppointment) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "You already have an appointment booked with this doctor in this time slot.",
+      });
     }
 
-    // If no overlaps, create the new appointment
+    // Count existing appointments for this doctor on the given date and time slot
+    const slotCount = await Appointment.countDocuments({
+      doctorId,
+      date,
+      slotTime,
+    });
+
+    if (slotCount >= 8) {
+      return res.status(400).json({
+        success: false,
+        message: "This time slot is fully booked. Please choose another.",
+      });
+    }
+
     const appointment = new Appointment({
       patientId,
       doctorId,
       date,
-      time,
+      slotTime,
       status,
       remarks,
     });
+
     await appointment.save();
 
     res.status(201).json({

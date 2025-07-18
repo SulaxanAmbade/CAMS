@@ -23,8 +23,10 @@
     color: white !important;
 
     .ant-btn {
-        color: white !important;
-        background-color: #423328 !important;
+        background: none;
+        border: 1px solid white;
+        color: white;
+        backdrop-filter: blur(16px);
     }
 
     .ant-form,

@@ -9,11 +9,6 @@ const DoctorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  visitingHours: {
-    start: { type: String, required: true },
-    end: { type: String, required: true },
-    slot: { type: Number, required: true }, // Duration in minutes
-  },
 });
 
 module.exports = mongoose.model("Doctor", DoctorSchema);

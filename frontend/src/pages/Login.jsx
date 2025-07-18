@@ -104,15 +104,16 @@ const Login = () => {
 
   return (
     <div className="formContainer">
-      <Card className="loginCard" style={{}}>
+      <Card className="loginCard">
+        <h6 style={{ color: "white" }}>Dr. Rahul Patil's</h6>
         <h1 style={{ color: "#423328", fontWeight: "bold" }}>
-          Dhanvantari Ayurveda's
+          Dhanvantari Ayurveda
         </h1>
-        <h4 style={{ textAlign: "center", marginLeft: "10px" }}>
+        <h5 style={{ textAlign: "center", marginLeft: "10px" }}>
           <b>C</b>linical <b>A</b>ppointment <b>M</b>anagement <b>S</b>ystem
-        </h4>
+        </h5>
         <hr />
-        <h6>Login as</h6>
+        <h5>Login as</h5>
         <div className="logButtonDiv">
           <Button
             type="text"

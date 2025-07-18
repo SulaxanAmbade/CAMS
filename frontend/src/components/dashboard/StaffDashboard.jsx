@@ -19,6 +19,7 @@ import moment from "moment";
 import TextArea from "antd/es/input/TextArea";
 import "../../css/dashboard.css";
 import Spinner from "../requirements/Spinner";
+import { TableOutlined, CreditCardOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -41,23 +42,6 @@ const AppointmentForm = ({
   const handleScheduleAppointment = async () => {
     if (selectedPatient && selectedDoctor && selectedDate && selectedTime) {
       setLoading(true);
-      const doctor = doctors.find((doc) => doc._id === selectedDoctor);
-
-      if (doctor) {
-        const { visitingHours } = doctor;
-        const startHour = visitingHours.start;
-        const endHour = visitingHours.end;
-        const selectedHour = selectedTime.format("HH:mm");
-
-        if (selectedHour < startHour || selectedHour > endHour) {
-          notification.error({
-            message: "Invalid Time Slot",
-            description: `Selected time is outside the doctor's visiting hours. Please select a time between ${startHour} and ${endHour}.`,
-          });
-          setLoading(false);
-          return;
-        }
-      }
 
       try {
         const response = await fetch(
@@ -71,7 +55,7 @@ const AppointmentForm = ({
               patientId: selectedPatient,
               doctorId: selectedDoctor,
               date: selectedDate.format("YYYY-MM-DD"),
-              time: selectedTime.format("HH:mm"),
+              slotTime: selectedTime,
               remark: remark,
             }),
           }
@@ -90,7 +74,7 @@ const AppointmentForm = ({
           setSelectedPatient("");
           setSelectedDoctor("");
           setSelectedDate("");
-          setSelectedTime(null);
+          setSelectedTime("");
           setRemark("");
           fetchAppointments(); // refresh appointment list
           setShowModal(false); // close form
@@ -165,14 +149,26 @@ const AppointmentForm = ({
         disabledDate={(current) => current && current < moment().startOf("day")}
       />
 
-      <TimePicker
-        placeholder="Select Time"
+      <Select
+        placeholder="Select Time Slot"
         value={selectedTime}
         onChange={setSelectedTime}
-        disabled={!selectedDoctor || !selectedDate}
-        format="HH:mm"
-        style={{ width: "100%", marginBottom: "1rem" }}
-      />
+        style={{ width: "100%", marginBottom: 16 }}
+      >
+        {[
+          "09:00 – 10:00",
+          "10:00 – 11:00",
+          "11:00 – 12:00",
+          "12:00 – 13:00",
+          "14:00 – 15:00",
+          "15:00 – 16:00",
+          "16:00 – 17:00",
+        ].map((slot) => (
+          <Option key={slot} value={slot}>
+            {slot}
+          </Option>
+        ))}
+      </Select>
 
       <TextArea
         rows={4}
@@ -209,10 +205,12 @@ const StaffDashboard = () => {
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchText, setSearchText] = useState("");
+  const [dateRange, setDateRange] = useState(null);
   const [filterStatus, setFilterStatus] = useState("All");
   const [showTodayOnly, setShowTodayOnly] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [viewMode, setViewMode] = useState("card"); // or "table"
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
     fetchAppointments();
@@ -283,12 +281,16 @@ const StaffDashboard = () => {
       const isToday = showTodayOnly
         ? moment(a.date).format("YYYY-MM-DD") === today
         : true;
+      const inDateRange = dateRange
+        ? moment(a.date).format("YYYY-MM-DD") >=
+            dateRange[0].format("YYYY-MM-DD") &&
+          moment(a.date).format("YYYY-MM-DD") <=
+            dateRange[1].format("YYYY-MM-DD")
+        : true;
+
       const patientName = a.patientId?.name?.toLowerCase() || "";
-      const doctorName = a.doctorId?.name?.toLowerCase() || "";
       return (
-        isToday &&
-        (patientName.includes(searchText.toLowerCase()) ||
-          doctorName.includes(searchText.toLowerCase()))
+        isToday && inDateRange && patientName.includes(searchText.toLowerCase())
       );
     })
     .sort((a, b) => {
@@ -326,9 +328,13 @@ const StaffDashboard = () => {
 
       <div className="dashboard-controls">
         <Input
-          placeholder="Search by Patient or Doctor name"
+          placeholder="Search by Patient's Name"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
+        />
+        <DatePicker.RangePicker
+          onChange={(dates) => setDateRange(dates)}
+          allowClear
         />
 
         <Radio.Group
@@ -348,19 +354,45 @@ const StaffDashboard = () => {
           className="today-button"
           onClick={() => setShowTodayOnly(!showTodayOnly)}
         >
-          {showTodayOnly
-            ? "Show All Appointments"
-            : "Show Today's Appointments"}
+          {showTodayOnly ? "All" : "Today's"}
         </Button>
 
         <Button className="add-button" onClick={() => setShowModal(true)}>
           Add Appointment
         </Button>
       </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          margin: "10px 0",
+        }}
+      >
+        <p style={{ margin: "5px 0", fontWeight: "bold" }}>
+          Showing {filteredAppointments.length} Appointments
+        </p>
+        <Button
+          onClick={() => setViewMode(viewMode === "card" ? "table" : "card")}
+          className="add-button"
+        >
+          {viewMode === "card" ? (
+            <>
+              <TableOutlined style={{ marginRight: "2px" }} />
+              Table
+            </>
+          ) : (
+            <>
+              <CreditCardOutlined style={{ marginRight: "2px" }} />
+              Card
+            </>
+          )}
+        </Button>
+      </div>
 
       {loading ? (
         <Spinner />
-      ) : (
+      ) : viewMode === "card" ? (
         <Row gutter={[16, 16]}>
           {filteredAppointments.map((a) => (
             <Col xs={24} sm={12} md={8} lg={6} key={a._id}>
@@ -368,7 +400,7 @@ const StaffDashboard = () => {
                 hoverable
                 className="card-style"
                 style={{
-                  background: `linear-gradient(135deg,#f5f0eb,${getCardColor(
+                  background: `linear-gradient(0deg,#000000,${getCardColor(
                     a.status
                   )})`,
                   border: isTomorrowConfirmed(a) ? "2px solid #ff0000" : "none",
@@ -380,14 +412,12 @@ const StaffDashboard = () => {
                       color="red"
                       style={{
                         textAlign: "center",
-                        overflow: "hidden",
                         width: "100%",
                         marginBottom: 8,
                       }}
                     >
                       Tomorrow's Confirmed Appointment
                     </Tag>
-
                     <Button
                       type="primary"
                       size="small"
@@ -400,7 +430,7 @@ const StaffDashboard = () => {
                             {
                               appointmentId: a._id,
                               title: "⏰ Appointment Reminder",
-                              message: `You have an appointment tomorrow at ${a.time}`,
+                              message: `You have an appointment tomorrow at ${a.slotTime}`,
                             }
                           );
 
@@ -414,7 +444,7 @@ const StaffDashboard = () => {
                                 res.data.message || "Failed to send reminder.",
                             });
                           }
-                        } catch (error) {
+                        } catch {
                           notification.error({
                             message: "Error sending reminder.",
                           });
@@ -439,20 +469,107 @@ const StaffDashboard = () => {
                 </Select>
 
                 <div className="appointment-date">
-                  {moment(a.date).format("DD MMMM")}{" "}
-                  {moment(a.date).format("YYYY")}
+                  {moment(a.date).format("DD MMMM YYYY")}
                 </div>
-
-                <div className="appointment-time">{a.time}</div>
-
+                <div className="appointment-time">{a.slotTime}</div>
                 <div className="appointment-info">
-                  {a.patientId?.name || "Deleted Patient"} <br />
-                  Dr.{a.doctorId?.name || "Deleted Doctor"}
+                  {a.patientId?.name || "Deleted Patient"}
                 </div>
               </Card>
             </Col>
           ))}
         </Row>
+      ) : (
+        <table
+          style={{ width: "100%", marginTop: 20, borderCollapse: "collapse" }}
+        >
+          <thead>
+            <tr>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Date</th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Time</th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Patient
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Status
+              </th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredAppointments.map((a) => (
+              <tr key={a._id}>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  {moment(a.date).format("DD MMM YYYY")}
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  {a.slotTime}
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  {a.patientId?.name || "Unknown"}
+                </td>
+
+                <td
+                  style={{
+                    border: "1px solid #ddd",
+                    padding: "8px",
+                    backgroundColor: `${getCardColor(a.status)}`,
+                  }}
+                >
+                  <Select
+                    size="small"
+                    value={a.status}
+                    onChange={(value) => handleStatusChange(a._id, value)}
+                  >
+                    {statusOrder.map((s) => (
+                      <Select.Option key={s} value={s}>
+                        {s}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  {isTomorrowConfirmed(a) && (
+                    <Button
+                      type="link"
+                      onClick={async () => {
+                        try {
+                          const res = await axios.post(
+                            `${process.env.REACT_APP_BACKEND}/api/v1/notification/send-custom-reminder`,
+                            {
+                              appointmentId: a._id,
+                              title: "⏰ Appointment Reminder",
+                              message: `You have an appointment tomorrow at ${a.slotTime}`,
+                            }
+                          );
+
+                          if (res.data.success) {
+                            notification.success({
+                              message: "Reminder sent successfully!",
+                            });
+                          } else {
+                            notification.error({
+                              message:
+                                res.data.message || "Failed to send reminder.",
+                            });
+                          }
+                        } catch {
+                          notification.error({
+                            message: "Error sending reminder.",
+                          });
+                        }
+                      }}
+                    >
+                      Send Reminder
+                    </Button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
 
       <Modal

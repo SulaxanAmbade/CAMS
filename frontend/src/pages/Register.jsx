@@ -32,7 +32,7 @@ const Register = () => {
   const onSubmithandle = async (values) => {
     try {
       dispatch(showLoading());
-      const response = await axios.post("/api/v1/user/register", values);
+      const response = await axios.post("/api/v1/staff/register", values);
       dispatch(hideLoading());
       if (response.data.success) {
         message.success("Registered Successfully!!");
@@ -120,17 +120,6 @@ const Register = () => {
           <Input.Password placeholder="Enter your password" />
         </Form.Item>
 
-        <Form.Item
-          label="Role"
-          name="role"
-          rules={[{ required: true, message: "Please select your role!" }]}
-        >
-          <Select placeholder="Select your role">
-            <Option value="Staff">Staff</Option>
-            <Option value="Doctor">Doctor</Option>
-            <Option value="Patient">Patient</Option>
-          </Select>
-        </Form.Item>
 
         <div style={{ textAlign: "center", marginBottom: "10px", color: "bisque" }}>
           <h6>Already a user?</h6>

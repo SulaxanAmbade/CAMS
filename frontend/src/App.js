@@ -8,7 +8,7 @@ import ProtectedLayout from "./components/requirements/ProtectedLayout";
 import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import DoctorManagement from "./components/functions/DoctorManagement";
+import StaffManagement from "./components/functions/StaffManagement";
 import PatientManagement from "./components/functions/PatientManagement";
 import Profile from "./components/profile/Profile";
 import SplashScreen from "./pages/SplashScreen";
@@ -49,7 +49,7 @@ function App() {
             }
           />
           <Route
-            path="/*"
+            path="/"
             element={
               <ProtectedRoutes>
                 <ProtectedLayout>
@@ -79,11 +79,11 @@ function App() {
             }
           />
           <Route
-            path="/manage-doctors"
+            path="/manage-staff"
             element={
               <ProtectedRoutes>
                 <ProtectedLayout>
-                  <DoctorManagement />
+                  <StaffManagement />
                 </ProtectedLayout>
               </ProtectedRoutes>
             }

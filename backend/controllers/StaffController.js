@@ -98,4 +98,26 @@ const getUserData = async (req, res) => {
   }
 };
 
-module.exports = { getAllStaff, loginStaff, getUserData };
+const deleteStaff = async (req, res) => {
+  try {
+    const deletedStaff = await Staff.findByIdAndDelete(req.params.id);
+    if (!deletedStaff) {
+      return res
+        .status(201)
+        .json({ success: true, message: "Staff not found" });
+    }
+    res
+      .status(200)
+      .json({ success: true, message: "Staff deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+module.exports = {
+  getAllStaff,
+  loginStaff,
+  getUserData,
+  registerStaff,
+  deleteStaff,
+};

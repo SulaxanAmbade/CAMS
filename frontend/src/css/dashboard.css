@@ -62,6 +62,7 @@
 
 .card-style {
   background: linear-gradient(135deg, #4a3623, #e6b35a);
+  color: white;
   text-align: center;
   display: flex;
   flex-direction: column;

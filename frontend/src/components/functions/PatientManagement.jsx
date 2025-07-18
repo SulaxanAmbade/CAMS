@@ -141,7 +141,7 @@ export const PatientManagement = () => {
 
   return (
     <>
-      {user?.role === "staff" ? (
+      {(user?.role === "staff") | (user?.role === "doctor") ? (
         <>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <Button
@@ -194,7 +194,7 @@ export const PatientManagement = () => {
                   },
                 ]}
               >
-                <Input />
+                <Input placeholder="Name" />
               </Form.Item>
               <Form.Item
                 label="Date of Birth"
@@ -206,14 +206,14 @@ export const PatientManagement = () => {
                   },
                 ]}
               >
-                <DatePicker style={{ width: "100%" }} />
+                <DatePicker format={"DD/MM/YYYY"} style={{ width: "100%" }} />
               </Form.Item>
               <Form.Item
                 label="Gender"
                 name="gender"
                 rules={[{ required: true, message: "Please select gender!" }]}
               >
-                <Select>
+                <Select placeholder="Select Gender">
                   <Option value="Male">Male</Option>
                   <Option value="Female">Female</Option>
                   <Option value="Others">Others</Option>
@@ -224,32 +224,32 @@ export const PatientManagement = () => {
                 name="contactNo"
                 rules={[
                   {
-                    pattern: /^\+91\d{10}$/,
+                    pattern: /^\d{10}$/,
                     required: true,
                     message: "Please input valid contact number!",
                   },
                 ]}
               >
-                <Input />
+                <Input addonBefore="+91" maxLength={10} />
               </Form.Item>
               <Form.Item
                 label="Emergency Contact"
                 name="emergencyContact"
                 rules={[
                   {
-                    pattern: /^\+91\d{10}$/,
+                    pattern: /^\d{10}$/,
                     required: true,
                     message: "Please input valid emergency contact!",
                   },
                 ]}
               >
-                <Input />
+                <Input addonBefore="+91" maxLength={10} />
               </Form.Item>
               <Form.Item label="Medical History" name="medicalHistory">
                 <Input.TextArea rows={4} />
               </Form.Item>
               <Form.Item>
-                <Button type="primary" htmlType="submit">
+                <Button block type="primary" htmlType="submit">
                   Add Patient
                 </Button>
               </Form.Item>
@@ -294,6 +294,13 @@ export const PatientManagement = () => {
           <h2 style={{ color: "red" }}>
             ERROR 404 : Sorry You Don't have Access to the Page
           </h2>
+          <Button
+            onClick={() => {
+              navigate("/");
+            }}
+          >
+            Home
+          </Button>
         </div>
       )}
     </>

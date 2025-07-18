@@ -33,7 +33,7 @@ const HomePage = () => {
     },
   ];
 
-  if (user?.role === "staff") {
+  if (user?.role === "doctor") {
     menuItems.splice(
       1,
       0,
@@ -43,11 +43,18 @@ const HomePage = () => {
         label: "Patients",
       },
       {
-        key: "doctors",
+        key: "staff",
         icon: <UsergroupAddOutlined />,
-        label: "Doctors",
+        label: "Staff",
       }
     );
+  }
+  if (user?.role === "staff") {
+    menuItems.splice(1, 0, {
+      key: "patients",
+      icon: <TeamOutlined />,
+      label: "Patients",
+    });
   }
 
   const renderDashboard = () => {
@@ -70,7 +77,7 @@ const HomePage = () => {
           selectedKeys="appointments"
           onClick={(e) => {
             if (e.key === "patients") navigate("/manage-patients");
-            else if (e.key === "doctors") navigate("/manage-doctors");
+            else if (e.key === "staff") navigate("/manage-staff");
             else setView(e.key);
           }}
           items={menuItems}
