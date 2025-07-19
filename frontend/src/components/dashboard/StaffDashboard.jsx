@@ -14,12 +14,17 @@ import {
   TimePicker,
   Modal,
   Tag,
+  Dropdown,
 } from "antd";
 import moment from "moment";
 import TextArea from "antd/es/input/TextArea";
 import "../../css/dashboard.css";
 import Spinner from "../requirements/Spinner";
-import { TableOutlined, CreditCardOutlined } from "@ant-design/icons";
+import {
+  TableOutlined,
+  CreditCardOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -114,7 +119,7 @@ const AppointmentForm = ({
         onChange={setSelectedPatient}
         style={{ width: "100%", marginBottom: "1rem" }}
       >
-        {patients.map((patient) => (
+        {patients?.map((patient) => (
           <Option key={patient._id} value={patient._id}>
             {patient.name}
           </Option>
@@ -131,7 +136,7 @@ const AppointmentForm = ({
         }}
         style={{ width: "100%", marginBottom: "1rem" }}
       >
-        {doctors.map((doctor) => (
+        {doctors?.map((doctor) => (
           <Option key={doctor._id} value={doctor._id}>
             {doctor.name}
           </Option>
@@ -271,7 +276,30 @@ const StaffDashboard = () => {
       notification.error({ message: "Failed to update status" });
     }
   };
+  const confirmDelete = (appointmentId) => {
+    Modal.confirm({
+      centered: true,
+      title: "Are you sure you want to delete this Appointment?",
+      content: "This action cannot be undone.",
+      onOk() {
+        handleDelete(appointmentId);
+      },
+    });
+  };
+  const handleDelete = async (appointmentId) => {
+    try {
+      await axios.delete(
+        `${process.env.REACT_APP_BACKEND}/api/v1/appointment/deleteAppointment/${appointmentId}`
+      );
 
+      notification.success({ message: "Appointment deleted successfully!" });
+      fetchAppointments();
+    } catch (error) {
+      notification.error({
+        message: error.response?.data?.message || error.message,
+      });
+    }
+  };
   const today = moment().format("YYYY-MM-DD");
   const statusOrder = ["Pending", "Confirmed", "Completed", "Cancelled"];
 
@@ -455,18 +483,27 @@ const StaffDashboard = () => {
                     </Button>
                   </>
                 )}
+                <div style={{ display: "flex" }}>
+                  <Select
+                    value={a.status}
+                    onChange={(value) => handleStatusChange(a._id, value)}
+                    style={{ flexGrow: "2", width: "100%", marginBottom: 8 }}
+                  >
+                    {statusOrder.map((s) => (
+                      <Select.Option key={s} value={s}>
+                        {s}
+                      </Select.Option>
+                    ))}
+                  </Select>
 
-                <Select
-                  value={a.status}
-                  onChange={(value) => handleStatusChange(a._id, value)}
-                  style={{ width: "100%", marginBottom: 8 }}
-                >
-                  {statusOrder.map((s) => (
-                    <Select.Option key={s} value={s}>
-                      {s}
-                    </Select.Option>
-                  ))}
-                </Select>
+                  <Button
+                    type="text"
+                    danger
+                    onClick={() => confirmDelete(a._id)}
+                  >
+                    <DeleteOutlined />
+                  </Button>
+                </div>
 
                 <div className="appointment-date">
                   {moment(a.date).format("DD MMMM YYYY")}

@@ -98,6 +98,16 @@ const DoctorDashboard = () => {
       message.error("Failed to update status");
     }
   };
+  const confirmDelete = (appointmentId) => {
+    Modal.confirm({
+      centered: true,
+      title: "Are you sure you want to delete this Appointment?",
+      content: "This action cannot be undone.",
+      onOk() {
+        handleDelete(appointmentId);
+      },
+    });
+  };
   const handleDelete = async (appointmentId) => {
     try {
       await axios.delete(
@@ -371,7 +381,7 @@ const DoctorDashboard = () => {
                     danger
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDelete(a._id);
+                      confirmDelete(a._id);
                     }}
                   >
                     Delete
@@ -505,7 +515,7 @@ const DoctorDashboard = () => {
             block
             type="link"
             danger
-            onClick={() => handleDelete(selectedAppointment._id)}
+            onClick={() => confirmDelete(selectedAppointment._id)}
           >
             Delete
           </Button>

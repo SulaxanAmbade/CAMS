@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { message, Input, Radio, Spin, Card, Row, Col, Tag } from "antd";
+import {
+  message,
+  Input,
+  Radio,
+  DatePicker,
+  Spin,
+  Card,
+  Row,
+  Col,
+  Tag,
+} from "antd";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import { getFcmToken } from "../../firebase"; // 🔸 Import FCM logic
@@ -13,6 +23,7 @@ const PatientDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
+  const [dateRange, setDateRange] = useState(null);
 
   useEffect(() => {
     fetchAppointments();
@@ -58,9 +69,17 @@ const PatientDashboard = () => {
 
   const filteredAppointments = appointments
     .filter((a) => (filterStatus !== "All" ? a.status === filterStatus : true))
+
     .filter((a) => {
+      const inDateRange = dateRange
+        ? moment(a.date).format("YYYY-MM-DD") >=
+            dateRange[0].format("YYYY-MM-DD") &&
+          moment(a.date).format("YYYY-MM-DD") <=
+            dateRange[1].format("YYYY-MM-DD")
+        : true;
+
       const doctorName = a.doctorId?.name?.toLowerCase() || "";
-      return doctorName.includes(searchText.toLowerCase());
+      return inDateRange && doctorName.includes(searchText.toLowerCase());
     })
     .sort((a, b) => {
       const timeA = moment(`${a.date} ${a.time}`, "YYYY-MM-DD HH:mm");
@@ -101,6 +120,10 @@ const PatientDashboard = () => {
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
         />
+        <DatePicker.RangePicker
+          onChange={(dates) => setDateRange(dates)}
+          allowClear
+        />
         <Radio.Group
           className="radio-group"
           value={filterStatus}
@@ -124,7 +147,7 @@ const PatientDashboard = () => {
               <Card
                 hoverable
                 style={{
-                  background: `linear-gradient(135deg,#e3e1e1,${getCardColor(
+                  background: `linear-gradient(0deg,#000000,${getCardColor(
                     a.status
                   )})`,
                   border: isTomorrowConfirmed(a) ? "2px solid #ff0000" : "none",
@@ -143,7 +166,7 @@ const PatientDashboard = () => {
                   {moment(a.date).format("DD MMMM")}
                 </div>
                 <div>{moment(a.date).format("YYYY")}</div>
-                <div style={{ fontSize: "200%" }}>{a.time}</div>
+                <div style={{ fontSize: "200%" }}>{a.slotTime}</div>
                 <div>Dr.{a.doctorId?.name || "Deleted Doctor"}</div>
               </Card>
             </Col>

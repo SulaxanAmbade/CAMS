@@ -39,7 +39,6 @@ export const PatientManagement = () => {
         `${process.env.REACT_APP_BACKEND}/api/v1/appointment/getAppointmentsByPatientId/${patientId}`
       );
       setAppointments(res.data.data);
-      setIsAppointmentModalVisible(true);
     } catch (err) {
       notification.error({
         message: "No Appointments Found",
@@ -68,6 +67,7 @@ export const PatientManagement = () => {
 
   const handleAddPatient = async (values) => {
     try {
+      values.contactNo = `+91${values.contactNo}`;
       const response = await axios.post(
         `${process.env.REACT_APP_BACKEND}/api/v1/patient/addNewPatient`,
         values
@@ -91,6 +91,7 @@ export const PatientManagement = () => {
       setPatientData(
         patientData.filter((patient) => patient._id !== patientId)
       );
+      setIsAppointmentModalVisible(false);
       notification.success({ message: "Patient deleted successfully!" });
     } catch (error) {
       notification.error({
@@ -101,6 +102,7 @@ export const PatientManagement = () => {
 
   const confirmDeletePatient = (patientId) => {
     Modal.confirm({
+      centered: true,
       title: "Are you sure you want to delete this patient?",
       content: "This action cannot be undone.",
       onOk() {
@@ -124,19 +126,6 @@ export const PatientManagement = () => {
       key: "emergencyContact",
     },
     { title: "Gender", dataIndex: "gender", key: "gender" },
-    {
-      title: "Action",
-      key: "action",
-      render: (text, record) => (
-        <Button
-          type="link"
-          danger
-          onClick={() => confirmDeletePatient(record._id)}
-        >
-          Delete
-        </Button>
-      ),
-    },
   ];
 
   return (
@@ -167,6 +156,7 @@ export const PatientManagement = () => {
             onRow={(record) => ({
               onClick: () => {
                 setSelectedPatient(record);
+                setIsAppointmentModalVisible(true);
                 fetchAppointments(record._id);
               },
             })}
@@ -265,6 +255,7 @@ export const PatientManagement = () => {
             <h3>
               Appointment History: <br />
             </h3>
+
             <h4>{selectedPatient?.name}</h4>
             {loading ? (
               <Spinner />
@@ -287,6 +278,15 @@ export const PatientManagement = () => {
                 ))}
               </Row>
             )}
+            <Button
+              style={{ margin: "10px 0px" }}
+              type="link"
+              danger
+              block
+              onClick={() => confirmDeletePatient(selectedPatient._id)}
+            >
+              Delete Patient
+            </Button>
           </Modal>
         </>
       ) : (

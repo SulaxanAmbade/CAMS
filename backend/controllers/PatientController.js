@@ -1,6 +1,6 @@
 const newPatient = require("../models/Patient");
 const jwt = require("jsonwebtoken");
-
+const Appointment = require("../models/Appointment");
 const getAllPatient = async (req, res) => {
   try {
     const patients = await newPatient.find();
@@ -69,6 +69,7 @@ const updatePatient = async (req, res) => {
 const deletePatient = async (req, res) => {
   try {
     const deletedPatient = await newPatient.findByIdAndDelete(req.params.id);
+
     if (!deletedPatient) {
       return res
         .status(404)
@@ -77,6 +78,7 @@ const deletePatient = async (req, res) => {
     res
       .status(200)
       .json({ success: true, message: "Patient deleted successfully" });
+    await Appointment.deleteMany({ patientId: req.params.id });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
