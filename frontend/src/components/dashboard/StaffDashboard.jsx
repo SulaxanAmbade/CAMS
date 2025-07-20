@@ -568,6 +568,13 @@ const StaffDashboard = () => {
                   </Select>
                 </td>
                 <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                  <Button
+                    type="text"
+                    danger
+                    onClick={() => confirmDelete(a._id)}
+                  >
+                    <DeleteOutlined />
+                  </Button>
                   {isTomorrowConfirmed(a) && (
                     <Button
                       type="link"
