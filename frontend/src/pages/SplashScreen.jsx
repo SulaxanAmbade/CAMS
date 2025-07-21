@@ -7,6 +7,13 @@ const SplashScreen = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    // If user is already logged in, prevent splash screen
+    if (token) {
+      navigate("/", { replace: true }); // or redirect to /dashboard if needed
+      return;
+    }
     const timeout = setTimeout(() => {
       navigate("/", { replace: true }); // Navigate to homepage after 2s
     }, 5000);
