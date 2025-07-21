@@ -289,7 +289,7 @@ const DoctorDashboard = () => {
         <Spinner />
       ) : viewMode === "card" ? (
         <Row gutter={[16, 16]}>
-          {filteredAppointments.map((a) => (
+          {filteredAppointments?.map((a) => (
             <Col xs={24} sm={12} md={8} lg={6} key={a._id}>
               <Card
                 hoverable
@@ -409,7 +409,7 @@ const DoctorDashboard = () => {
           onChange={setSelectedPatient}
           style={{ width: "100%", marginBottom: 16 }}
         >
-          {patients.map((patient) => (
+          {patients?.map((patient) => (
             <Option key={patient._id} value={patient._id}>
               {patient.name}
             </Option>
