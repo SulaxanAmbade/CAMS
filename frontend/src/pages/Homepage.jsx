@@ -7,6 +7,7 @@ import {
   ScheduleOutlined,
   TeamOutlined,
   UsergroupAddOutlined,
+  CopyrightOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import StaffDashboard from "../components/dashboard/StaffDashboard";
@@ -16,8 +17,8 @@ import Profile from "../components/profile/Profile";
 import { setUser } from "../redux/features/userSlice";
 import "../css/homepage.css";
 import logo from "../assets/logoRs.svg";
-
-const { Header, Content } = Layout;
+import kjLogo from "../assets/kjsieit-logowhite.svg";
+const { Header, Content, Footer } = Layout;
 
 const HomePage = () => {
   const dispatch = useDispatch();
@@ -89,7 +90,22 @@ const HomePage = () => {
         </Space>
       </Header>
 
-      <Content style={{ padding: 8 }}>{renderDashboard()}</Content>
+      <Content style={{ minHeight: "100vh", padding: 8 }}>
+        {renderDashboard()}
+      </Content>
+      <Footer className="footerSection">
+        <div className="footerDiv">
+          <img src={kjLogo} alt="" />
+        </div>
+        <div style={{ textAlign: "center" }} className="footerDiv">
+          <CopyrightOutlined /> <b>Developed with Care</b> <hr />
+          Project Guide : Dr. Sheetal Jagtap <br /> Om Bankar & Sulaxan Ambade
+        </div>
+        <div style={{ textAlign: "end" }} className="footerDiv">
+          Department of Artificial Intelligence and Data Science <br /> K.J.
+          Somaiya Institute of Technology, Sion
+        </div>
+      </Footer>
     </Layout>
   );
 };

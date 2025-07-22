@@ -5,6 +5,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { showLoading, hideLoading } from "../redux/features/alertSlice";
 import "../css/register.css";
+import logo from "../assets/logoRs.svg";
 //https://cams-qgq9.onrender.com
 const Login = () => {
   const navigate = useNavigate();
@@ -112,8 +113,28 @@ const Login = () => {
 
   return (
     <div className="formContainer">
+      <img
+        src={logo}
+        style={{
+          position: "fixed",
+          top: "10px",
+          left: "10px",
+          boxShadow: "1px 1px 4px black, 0px 1px 4px white",
+          borderRadius: "50%",
+        }}
+        className="logo"
+        alt="logo"
+      />
       <Card className="loginCard">
-        <h6 style={{ color: "white" }}>Dr. Rahul Patil's</h6>
+        <h3
+          style={{
+            color: "#014f05",
+            fontWeight: "bold",
+            textShadow: "2px 2px 6px white,-2px 1px 8px black",
+          }}
+        >
+          Dr. Rahul Patil's
+        </h3>
         <h1 style={{ color: "#423328", fontWeight: "bold" }}>
           Dhanvantari Ayurveda
         </h1>
