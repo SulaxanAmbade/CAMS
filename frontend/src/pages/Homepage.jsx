@@ -1,6 +1,20 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Layout, Menu, Avatar, Dropdown, Space, Typography } from "antd";
+import axios from "axios";
+import { message } from "antd";
+import {
+  Layout,
+  Menu,
+  Avatar,
+  Dropdown,
+  Form,
+  Select,
+  Space,
+  Typography,
+  Input,
+  Modal,
+  Button,
+} from "antd";
 import {
   UserOutlined,
   LogoutOutlined,
@@ -21,11 +35,30 @@ import kjLogo from "../assets/kjsieit-logowhite.svg";
 const { Header, Content, Footer } = Layout;
 
 const HomePage = () => {
+  const { Option } = Select;
+  const [form] = Form.useForm();
+  // Modal and doctor form state
+  const [isDoctorModalVisible, setIsDoctorModalVisible] = useState(false);
+  const [doctorForm] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.user);
   const [view, setView] = useState("appointments");
-
+  const handleAddDoctor = async (values) => {
+    try {
+      values.contactNo = `+91${values.contactNo}`;
+      const response = await axios.post("/api/v1/doctor/addNewDoctor", values);
+      if (response.data.success) {
+        message.success("Doctor added successfully!");
+        setIsDoctorModalVisible(false);
+        doctorForm.resetFields();
+      } else {
+        message.error(response.data.message || "Failed to add doctor");
+      }
+    } catch (error) {
+      message.error("Error adding doctor");
+    }
+  };
   const menuItems = [
     {
       key: "appointments",
@@ -47,6 +80,11 @@ const HomePage = () => {
         key: "staff",
         icon: <UsergroupAddOutlined />,
         label: "Staff",
+      },
+      {
+        key: "register",
+        icon: <UsergroupAddOutlined />,
+        label: "Add A Doctor",
       }
     );
   }
@@ -79,6 +117,7 @@ const HomePage = () => {
           onClick={(e) => {
             if (e.key === "patients") navigate("/manage-patients");
             else if (e.key === "staff") navigate("/manage-staff");
+            else if (e.key === "register") setIsDoctorModalVisible(true);
             else setView(e.key);
           }}
           items={menuItems}
@@ -94,18 +133,79 @@ const HomePage = () => {
         {renderDashboard()}
       </Content>
       <Footer className="footerSection">
-        <div className="footerDiv">
-          <img src={kjLogo} alt="" />
+        <div className="footerLogoDiv">
+          <img className="footerLogo" src={kjLogo} alt="" />
         </div>
-        <div style={{ textAlign: "center" }} className="footerDiv">
+        <div className="team">
           <CopyrightOutlined /> <b>Developed with Care</b> <hr />
           Project Guide : Dr. Sheetal Jagtap <br /> Om Bankar & Sulaxan Ambade
         </div>
-        <div style={{ textAlign: "end" }} className="footerDiv">
+        <div className="college">
           Department of Artificial Intelligence and Data Science <br /> K.J.
           Somaiya Institute of Technology, Sion
         </div>
       </Footer>
+      <Modal
+        open={isDoctorModalVisible}
+        onCancel={() => setIsDoctorModalVisible(false)}
+        footer={null}
+      >
+        <h3>Add New Doctor</h3>
+        <Form form={doctorForm} onFinish={handleAddDoctor}>
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[
+              { required: true, message: "Please input the doctor's name!" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[
+              {
+                required: true,
+                message: "Please input the doctor's password!",
+              },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item
+            label="Specialization"
+            name="specialization"
+            rules={[
+              { required: true, message: "Please input the specialization!" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Contact"
+            name="contactNo"
+            rules={[
+              { required: true, message: "Please input the contact number!" },
+              {
+                pattern: /^\d{10}$/,
+                message: "Invalid phone number format!",
+              },
+            ]}
+          >
+            <Input addonBefore="+91" />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              Add Doctor
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </Layout>
   );
 };

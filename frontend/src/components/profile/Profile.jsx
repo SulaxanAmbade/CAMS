@@ -93,9 +93,6 @@ const Profile = () => {
                 <Descriptions.Item label="Specialization">
                   {user?.specialization}
                 </Descriptions.Item>
-                <Descriptions.Item label="Visiting Hours">
-                  {user?.visitingHours?.start} - {user?.visitingHours?.end}
-                </Descriptions.Item>
               </>
             )}
           </Descriptions>

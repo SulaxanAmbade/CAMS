@@ -7,7 +7,6 @@ import PublicRoutes from "./components/requirements/PublicRoutes";
 import ProtectedLayout from "./components/requirements/ProtectedLayout";
 import Homepage from "./pages/Homepage";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import StaffManagement from "./components/functions/StaffManagement";
 import PatientManagement from "./components/functions/PatientManagement";
 import Profile from "./components/profile/Profile";
@@ -27,14 +26,6 @@ function App() {
             element={
               <PublicRoutes>
                 <Login />
-              </PublicRoutes>
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              <PublicRoutes>
-                <Register />
               </PublicRoutes>
             }
           />

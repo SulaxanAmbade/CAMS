@@ -19,9 +19,11 @@ import axios from "axios";
 export const StaffManagement = () => {
   const { user } = useSelector((state) => state.user);
   const [staffData, setStaffData] = useState([]);
+  const [doctorData, setDoctorData] = useState([]);
   const [isStaffModalVisible, setIsStaffModalVisible] = useState(false);
   const [staffForm] = Form.useForm();
   const [selectedStaff, setSelectedStaff] = useState(null);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
   const navigate = useNavigate();
   const { Option } = Select;
 
@@ -42,6 +44,28 @@ export const StaffManagement = () => {
       ),
     },
   ];
+  const columnsDoctor = [
+    { title: "Name", dataIndex: "name", key: "name" },
+    { title: "Contact", dataIndex: "contactNo", key: "contactNo" },
+    {
+      title: "Specialization",
+      dataIndex: "specialization",
+      key: "Specialization",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (text, record) => (
+        <Button
+          type="link"
+          danger
+          onClick={() => confirmDeleteDoctor(record._id)}
+        >
+          Delete
+        </Button>
+      ),
+    },
+  ];
 
   const fetchStaff = async () => {
     try {
@@ -51,12 +75,24 @@ export const StaffManagement = () => {
       setStaffData(res.data.data);
     } catch (error) {
       notification.error({
+        message: "Failed to fetch staff",
+        description: error.response?.data?.message || error.message,
+      });
+    }
+  };
+  const fetchDoctors = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_BACKEND}/api/v1/doctor/getAllDoctors`
+      );
+      setDoctorData(res.data.data);
+    } catch (error) {
+      notification.error({
         message: "Failed to fetch doctors",
         description: error.response?.data?.message || error.message,
       });
     }
   };
-
   const handleAddStaff = async (values) => {
     try {
       values.contactNo = `+91${values.contactNo}`;
@@ -100,9 +136,42 @@ export const StaffManagement = () => {
       },
     });
   };
+  const handleDeleteDoctor = async (doctorId) => {
+    const doctorToDelete = doctorData.find((doc) => doc._id === doctorId);
+    if (doctorToDelete?.contactNo === "+919921118724") {
+      notification.error({
+        message: "Protected Doctor",
+        description: "You cannot delete this doctor.",
+      });
+      return;
+    }
 
+    try {
+      await axios.delete(
+        `${process.env.REACT_APP_BACKEND}/api/v1/doctor/deleteDoctor/${doctorId}`
+      );
+      setDoctorData(doctorData.filter((doctor) => doctor._id !== doctorId));
+      notification.success({ message: "Doctor deleted successfully!" });
+    } catch (error) {
+      notification.error({
+        message: "Failed to delete Doctor",
+        description: error.response?.data?.message || error.message,
+      });
+    }
+  };
+
+  const confirmDeleteDoctor = (doctorId) => {
+    Modal.confirm({
+      title: "Are you sure you want to delete this doctor?",
+      content: "This action cannot be undone.",
+      onOk() {
+        handleDeleteDoctor(doctorId);
+      },
+    });
+  };
   useEffect(() => {
     fetchStaff();
+    fetchDoctors();
   }, []);
 
   return (
@@ -136,7 +205,19 @@ export const StaffManagement = () => {
               },
             })}
           />
-
+          {user?.role === "doctor" && user?.contactNo === "+919921118724" ? (
+            <Table
+              dataSource={doctorData}
+              columns={columnsDoctor}
+              rowKey="_id"
+              pagination={false}
+              onRow={(record) => ({
+                onClick: () => {
+                  setSelectedDoctor(record);
+                },
+              })}
+            />
+          ) : null}
           <Modal
             open={isStaffModalVisible}
             onCancel={() => setIsStaffModalVisible(false)}
