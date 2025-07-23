@@ -29,6 +29,7 @@ const Profile = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.clear();
     sessionStorage.removeItem("splashSeen");
     dispatch(setUser(null));
     navigate("/login");

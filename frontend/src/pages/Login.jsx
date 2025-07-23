@@ -36,7 +36,6 @@ const Login = () => {
   // Staff Login Handler
   const onSubmitStaffLogin = async (values) => {
     try {
-      dispatch(showLoading());
       values.contactNo = `+91${values.contactNo}`;
       const response = await axios.post(
         `${process.env.REACT_APP_BACKEND}/api/v1/staff/login`,
@@ -52,15 +51,12 @@ const Login = () => {
       }
     } catch (error) {
       message.error(error.response?.data?.message || "Something went wrong.");
-    } finally {
-      dispatch(hideLoading());
     }
   };
 
   // Doctor Login Handler
   const onSubmitDoctorLogin = async (values) => {
     try {
-      dispatch(showLoading());
       values.contactNo = `+91${values.contactNo}`;
       const response = await axios.post(
         `${process.env.REACT_APP_BACKEND}/api/v1/doctor/login`,
@@ -75,15 +71,12 @@ const Login = () => {
       }
     } catch (error) {
       message.error(error.response?.data?.message || "An error occurred.");
-    } finally {
-      dispatch(hideLoading());
     }
   };
 
   // Patient Login Handler
   const onSubmitPatientLogin = async (values) => {
     try {
-      dispatch(showLoading());
       values.contactNo = `+91${values.contactNo}`;
       const response = await axios.post(
         `${process.env.REACT_APP_BACKEND}/api/v1/patient/login`,
@@ -98,8 +91,6 @@ const Login = () => {
       }
     } catch (error) {
       message.error(error.response?.data?.message || "An error occurred.");
-    } finally {
-      dispatch(hideLoading());
     }
   };
 
