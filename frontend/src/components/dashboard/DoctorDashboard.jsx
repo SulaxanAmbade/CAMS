@@ -411,7 +411,7 @@ const DoctorDashboard = () => {
         >
           {patients?.map((patient) => (
             <Option key={patient._id} value={patient._id}>
-              {patient.name}
+              {patient.name} ({patient.place})
             </Option>
           ))}
         </Select>
@@ -440,6 +440,7 @@ const DoctorDashboard = () => {
             "13:30 – 14:30",
             "14:30 – 15:30",
             "15:30 – 16:30",
+            "16:30 – 17:30",
           ].map((slot) => (
             <Option key={slot} value={slot}>
               {slot}
@@ -474,9 +475,10 @@ const DoctorDashboard = () => {
           }}
         >
           <p>
-            <b>Patient Name:</b>{" "}
-            {selectedAppointment?.patientId?.name || "Unknown"}
+            <b>Patient:</b> {selectedAppointment?.patientId?.name || "Unknown"} ({selectedAppointment?.patientId?.place})
+            
           </p>
+
           <p>
             <b>Date:</b>{" "}
             {moment(selectedAppointment?.date).format("DD/MM/YYYY")}

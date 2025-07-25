@@ -19,7 +19,7 @@ const PatientSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    emergencyContact: {
+    place: {
       type: String,
       required: true,
     },

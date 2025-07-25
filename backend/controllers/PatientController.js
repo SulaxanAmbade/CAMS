@@ -17,17 +17,24 @@ const getAllPatient = async (req, res) => {
 
 const addNewPatient = async (req, res) => {
   try {
-    const { contactNo } = req.body;
-    const existingPatient = await newPatient.findOne({ contactNo });
+    const { name, dateOfBirth, place } = req.body;
+
+    const existingPatient = await newPatient.findOne({
+      name,
+      dateOfBirth,
+      place,
+    });
+
     if (existingPatient) {
       return res.status(400).json({
         success: false,
-        message: "Patient with this contact already exists.",
+        message: "Patient with this name, date of birth, and place already exists.",
       });
     }
 
     const newPatientData = new newPatient(req.body);
     const savedPatient = await newPatientData.save();
+
     res.status(201).json({ success: true, data: savedPatient });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -85,16 +92,17 @@ const deletePatient = async (req, res) => {
 };
 
 const patientLogin = async (req, res) => {
-  const { contactNo } = req.body;
+  const { name, dateOfBirth, place } = req.body;
 
-  if (!contactNo) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Phone number is required" });
+  if (!name || !dateOfBirth || !place) {
+    return res.status(400).json({
+      success: false,
+      message: "Name, date of birth, and place are required",
+    });
   }
 
   try {
-    const patient = await newPatient.findOne({ contactNo });
+    const patient = await newPatient.findOne({ name, dateOfBirth, place });
 
     if (!patient) {
       return res
@@ -103,7 +111,7 @@ const patientLogin = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: patient._id, contactNo: patient.contactNo, role: "patient" },
+      { id: patient._id, name: patient.name, role: "patient" },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -119,6 +127,7 @@ const patientLogin = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 const saveFcmToken = async (req, res) => {
   try {

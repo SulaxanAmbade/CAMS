@@ -119,13 +119,13 @@ export const PatientManagement = () => {
       key: "dateOfBirth",
       render: (text) => new Date(text).toLocaleDateString("en-GB"),
     },
-    { title: "Contact No", dataIndex: "contactNo", key: "contactNo" },
-    {
-      title: "Emergency Contact",
-      dataIndex: "emergencyContact",
-      key: "emergencyContact",
-    },
     { title: "Gender", dataIndex: "gender", key: "gender" },
+    {
+      title: "Place",
+      dataIndex: "place",
+      key: "place",
+    },
+    { title: "Contact No", dataIndex: "contactNo", key: "contactNo" },
   ];
 
   return (
@@ -210,6 +210,18 @@ export const PatientManagement = () => {
                 </Select>
               </Form.Item>
               <Form.Item
+                label="Place"
+                name="place"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input Place !",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item
                 label="Contact No"
                 name="contactNo"
                 rules={[
@@ -222,19 +234,7 @@ export const PatientManagement = () => {
               >
                 <Input addonBefore="+91" maxLength={10} />
               </Form.Item>
-              <Form.Item
-                label="Emergency Contact"
-                name="emergencyContact"
-                rules={[
-                  {
-                    pattern: /^\d{10}$/,
-                    required: true,
-                    message: "Please input valid emergency contact!",
-                  },
-                ]}
-              >
-                <Input addonBefore="+91" maxLength={10} />
-              </Form.Item>
+
               <Form.Item label="Medical History" name="medicalHistory">
                 <Input.TextArea rows={4} />
               </Form.Item>

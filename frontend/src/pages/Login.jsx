@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Form, Input, Modal, Table, message } from "antd";
+import {
+  Button,
+  Card,
+  DatePicker,
+  Form,
+  Input,
+  Modal,
+  Table,
+  message,
+} from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
@@ -77,7 +86,6 @@ const Login = () => {
   // Patient Login Handler
   const onSubmitPatientLogin = async (values) => {
     try {
-      values.contactNo = `+91${values.contactNo}`;
       const response = await axios.post(
         `${process.env.REACT_APP_BACKEND}/api/v1/patient/login`,
         values
@@ -266,17 +274,38 @@ const Login = () => {
         <Form layout="vertical" onFinish={onSubmitPatientLogin}>
           <h3 style={{ textAlign: "center" }}>Patient Login</h3>
           <Form.Item
-            label="Phone Number"
-            name="contactNo"
+            label="Name"
+            name="name"
             rules={[
               { required: true, message: "Please input your phone number!" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Place"
+            name="place"
+            rules={[
               {
-                pattern: /^\d{10}$/,
-                message: "Invalid phone number format!",
+                required: true,
+                message: "Please input Place !",
               },
             ]}
           >
-            <Input addonBefore="+91" maxLength={10} placeholder="XXXXXXXXXX" />
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Date of Birth"
+            name="dateOfBirth"
+            rules={[
+              {
+                required: true,
+                message: "Please input the date of birth!",
+              },
+            ]}
+          >
+            <DatePicker format={"DD/MM/YYYY"} style={{ width: "100%" }} />
           </Form.Item>
           <Form.Item>
             <Button

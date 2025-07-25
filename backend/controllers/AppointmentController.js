@@ -78,7 +78,7 @@ module.exports = { createAppointment };
 const getAllAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find()
-      .populate({ path: "patientId", select: "name" })
+      .populate({ path: "patientId", select: "name place" })
       .populate({ path: "doctorId", select: "name" });
     res.status(200).json({
       success: true,
@@ -94,7 +94,7 @@ const getAllAppointments = async (req, res) => {
 const getDoctorAppointment = async (req, res) => {
   try {
     const appointments = await Appointment.find({ doctorId: req.body.userID })
-      .populate({ path: "patientId", select: "name" })
+      .populate({ path: "patientId", select: "name place" })
       .populate({ path: "doctorId", select: "name" });
 
     // Check if appointments are empty
@@ -123,7 +123,7 @@ const getDoctorAppointment = async (req, res) => {
 const getPatientAppointment = async (req, res) => {
   try {
     const appointments = await Appointment.find({ patientId: req.body.userID })
-      .populate({ path: "patientId", select: "name" })
+      .populate({ path: "patientId", select: "name place" })
       .populate({ path: "doctorId", select: "name" });
 
     // Check if appointments are empty

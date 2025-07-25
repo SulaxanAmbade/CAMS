@@ -121,7 +121,7 @@ const AppointmentForm = ({
       >
         {patients?.map((patient) => (
           <Option key={patient._id} value={patient._id}>
-            {patient.name}
+            {patient.name}({patient.place})
           </Option>
         ))}
       </Select>
@@ -168,6 +168,7 @@ const AppointmentForm = ({
           "13:30 – 14:30",
           "14:30 – 15:30",
           "15:30 – 16:30",
+          "16:30 – 17:30",
         ].map((slot) => (
           <Option key={slot} value={slot}>
             {slot}
@@ -472,9 +473,11 @@ const StaffDashboard = () => {
                                 res.data.message || "Failed to send reminder.",
                             });
                           }
-                        } catch {
+                        } catch (error) {
                           notification.error({
-                            message: "Error sending reminder.",
+                            message: error.message,
+                            description:
+                              "Patient is NOT logged in to Any Browser",
                           });
                         }
                       }}
@@ -510,7 +513,8 @@ const StaffDashboard = () => {
                 </div>
                 <div className="appointment-time">{a.slotTime}</div>
                 <div className="appointment-info">
-                  {a.patientId?.name || "Deleted Patient"}
+                  {a.patientId?.name || "Deleted Patient"} ({a.patientId?.place}
+                  )
                 </div>
               </Card>
             </Col>
