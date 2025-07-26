@@ -49,36 +49,6 @@ function App() {
               </ProtectedRoutes>
             }
           />
-          <Route
-            path="/manage-patients"
-            element={
-              <ProtectedRoutes>
-                <ProtectedLayout>
-                  <PatientManagement />
-                </ProtectedLayout>
-              </ProtectedRoutes>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoutes>
-                <ProtectedLayout>
-                  <Profile />
-                </ProtectedLayout>
-              </ProtectedRoutes>
-            }
-          />
-          <Route
-            path="/manage-staff"
-            element={
-              <ProtectedRoutes>
-                <ProtectedLayout>
-                  <StaffManagement />
-                </ProtectedLayout>
-              </ProtectedRoutes>
-            }
-          />
         </Routes>
       )}
     </BrowserRouter>

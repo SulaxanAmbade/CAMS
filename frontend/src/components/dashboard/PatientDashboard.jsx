@@ -167,7 +167,7 @@ const PatientDashboard = () => {
                 </div>
                 <div>{moment(a.date).format("YYYY")}</div>
                 <div style={{ fontSize: "200%" }}>{a.slotTime}</div>
-                <div>Dr.{a.doctorId?.name || "Deleted Doctor"}</div>
+                <div>{a.doctorId?.name}</div>
               </Card>
             </Col>
           ))}

@@ -32,6 +32,8 @@ import { setUser } from "../redux/features/userSlice";
 import "../css/homepage.css";
 import logo from "../assets/logoRs.svg";
 import kjLogo from "../assets/kjsieit-logowhite.svg";
+import PatientManagement from "../components/functions/PatientManagement";
+import StaffManagement from "../components/functions/StaffManagement";
 const { Header, Content, Footer } = Layout;
 
 const HomePage = () => {
@@ -46,6 +48,7 @@ const HomePage = () => {
   const [view, setView] = useState("appointments");
   const handleAddDoctor = async (values) => {
     try {
+      values.name = `Dr. ${values.name}`;
       values.contactNo = `+91${values.contactNo}`;
       const response = await axios.post("/api/v1/doctor/addNewDoctor", values);
       if (response.data.success) {
@@ -80,11 +83,6 @@ const HomePage = () => {
         key: "staff",
         icon: <UsergroupAddOutlined />,
         label: "Staff",
-      },
-      {
-        key: "register",
-        icon: <UsergroupAddOutlined />,
-        label: "Add A Doctor",
       }
     );
   }
@@ -95,9 +93,18 @@ const HomePage = () => {
       label: "Patients",
     });
   }
+  if (user?.role === "doctor" && user?.contactNo === "+919921118724") {
+    menuItems.splice(1, 0, {
+      key: "register",
+      icon: <UsergroupAddOutlined />,
+      label: "Add A Doctor",
+    });
+  }
 
   const renderDashboard = () => {
     if (view === "profile") return <Profile />;
+    if (view === "patients") return <PatientManagement />;
+    if (view === "staff") return <StaffManagement />;
     if (user?.role === "staff") return <StaffDashboard />;
     if (user?.role === "doctor") return <DoctorDashboard />;
     if (user?.role === "patient") return <PatientDashboard />;
@@ -113,11 +120,9 @@ const HomePage = () => {
         <Menu
           theme="dark"
           mode="horizontal"
-          selectedKeys="appointments"
+          selectedKeys="none"
           onClick={(e) => {
-            if (e.key === "patients") navigate("/manage-patients");
-            else if (e.key === "staff") navigate("/manage-staff");
-            else if (e.key === "register") setIsDoctorModalVisible(true);
+            if (e.key === "register") setIsDoctorModalVisible(true);
             else setView(e.key);
           }}
           items={menuItems}
@@ -159,7 +164,7 @@ const HomePage = () => {
               { required: true, message: "Please input the doctor's name!" },
             ]}
           >
-            <Input />
+            <Input addonBefore="Dr." />
           </Form.Item>
 
           <Form.Item

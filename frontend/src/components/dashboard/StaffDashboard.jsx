@@ -145,6 +145,7 @@ const AppointmentForm = ({
 
       <DatePicker
         placeholder="Select Date"
+        format={"DD MMMM YYYY"}
         onChange={(date) => {
           setSelectedDate(date);
           setSelectedTime(null);
@@ -363,6 +364,7 @@ const StaffDashboard = () => {
         />
         <DatePicker.RangePicker
           onChange={(dates) => setDateRange(dates)}
+          format={"DD MMMM YYYY"}
           allowClear
         />
 
@@ -513,8 +515,7 @@ const StaffDashboard = () => {
                 </div>
                 <div className="appointment-time">{a.slotTime}</div>
                 <div className="appointment-info">
-                  {a.patientId?.name || "Deleted Patient"} ({a.patientId?.place}
-                  )
+                  {a.patientId?.name} ({a.patientId?.place})
                 </div>
               </Card>
             </Col>
@@ -549,7 +550,7 @@ const StaffDashboard = () => {
                   {a.slotTime}
                 </td>
                 <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                  {a.patientId?.name || "Unknown"}
+                  {a.patientId?.name} ({a.patientId?.place})
                 </td>
 
                 <td

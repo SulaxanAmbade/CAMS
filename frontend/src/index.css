@@ -68,6 +68,11 @@
     box-shadow: none !important;
 }
 
+:where(.css-dev-only-do-not-override-qnu6hi).ant-menu-dark.ant-menu-horizontal>.ant-menu-submenu-selected,
+:where(.css-dev-only-do-not-override-qnu6hi).ant-menu-dark.ant-menu-vertical>.ant-menu-submenu-selected {
+    background-color: #C49B59;
+}
+
 .ant-table,
 .ant-table-cell {
     background: none !important;

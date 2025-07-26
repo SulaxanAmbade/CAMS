@@ -27,6 +27,7 @@
 .dashboard-controls input {
   width: 220px;
   max-width: 100%;
+  color: white;
 }
 
 .radio-group .ant-radio-button-wrapper {

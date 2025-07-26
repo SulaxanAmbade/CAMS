@@ -117,7 +117,12 @@ export const PatientManagement = () => {
       title: "Date of Birth",
       dataIndex: "dateOfBirth",
       key: "dateOfBirth",
-      render: (text) => new Date(text).toLocaleDateString("en-GB"),
+      render: (text) =>
+        new Date(text).toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        }),
     },
     { title: "Gender", dataIndex: "gender", key: "gender" },
     {
@@ -132,21 +137,13 @@ export const PatientManagement = () => {
     <>
       {(user?.role === "staff") | (user?.role === "doctor") ? (
         <>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <Button
-              style={{ background: "#3E2B20", color: "white" }}
-              size="large"
-              onClick={() => navigate("/")}
-            >
-              <ArrowLeftOutlined />
-            </Button>
-            <Button
-              style={{ background: "#3E2B20", color: "white" }}
-              onClick={() => setIsPatientModalVisible(true)}
-            >
-              Add New Patient
-            </Button>
-          </div>
+          <Button
+            size="large"
+            style={{ background: "#2C1D13", color: "white" }}
+            onClick={() => setIsPatientModalVisible(true)}
+          >
+            Add New Patient
+          </Button>
 
           <Table
             dataSource={patientData}

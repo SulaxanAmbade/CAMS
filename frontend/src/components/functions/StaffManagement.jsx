@@ -27,25 +27,29 @@ export const StaffManagement = () => {
   const navigate = useNavigate();
   const { Option } = Select;
 
-  const columns = [
-    { title: "Name", dataIndex: "name", key: "name" },
+  const baseColumns = [
+    { title: "Staff", dataIndex: "name", key: "name" },
     { title: "Contact", dataIndex: "contactNo", key: "contactNo" },
-    {
-      title: "Action",
-      key: "action",
-      render: (text, record) => (
-        <Button
-          type="link"
-          danger
-          onClick={() => confirmDeleteStaff(record._id)}
-        >
-          Delete
-        </Button>
-      ),
-    },
   ];
+
+  const actionColumn = {
+    title: "Action",
+    key: "action",
+    render: (text, record) => (
+      <Button type="link" danger onClick={() => confirmDeleteStaff(record._id)}>
+        Delete
+      </Button>
+    ),
+  };
+
+  const columns = [...baseColumns];
+
+  if (user?.contactNo === "+919921118724") {
+    columns.push(actionColumn);
+  }
+
   const columnsDoctor = [
-    { title: "Name", dataIndex: "name", key: "name" },
+    { title: "Doctor", dataIndex: "name", key: "name" },
     { title: "Contact", dataIndex: "contactNo", key: "contactNo" },
     {
       title: "Specialization",
@@ -178,21 +182,15 @@ export const StaffManagement = () => {
     <>
       {user?.role === "doctor" ? (
         <>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+          {user?.contactNo === "+919921118724" ? (
             <Button
-              style={{ background: "#3E2B20", color: "white" }}
               size="large"
-              onClick={() => navigate("/")}
-            >
-              <ArrowLeftOutlined />
-            </Button>
-            <Button
-              style={{ background: "#3E2B20", color: "white" }}
+              style={{ background: "#2C1D13", color: "white" }}
               onClick={() => setIsStaffModalVisible(true)}
             >
               Add New Staff
             </Button>
-          </div>
+          ) : null}
 
           <Table
             dataSource={staffData}
@@ -205,7 +203,7 @@ export const StaffManagement = () => {
               },
             })}
           />
-          {user?.role === "doctor" && user?.contactNo === "+919921118724" ? (
+          {user?.contactNo === "+919921118724" ? (
             <Table
               dataSource={doctorData}
               columns={columnsDoctor}
